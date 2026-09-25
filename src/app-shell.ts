@@ -1,4 +1,8 @@
-export function mountAppShell(root: HTMLElement): void {
+import { createAccountStore } from './accounts/account-store';
+import { mountAccountManager, type LoginHandler } from './accounts/account-ui';
+import { LASTRO_SERVER_PROFILES } from './servers/server-profiles';
+
+export function mountAppShell(root: HTMLElement, onLogin?: LoginHandler): void {
   const header = document.createElement('header');
   header.className = 'app-header';
   const icon = document.createElement('img');
@@ -33,4 +37,6 @@ export function mountAppShell(root: HTMLElement): void {
   game.setAttribute('aria-label', '游戏');
   main.append(controls, game);
   root.replaceChildren(header, main);
+  mountAccountManager({ root: controls, profiles: LASTRO_SERVER_PROFILES, store: createAccountStore(),
+    onLogin: onLogin ?? (() => { status.textContent = '客户端尚未就绪'; throw new Error('Client not initialized'); }) });
 }
