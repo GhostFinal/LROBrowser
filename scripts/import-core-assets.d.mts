@@ -1,0 +1,1 @@
+export function importCoreAssets(options: { clientRoot: string; roSourceRoot: string; runtimePath?: string; output?: string }): Promise<{ files: Array<{ path: string; bytes: number; sha256: string; kind: string }> }>;

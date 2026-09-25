@@ -8,6 +8,15 @@ function packageRuntime(): Plugin {
     generateBundle() {
       const runtime = path.resolve('.staging/runtime/Online.js');
       if (existsSync(runtime)) this.emitFile({ type: 'asset', fileName: 'runtime/Online.js', source: readFileSync(runtime) });
+      const manifestPath = path.resolve('.staging/core/executable-assets.json');
+      if (!existsSync(manifestPath)) return;
+      const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as { files: Array<{ path: string }> };
+      for (const file of manifest.files) {
+        const source = path.resolve('.staging/core', file.path);
+        if (!existsSync(source)) throw new Error(`Missing core asset: ${file.path}`);
+        this.emitFile({ type: 'asset', fileName: `core/${file.path}`, source: readFileSync(source) });
+      }
+      this.emitFile({ type: 'asset', fileName: 'core/executable-assets.json', source: readFileSync(manifestPath) });
     },
   };
 }
