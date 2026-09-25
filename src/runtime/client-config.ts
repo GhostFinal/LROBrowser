@@ -21,6 +21,15 @@ export interface V2ClientConfig {
   readonly systemRoot: 'core/System/';
   readonly customWasmUri: 'core/wasm/liblua5.1.wasm';
   readonly resourceProfileId: 'lastro-public';
+  readonly remoteClient: string;
+  readonly resourcePathCharset: string;
+  readonly lastroDataCharset: string;
+  readonly statusDescriptionCharset: string;
+  readonly networkCharset: string;
+  readonly loadLua: true;
+  readonly skipServerList: true;
+  readonly enableCashShop: true;
+  readonly customItemInfo: readonly string[];
 }
 
 export function buildClientConfig(profile: AvailableServerProfile, credentials: ClientCredentials): V2ClientConfig {
@@ -49,5 +58,9 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
     systemRoot: 'core/System/',
     customWasmUri: 'core/wasm/liblua5.1.wasm',
     resourceProfileId: available.resourceProfileId,
+    remoteClient: 'https://game.lastro.cn/ro/client_re/',
+    resourcePathCharset: 'gbk', lastroDataCharset: 'gbk', statusDescriptionCharset: 'big5', networkCharset: 'gbk',
+    loadLua: true, skipServerList: true, enableCashShop: true,
+    customItemInfo: Object.freeze(['System/itemInfo_re_59.lua', 'System/itemInfo_re_61.lua']),
   });
 }

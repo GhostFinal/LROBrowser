@@ -10,6 +10,7 @@ if (!profile || profile.availability !== 'available') throw new Error('missing f
 describe('V2 runtime patch', () => {
   it('replaces the factory and removes legacy initialization regions', () => {
     const fixture = [
+      '/** Earlier runtime documentation */\nconst retainedRuntime = 1;',
       '//#region src/Network/SocketHelpers/WebSocket.js\nfunction Socket$1() {}\n//#endregion',
       '//#region src/Network/SocketHelpers/NodeSocket.js\nvar Socket;\n//#endregion',
       'function defaultSocketFactory(host, port) { return new Socket(host, port); }',
@@ -18,6 +19,7 @@ describe('V2 runtime patch', () => {
     ].join('\n');
     const patched = patchV2Runtime(fixture);
     expect(patched).toContain('globalThis.LastRODirectSocketFactory(host, port)');
+    expect(patched).toContain('const retainedRuntime = 1;');
     expect(patched).not.toMatch(/WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i);
   });
 

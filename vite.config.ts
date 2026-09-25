@@ -31,6 +31,7 @@ export default defineConfig({
   server: {
     hmr: false,
     headers: {
+      'Content-Security-Policy': "script-src 'self' 'wasm-unsafe-eval'",
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Resource-Policy': 'same-origin',

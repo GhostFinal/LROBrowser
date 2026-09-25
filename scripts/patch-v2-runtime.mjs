@@ -52,7 +52,7 @@ export function patchV2Runtime(source) {
   output = replaceOnce(output, 'if (!Configs.get("remoteClient") && !count && !window.electronAPI?.isElectron) {', 'if (!Configs.get("remoteClient") && !count) {');
   output = removeRegion(output, ['legacy transport', 'WebSocket']);
   output = removeRegion(output, ['NodeSocket']);
-  output = output.replace(/\/\*\*[\s\S]*?Default socket factory[\s\S]*?\*\/\r?\nfunction defaultSocketFactory/, 'function defaultSocketFactory');
+  output = output.replace(/\/\*\*(?:(?!\*\/)[\s\S])*?Default socket factory(?:(?!\*\/)[\s\S])*?\*\/\r?\nfunction defaultSocketFactory/, 'function defaultSocketFactory');
   if (/new WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i.test(output)) fail('legacy-transport');
   return output;
 }

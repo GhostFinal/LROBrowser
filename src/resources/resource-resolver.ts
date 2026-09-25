@@ -134,9 +134,8 @@ export function buildResourcePathCandidates(resourcePath: string, primaryCharset
 }
 
 function normalizeRoot(root: string): string {
-  const url = new URL(root);
-  if (url.protocol !== 'https:' || !DEFAULT_RESOURCE_ROOTS.some((allowed) => new URL(allowed).origin === url.origin)) throw new Error('Unapproved resource root');
-  return root.endsWith('/') ? root : `${root}/`;
+  if (!DEFAULT_RESOURCE_ROOTS.some(allowed => root === allowed)) throw new Error('Unapproved resource root');
+  return root;
 }
 
 function header(response: Response, name: string): string | undefined {
@@ -150,7 +149,7 @@ async function fetchResource(url: string, options: ResolvePassiveResourceOptions
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), Math.max(1, options.timeoutMs ?? 8000));
   try {
-    const response = await fetchImpl(url, { signal: controller.signal });
+    const response = await fetchImpl(url, { signal: controller.signal, redirect: 'error', credentials: 'omit' });
     if (!response.ok) throw new Error(`http-${response.status}`);
     const contentType = header(response, 'content-type')?.toLowerCase() ?? '';
     if (contentType.includes('text/html')) throw new Error('html-response');
@@ -176,9 +175,10 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
   if (classification === 'packaged-executable') throw new ResourceResolutionError(normalizedPath, [{ url: normalizedPath, reason: 'package-only-resource' }]);
   const cache = options.cache ?? createResourceCache();
   const cached = await cache.match(normalizedPath).catch(() => null);
-  if (cached) return cached.bytes.slice(0);
+  if (cached?.bytes.byteLength) return cached.bytes.slice(0);
   const candidates = buildResourcePathCandidates(normalizedPath, options.primaryCharset, options.fallbackCharset);
   const roots = (options.resourceRoots ?? DEFAULT_RESOURCE_ROOTS).map(normalizeRoot);
+  if (roots.join('|') !== DEFAULT_RESOURCE_ROOTS.join('|')) throw new Error('Resource root order is fixed');
   for (const root of roots) {
     for (const candidate of candidates) {
       const url = root + candidate;
