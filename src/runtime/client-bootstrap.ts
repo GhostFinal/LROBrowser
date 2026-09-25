@@ -28,12 +28,20 @@ const LASTRO_RESOURCE_ROOTS = Object.freeze([
   'https://clientdata.ltsd.ro/ro/client_re/'
 ] as const);
 
-async function loadExecutableManifest(): Promise<ExecutableAssetManifest> {
-  const response = await fetch(new URL('../core/executable-assets.json', new URL('/runtime/Online.js', document.baseURI)));
+export async function parseExecutableAssetManifest(response: Response): Promise<ExecutableAssetManifest> {
   if (!response.ok) throw new Error(`核心资源清单加载失败 (${response.status})`);
+  const contentType = response.headers.get('content-type') ?? '';
+  if (!contentType.toLowerCase().includes('json')) {
+    throw new Error(`核心资源清单返回了 ${contentType || '非 JSON 内容'}；请重启 Vite 开发服务器后再安装 Dev Proxy`);
+  }
   const manifest = await response.json() as ExecutableAssetManifest;
   if (!Array.isArray(manifest.files)) throw new Error('核心资源清单格式无效');
   return manifest;
+}
+
+async function loadExecutableManifest(): Promise<ExecutableAssetManifest> {
+  const response = await fetch(new URL('../core/executable-assets.json', new URL('/runtime/Online.js', document.baseURI)));
+  return parseExecutableAssetManifest(response);
 }
 
 export async function bootstrapV2Client(options: BootstrapOptions): Promise<void> {
