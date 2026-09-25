@@ -10,7 +10,7 @@
   "background_color": "#f5f6f5",
   "theme_color": "#15231d",
   "icons": [
-    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
   ],
   "permissions_policy": {
     "direct-sockets": ["self"],

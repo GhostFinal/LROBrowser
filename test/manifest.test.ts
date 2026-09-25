@@ -13,6 +13,7 @@ describe('Phase A IWA', () => {
     expect(manifest.display).toBe('standalone');
     expect(manifest.permissions_policy['direct-sockets']).toEqual(['self']);
     expect(manifest.permissions_policy['cross-origin-isolated']).toEqual(['self']);
+    expect(manifest.icons).toEqual([{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' }]);
     expect(manifest).not.toHaveProperty('update_manifest_url');
     expect(source).not.toMatch(/socketProxy|WebSocket|wss/i);
   });

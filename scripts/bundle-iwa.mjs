@@ -44,7 +44,6 @@ export async function createBundle(distDirectory, baseUrl) {
   const origin = new globalThis.URL(baseUrl);
   if (origin.protocol !== 'https:' || !origin.pathname.endsWith('/')) throw new Error('base URL must be an HTTPS origin ending with /');
   const builder = new BundleBuilder();
-  builder.setPrimaryURL(origin.href);
   for (const file of await walk(dist)) {
     const relative = path.relative(dist, file).replaceAll(path.sep, '/');
     const url = new globalThis.URL(relative, origin).href;

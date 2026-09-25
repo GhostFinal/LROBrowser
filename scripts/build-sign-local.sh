@@ -14,6 +14,7 @@ if [[ "$NODE_MAJOR" != "24" ]]; then
   printf 'Node.js 24 is required; found %s.\n' "$(node --version)" >&2
   exit 1
 fi
+NODE_BIN="$(command -v node)"
 
 if [[ -x "$ROOT_DIR/.tools/node_modules/.bin/pnpm" ]]; then
   PNPM_BIN="$ROOT_DIR/.tools/node_modules/.bin/pnpm"
@@ -43,6 +44,25 @@ fi
 chmod 600 "$KEY_PATH"
 
 cd "$ROOT_DIR"
+CLIENT_ROOT="${LASTRO_IWA_CLIENT_ROOT:-/run/media/parker/7A9F-F871/ROWeb/ro/client_re}"
+RO_SOURCE_ROOT="${LASTRO_IWA_RO_SOURCE_ROOT:-/run/media/parker/7A9F-F871/ROWeb/ro/src}"
+if [[ ! -f "$ROOT_DIR/.staging/v2/Online.js" ]]; then
+  printf 'Missing staged V2 runtime: %s/.staging/v2/Online.js\n' "$ROOT_DIR" >&2
+  exit 1
+fi
+if [[ ! -d "$CLIENT_ROOT" || ! -d "$RO_SOURCE_ROOT" ]]; then
+  printf 'Core asset roots are unavailable. Set LASTRO_IWA_CLIENT_ROOT and LASTRO_IWA_RO_SOURCE_ROOT.\n' >&2
+  exit 1
+fi
+"$NODE_BIN" scripts/patch-v2-runtime.mjs \
+  --input "$ROOT_DIR/.staging/v2/Online.js" \
+  --output "$ROOT_DIR/.staging/runtime/Online.js" \
+  --manifest "$ROOT_DIR/.staging/runtime-patch-manifest.json"
+"$NODE_BIN" scripts/import-core-assets.mjs \
+  --client-root "$CLIENT_ROOT" \
+  --ro-source-root "$RO_SOURCE_ROOT" \
+  --runtime "$ROOT_DIR/.staging/runtime/Online.js" \
+  --output "$ROOT_DIR/.staging/core"
 "$PNPM_BIN" build
 "$PNPM_BIN" audit:iwa
 "$PNPM_BIN" bundle:iwa

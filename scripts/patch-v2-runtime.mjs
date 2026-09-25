@@ -45,14 +45,28 @@ function replaceFunctionBody(source, name, body) {
 }
 
 export function patchV2Runtime(source) {
-  let output = source;
+  if (!source.startsWith('import ')) fail('anchor:runtime-imports');
+  const normalizedSource = source.replace(/\r\n/g, '\n');
+  let output = `import { decorateLastROLoginTemplate, decorateLastROLoginStyles, installLastROLogin } from "./lastro-account-login.mjs";\n${normalizedSource}`;
   output = replaceFunctionBody(output, 'defaultSocketFactory', '{\n\tif (typeof globalThis.LastRODirectSocketFactory !== "function") throw new Error("Direct TCP factory unavailable");\n\treturn globalThis.LastRODirectSocketFactory(host, port);\n}');
   output = replaceOnce(output, 'init_WebSocket();', '');
   output = replaceOnce(output, 'init_NodeSocket();', '');
   output = replaceOnce(output, 'if (!Configs.get("remoteClient") && !count && !window.electronAPI?.isElectron) {', 'if (!Configs.get("remoteClient") && !count) {');
+  output = replaceOnce(output, 'var root = freeGlobal || freeSelf || Function("return this")();', 'var root = freeGlobal || freeSelf || globalThis;');
+  output = replaceOnce(output, 'return Function(importsKeys, sourceURL + "return " + source).apply(undefined, importsValues);',
+    'throw new Error("Dynamic templates are disabled in the IWA runtime");');
   output = removeRegion(output, ['legacy transport', 'WebSocket']);
   output = removeRegion(output, ['NodeSocket']);
   output = output.replace(/\/\*\*(?:(?!\*\/)[\s\S])*?Default socket factory(?:(?!\*\/)[\s\S])*?\*\/\r?\nfunction defaultSocketFactory/, 'function defaultSocketFactory');
+  output = replaceOnce(output, 'new GUIComponent(name, enhanceWinLoginStyles(name, cssText))',
+    'new GUIComponent(name, decorateLastROLoginStyles(name, enhanceWinLoginStyles(name, cssText)))');
+  output = replaceOnce(output, 'const renderedHtmlText = enhanceWinLoginTemplate(name, htmlText);',
+    'const renderedHtmlText = decorateLastROLoginTemplate(name, enhanceWinLoginTemplate(name, htmlText));');
+  output = replaceOnce(output,
+    '\t\tvoid 0;\n\t\tpopulateLoginServerButtons(root, Configs.get("loginServerProfiles", []), Configs.getServer?.().id || "lastro", (profile) => Component.onServerSelect(profile));',
+    '\t\tinstallLastROLogin({ root, component: Component, configs: Configs });');
+  output = replaceOnce(output, '\t\tconst pass = _inputPassword.value;\n\t\tapplyDebugLoginFields();',
+    '\t\tconst pass = _inputPassword.value;\n\t\tconst beforeConnect = globalThis.LastROLoginBeforeConnect;\n\t\tif (typeof beforeConnect === "function" && beforeConnect(user, pass) === false) return false;\n\t\tapplyDebugLoginFields();');
   if (/new WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i.test(output)) fail('legacy-transport');
   return output;
 }

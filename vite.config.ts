@@ -1,10 +1,31 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { defineConfig, type Plugin } from 'vitest/config';
+import { defineConfig, type Plugin, type ViteDevServer } from 'vite';
 
 function packageRuntime(): Plugin {
+  function serveStagedRuntime(server: ViteDevServer) {
+    server.middlewares.use((request, response, next) => {
+      const pathname = decodeURIComponent((request.url ?? '').split('?')[0] ?? '');
+      let source: string | undefined;
+      if (pathname === '/runtime/Online.js') source = path.resolve('.staging/runtime/Online.js');
+      else if (pathname === '/runtime/lastro-account-login.mjs') source = path.resolve('src/runtime/lastro-account-login.mjs');
+      else if (pathname.startsWith('/runtime/')) source = path.resolve('.staging/core', pathname.slice('/runtime/'.length));
+      else if (pathname.startsWith('/core/')) source = path.resolve('.staging/core', pathname.slice('/core/'.length));
+      if (!source || !existsSync(source)) { next(); return; }
+      const extension = path.extname(source).toLowerCase();
+      const contentType = extension === '.json' ? 'application/json' : extension === '.wasm' ? 'application/wasm' : 'text/javascript; charset=utf-8';
+      response.statusCode = 200;
+      response.setHeader('Content-Type', contentType);
+      response.setHeader('Content-Security-Policy', "script-src 'self' 'wasm-unsafe-eval'");
+      response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+      response.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+      response.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+      response.end(readFileSync(source));
+    });
+  }
   return {
     name: 'package-patched-runtime',
+    configureServer: serveStagedRuntime,
     generateBundle() {
       const runtime = path.resolve('.staging/runtime/Online.js');
       if (existsSync(runtime)) this.emitFile({ type: 'asset', fileName: 'runtime/Online.js', source: readFileSync(runtime) });

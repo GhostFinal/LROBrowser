@@ -1,5 +1,5 @@
 import type { AvailableServerProfile } from '../servers/server-profile';
-import { getAvailableServerProfile } from '../servers/server-profiles';
+import { getAvailableServerProfile, LASTRO_SERVER_PROFILES } from '../servers/server-profiles';
 
 export interface ClientCredentials {
   username: string;
@@ -8,7 +8,8 @@ export interface ClientCredentials {
 
 export interface V2ClientConfig {
   readonly servers: readonly [Readonly<Record<string, unknown>>];
-  readonly autoLogin: readonly [string, string];
+  readonly autoLogin: readonly [string, string] | null;
+  readonly loginServerProfiles: readonly Readonly<Record<string, unknown>>[];
   readonly lastroProtocol: true;
   readonly lastroCustomPackets: true;
   readonly packetKeys: readonly [number, number, number];
@@ -34,8 +35,11 @@ export interface V2ClientConfig {
 
 export function buildClientConfig(profile: AvailableServerProfile, credentials: ClientCredentials): V2ClientConfig {
   const available = getAvailableServerProfile(profile.id);
-  if (!credentials.username || !credentials.password) throw new Error('账号资料不完整');
+  const hasUsername = Boolean(credentials.username);
+  const hasPassword = Boolean(credentials.password);
+  if (hasUsername !== hasPassword) throw new Error('账号资料不完整');
   const server = Object.freeze({
+    id: available.id,
     display: available.displayName,
     address: available.loginAddress,
     port: available.loginPort,
@@ -43,9 +47,20 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
     langtype: available.langtype,
     packetver: available.packetver,
   });
+  const loginServerProfiles = Object.freeze([
+    ...LASTRO_SERVER_PROFILES.map(candidate => candidate.availability === 'available'
+      ? Object.freeze({
+        id: candidate.id, label: candidate.displayName, availability: candidate.availability,
+        address: candidate.loginAddress, port: candidate.loginPort, version: candidate.version,
+        langtype: candidate.langtype, packetver: candidate.packetver,
+      })
+      : Object.freeze({ id: candidate.id, label: candidate.displayName, availability: candidate.availability,
+        unavailableReason: candidate.unavailableReason }),
+  )]);
   return Object.freeze({
     servers: Object.freeze([server] as const),
-    autoLogin: Object.freeze([credentials.username, credentials.password] as const),
+    autoLogin: hasUsername ? Object.freeze([credentials.username, credentials.password] as const) : null,
+    loginServerProfiles,
     lastroProtocol: true,
     lastroCustomPackets: true,
     packetKeys: Object.freeze([...available.packetKeys] as [number, number, number]),

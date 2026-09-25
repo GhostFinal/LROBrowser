@@ -10,15 +10,32 @@ if (!profile || profile.availability !== 'available') throw new Error('missing f
 describe('V2 runtime patch', () => {
   it('replaces the factory and removes legacy initialization regions', () => {
     const fixture = [
+      'import { existing } from "./existing.mjs";',
+      'var root = freeGlobal || freeSelf || Function("return this")();',
+      'function compileTemplate(importsKeys, sourceURL, source, importsValues) { return Function(importsKeys, sourceURL + "return " + source).apply(undefined, importsValues); }',
       '/** Earlier runtime documentation */\nconst retainedRuntime = 1;',
       '//#region src/Network/SocketHelpers/WebSocket.js\nfunction Socket$1() {}\n//#endregion',
       '//#region src/Network/SocketHelpers/NodeSocket.js\nvar Socket;\n//#endregion',
       'function defaultSocketFactory(host, port) { return new Socket(host, port); }',
       'function init_NetworkManager() { init_WebSocket(); init_NodeSocket(); }',
       'function loadFiles() { if (!Configs.get("remoteClient") && !count && !window.electronAPI?.isElectron) { alert("x"); } }',
+      'function createWinLogin({ name, htmlText, cssText }) {',
+      '\t\tconst Component = new GUIComponent(name, enhanceWinLoginStyles(name, cssText));',
+      '\t\tconst renderedHtmlText = enhanceWinLoginTemplate(name, htmlText);',
+      '\t\tvoid 0;',
+      '\t\tpopulateLoginServerButtons(root, Configs.get("loginServerProfiles", []), Configs.getServer?.().id || "lastro", (profile) => Component.onServerSelect(profile));',
+      '\t\tconst user = _inputUsername.value;',
+      '\t\tconst pass = _inputPassword.value;',
+      '\t\tapplyDebugLoginFields();',
+      '\t}',
     ].join('\n');
     const patched = patchV2Runtime(fixture);
     expect(patched).toContain('globalThis.LastRODirectSocketFactory(host, port)');
+    expect(patched).toContain('lastro-account-login.mjs');
+    expect(patched).toContain('installLastROLogin({ root, component: Component, configs: Configs })');
+    expect(patched).toContain('LastROLoginBeforeConnect');
+    expect(patched).toContain('globalThis;');
+    expect(patched).toContain('Dynamic templates are disabled in the IWA runtime');
     expect(patched).toContain('const retainedRuntime = 1;');
     expect(patched).not.toMatch(/WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i);
   });

@@ -16,6 +16,7 @@ describe('IWA Web Bundle', () => {
       const bytes = await createBundle(root, 'https://lastro-v2.local/');
       const bundle = new Bundle(bytes);
       expect(bundle.version).toMatch(/^b/);
+      expect(bundle.primaryURL).toBeNull();
       const [url] = bundle.urls;
       if (!url) throw new Error('bundle has no URLs');
       const response = bundle.getResponse(url);

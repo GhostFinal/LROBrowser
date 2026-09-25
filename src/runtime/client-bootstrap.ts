@@ -18,6 +18,7 @@ interface ExecutableAssetManifest {
 declare global {
   var ROConfig: V2ClientConfig | undefined;
   var LastRODirectSocketFactory: ((host: string, port: number) => LegacyClientSocket) | undefined;
+  var LastRODirectSocketsSupported: boolean | undefined;
   var LastROResourceRoots: readonly string[] | undefined;
   var LastROExecutableManifest: ExecutableAssetManifest | undefined;
 }
@@ -36,14 +37,7 @@ async function loadExecutableManifest(): Promise<ExecutableAssetManifest> {
 }
 
 export async function bootstrapV2Client(options: BootstrapOptions): Promise<void> {
-  if (!isDirectSocketsSupported()) {
-    options.mount.replaceChildren();
-    const message = document.createElement('p');
-    message.setAttribute('role', 'alert');
-    message.textContent = '当前环境不支持 Direct TCP。请使用支持 Direct Sockets 的 Chrome IWA 安装包。';
-    options.mount.append(message);
-    throw new Error('当前环境不支持 Direct TCP');
-  }
+  globalThis.LastRODirectSocketsSupported = isDirectSocketsSupported();
   globalThis.ROConfig = buildClientConfig(options.profile, options.credentials);
   globalThis.LastRODirectSocketFactory = options.socketFactory ?? createDirectSocket;
   globalThis.LastROResourceRoots = LASTRO_RESOURCE_ROOTS;

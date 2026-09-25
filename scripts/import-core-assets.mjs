@@ -98,6 +98,10 @@ export async function importCoreAssets({ clientRoot, roSourceRoot, runtimePath, 
     }
     await addFile(entries, destinations, runtime, 'runtime/Online.js', 'runtime', destinationRoot);
   }
+  for (const relative of config.runtimeFiles ?? []) {
+    safeRelative(relative);
+    await addFile(entries, destinations, path.join(repo, relative), `runtime/${path.basename(relative)}`, 'runtime', destinationRoot);
+  }
   const stagedRuntime = path.join(repo, '.staging/v2');
   try {
     for (const relative of await filesUnder(stagedRuntime)) {
