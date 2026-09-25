@@ -41,7 +41,9 @@ export async function signBundle(inputPath, keyPath, outputPath, bundleId) {
   await writeFile(outputPath, bytes);
   const sha256 = createHash('sha256').update(bytes).digest('hex');
   await writeFile(`${outputPath}.sha256`, `${sha256}  ${path.basename(outputPath)}\n`);
-  const metadata = { input: path.basename(input), output: path.basename(outputPath), bytes: bytes.byteLength, sha256, webBundleId: derivedId, testKey: true };
+  let version = null;
+  try { version = JSON.parse(await readFile(path.join(path.dirname(outputPath), 'audit-report.json'), 'utf8')).bundleVersion ?? null; } catch { /* signing can be unit-tested without an audit report */ }
+  const metadata = { input: path.basename(input), output: path.basename(outputPath), version, bytes: bytes.byteLength, sha256, webBundleId: derivedId, testKey: true };
   await writeFile(path.join(path.dirname(outputPath), 'release-manifest.json'), `${JSON.stringify(metadata, null, 2)}\n`);
   return metadata;
 }

@@ -1,6 +1,7 @@
 export interface SignMetadata {
   input: string;
   output: string;
+  version: string | null;
   bytes: number;
   sha256: string;
   webBundleId: string;
