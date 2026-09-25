@@ -11,6 +11,7 @@ import { namespaceUris, sanitizeReviewedSource } from './sanitize-v2-source.mjs'
 const repo = fileURLToPath(new URL('../', import.meta.url));
 const staging = path.join(repo, '.staging');
 const policy = JSON.parse(await readFile(new URL('../config/forbidden-source-patterns.json', import.meta.url), 'utf8'));
+const inventory = JSON.parse(await readFile(new URL('../config/lastro-module-inventory.json', import.meta.url), 'utf8'));
 const executable = /\.(?:[cm]?js|wasm|lua|lub)$/i;
 const textFile = /\.(?:[cm]?js|json|html?|css|lua|txt|ya?ml)$/i;
 
@@ -102,11 +103,17 @@ async function importSnapshot() {
   await rejectSymlinkParents(source);
   await rejectSymlinkParents(output);
   const allowlist = JSON.parse(await readFile(values.allowlist ?? path.join(repo, 'config/v2-allowlist.json'), 'utf8'));
+  const enforceInventory = !values.allowlist || path.resolve(values.allowlist) === path.join(repo, 'config/v2-allowlist.json');
   if (!Array.isArray(allowlist.files) || !allowlist.files.length) fail('invalid-allowlist');
+  if (enforceInventory && (!Array.isArray(inventory.entries) || !inventory.entries.length)) fail('invalid-module-inventory');
   allowlist.files.forEach(checkPath);
   if (new Set(allowlist.files).size !== allowlist.files.length) fail('duplicate-path');
   const names = await inspectTree(source);
   const allowed = new Set(allowlist.files);
+  if (enforceInventory) for (const entry of inventory.entries) {
+    if (entry.required && !allowed.has(entry.module)) fail('inventory-module-not-allowlisted', entry.module);
+    if (!Array.isArray(entry.tests) || entry.tests.some((test) => !names.includes(test))) fail('inventory-test-missing', entry.module);
+  }
   for (const name of allowed) if (!names.includes(name)) fail('missing', name);
   const buffered = new Map();
   const provenance = [];
