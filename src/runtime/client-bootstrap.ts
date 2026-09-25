@@ -11,9 +11,28 @@ export interface BootstrapOptions {
   runtimeUrl?: string;
 }
 
+interface ExecutableAssetManifest {
+  files: readonly { path: string; kind: string }[];
+}
+
 declare global {
   var ROConfig: V2ClientConfig | undefined;
   var LastRODirectSocketFactory: ((host: string, port: number) => LegacyClientSocket) | undefined;
+  var LastROResourceRoots: readonly string[] | undefined;
+  var LastROExecutableManifest: ExecutableAssetManifest | undefined;
+}
+
+const LASTRO_RESOURCE_ROOTS = Object.freeze([
+  'https://game.lastro.cn/ro/client_re/',
+  'https://clientdata.ltsd.ro/ro/client_re/'
+] as const);
+
+async function loadExecutableManifest(): Promise<ExecutableAssetManifest> {
+  const response = await fetch(new URL('../core/executable-assets.json', new URL('/runtime/Online.js', document.baseURI)));
+  if (!response.ok) throw new Error(`核心资源清单加载失败 (${response.status})`);
+  const manifest = await response.json() as ExecutableAssetManifest;
+  if (!Array.isArray(manifest.files)) throw new Error('核心资源清单格式无效');
+  return manifest;
 }
 
 export async function bootstrapV2Client(options: BootstrapOptions): Promise<void> {
@@ -27,6 +46,8 @@ export async function bootstrapV2Client(options: BootstrapOptions): Promise<void
   }
   globalThis.ROConfig = buildClientConfig(options.profile, options.credentials);
   globalThis.LastRODirectSocketFactory = options.socketFactory ?? createDirectSocket;
+  globalThis.LastROResourceRoots = LASTRO_RESOURCE_ROOTS;
+  globalThis.LastROExecutableManifest = await loadExecutableManifest();
   const runtimeUrl = options.runtimeUrl ?? '/runtime/Online.js';
   await import(/* @vite-ignore */ runtimeUrl);
 }
