@@ -98,6 +98,25 @@ export async function importCoreAssets({ clientRoot, roSourceRoot, runtimePath, 
     }
     await addFile(entries, destinations, runtime, 'runtime/Online.js', 'runtime', destinationRoot);
   }
+  const stagedRuntime = path.join(repo, '.staging/v2');
+  try {
+    for (const relative of await filesUnder(stagedRuntime)) {
+      if (relative === 'Online.js' || !/\.(?:[cm]?js)$/i.test(relative)) continue;
+      await addFile(entries, destinations, path.join(stagedRuntime, relative), `runtime/${path.basename(relative)}`, 'runtime', destinationRoot);
+    }
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+  for (const name of ['world-data.json', 'mob-data.json']) {
+    const generated = path.join(destinationRoot, 'data/world', name);
+    try {
+      const bytes = await readFile(generated);
+      const destination = `data/world/${name}`;
+      if (!destinations.has(destination)) entries.push({ path: destination, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), kind: 'data-json' });
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+  }
   entries.sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
   const manifest = { files: entries };
   await mkdir(destinationRoot, { recursive: true });
