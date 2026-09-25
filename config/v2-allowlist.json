@@ -1,0 +1,43 @@
+{
+  "files": [
+    "LastROThreadEventHandler.js",
+    "Online.js",
+    "PathFindingWorker.js",
+    "ThreadEventHandler.js",
+    "lastro-card-collection-ui.mjs",
+    "lastro-card-collection.mjs",
+    "lastro-effect-compat.mjs",
+    "lastro-guild-emblem-request.mjs",
+    "lastro-item-move-info.mjs",
+    "lastro-map-state.mjs",
+    "lastro-minimap-guild-render.mjs",
+    "lastro-navigation-debug.mjs",
+    "lastro-observer-mode.mjs",
+    "lastro-packet-framing.mjs",
+    "lastro-quick-teleport-catalog.mjs",
+    "lastro-resource-path.js",
+    "lastro-v1-migration.mjs",
+    "lastro-worldmap-details.mjs"
+  ],
+  "excludedBuildTools": ["sync-hat-table.mjs"],
+  "reviewedSha256": {
+    "LastROThreadEventHandler.js": "3897ea601d90450f351c0cda970f6aaada7c764f0260b9a029d247c12e1c1013",
+    "Online.js": "5525839d71144032bc6f836c40f3ea1bf58db3e672ac8f4becfdd84cdfbc9e3c",
+    "PathFindingWorker.js": "ace2272504f279b0c23f6c2df9f9a3888f7462a16451ac54655f4c2e7a5c3427",
+    "ThreadEventHandler.js": "f8402ce2b527093c94a9e2ef1de005f2398708328a08fb25cba95958671529df",
+    "lastro-card-collection-ui.mjs": "25ef4c4cbc493089837fe3e5692c072281f6903beb860e0e7e9978685137ff58",
+    "lastro-card-collection.mjs": "d0b4683575c779122b8054ce97009e06cd9f9d4b15d1af90fded03e71583a3e6",
+    "lastro-effect-compat.mjs": "0e2f34e185e530ad6f07454cb96a58c1829805e5838861e21db1dbebacf7cd74",
+    "lastro-guild-emblem-request.mjs": "906ac5f9a47f1203a7166f88fc586b80d743fa757911933f8607bd12d48ab54f",
+    "lastro-item-move-info.mjs": "fc168b4abb4aa12420c4b73708f1731fd0877c16234a44babf810b1b49b3cc44",
+    "lastro-map-state.mjs": "9d6c45c586883cb5cb5b69a10b28d0ba83623fc758a5959f7d401fd4b1720863",
+    "lastro-minimap-guild-render.mjs": "5654857a2302289171a417aa02763d4f3a449f77c34ca44a322794d3b281f74f",
+    "lastro-navigation-debug.mjs": "44a7f298da621354ac81827fd19284f6f3ac344b3cc6dedfde8e709a2d1882b4",
+    "lastro-observer-mode.mjs": "3c47dbaeab60433159363d344d3373e333502449085ecfe617bdad63450b0911",
+    "lastro-packet-framing.mjs": "7f4e9888676ed8cfd9ebbb301083b5b1ea920eb4f953235a98621e54bcae013d",
+    "lastro-quick-teleport-catalog.mjs": "d35f992252bcdd8f120c5158f6cbc9423d0e30258af2f71e93d68f1f546c6fe9",
+    "lastro-resource-path.js": "f919491ebc467bbcac172f9ded6cd2ddb6cbc5b2fc844a6d2c909e7182f4cda8",
+    "lastro-v1-migration.mjs": "a541d9f85ab5c9ac12f43a4c183ce0e3fd009500912cce1b588d9980aeef2140",
+    "lastro-worldmap-details.mjs": "67db488805c59be8a30cec06a659f466f5318ca5c07a155e46e771f7809e47a0"
+  }
+}

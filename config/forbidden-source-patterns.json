@@ -1,0 +1,10 @@
+{
+  "allowedOrigins": [
+    "https://game.lastro.cn",
+    "https://clientdata.ltsd.ro"
+  ],
+  "credentialMarkers": ["quickLoginAccounts"],
+  "privateProfileMarkers": ["xkore"],
+  "legacyTransportMarkers": ["socketProxy", "WebSocket", "wss://", "ws://", "electronAPI", "NodeSocket"],
+  "excludedConfigFiles": ["lastro-v2-config.js"]
+}
