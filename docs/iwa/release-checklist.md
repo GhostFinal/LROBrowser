@@ -8,7 +8,7 @@
 - [x] `pnpm build`
 - [x] `pnpm audit:iwa`
 - [x] `pnpm bundle:iwa`
-- [x] 使用仓库外 disposable test key 生成 `.swbn`
+- [x] 使用 `.local/keys/` 中被 Git 忽略的 disposable test key 生成 `.swbn`
 - [x] `pnpm test -- --run test/release-smoke.test.ts`
 - [x] `git diff --check` 和 `git status --short`
 

@@ -29,7 +29,11 @@ export async function signBundle(inputPath, keyPath, outputPath, bundleId) {
   const input = path.resolve(inputPath);
   const key = await realpath(keyPath);
   const repository = await realpath(process.cwd());
-  if (key === repository || key.startsWith(`${repository}${path.sep}`)) throw new Error('signing key must be outside the repository');
+  const localKeyDirectory = path.join(repository, '.local', 'keys') + path.sep;
+  const isIgnoredLocalKey = key.startsWith(localKeyDirectory);
+  if ((key === repository || key.startsWith(`${repository}${path.sep}`)) && !isIgnoredLocalKey) {
+    throw new Error('signing key must be outside the repository or inside .local/keys');
+  }
   const privateKey = parsePemKey(await readFile(key), process.env.WEB_BUNDLE_SIGNING_PASSPHRASE);
   const strategy = new NodeCryptoSigningStrategy(privateKey);
   const publicKey = await strategy.getPublicKey();

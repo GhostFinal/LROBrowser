@@ -4,6 +4,7 @@ dist/
 release/
 .tools/
 .superpowers/
+.local/
 *.wbn
 *.swbn
 *.pem

@@ -1,6 +1,6 @@
 # LastRO V2 IWA 本地开发
 
-Phase A 只支持本机手动安装和测试。生产 manifest 不包含 `update_manifest_url`，仓库不保存签名私钥，也不配置自动更新服务。
+Phase A 只支持本机手动安装和测试。生产 manifest 不包含 `update_manifest_url`，仓库不跟踪签名私钥，也不配置自动更新服务。
 
 在 Linux 上运行：
 
@@ -23,12 +23,10 @@ Chrome 的 Dev Mode IWA 安装需要本地 HTTPS、manifest 和 Web Bundle 文�
 
 ## 本地测试签名
 
-临时测试密钥必须放在仓库外，并明确标记为 disposable test key：
+运行本地打包脚本会在 `.local/keys/` 中生成并复用 disposable test key：
 
 ```bash
-rtk proxy mkdir -p /tmp/lastro-iwa-disposable-test
-rtk proxy openssl genpkey -algorithm ED25519 -out /tmp/lastro-iwa-disposable-test/test-key.pem
-rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm sign:iwa -- --key /tmp/lastro-iwa-disposable-test/test-key.pem
+./scripts/build-sign-local.sh
 ```
 
-签名脚本只接受仓库外的密钥路径，不会把密钥路径写入发行清单。不要把 `/tmp/lastro-iwa-disposable-test` 或 `release/*.swbn` 提交到 Git。
+脚本也接受 `LASTRO_IWA_SIGNING_KEY=/absolute/path/to/test-key.pem` 覆盖默认路径。签名脚本不会把密钥路径写入发行清单；`.local/keys/` 和 `release/*.swbn` 已加入 Git 忽略规则。
