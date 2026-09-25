@@ -164,6 +164,7 @@ export function mountAccountManager({ root, profiles, store, onLogin }: {
     try {
       await onLogin({ profile: getAvailableServerProfile(select.value), username: inputs.username.value,
         password: inputs.password.value, ...(accountId ? { savedAccountId: accountId } : {}) });
+      if (accountId) await store.markUsed(accountId, Date.now());
     } catch { message.textContent = '登录未完成，请检查连接状态'; }
     finally { busy = false; controls(); }
   });
