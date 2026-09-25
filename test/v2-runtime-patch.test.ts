@@ -61,4 +61,9 @@ describe('V2 runtime patch', () => {
   it('keeps the real imported runtime source available for the next patch step', async () => {
     await expect(readFile('.staging/v2/Online.js', 'utf8')).resolves.toContain('defaultSocketFactory');
   });
+
+  it('sets skipIntro to bypass local GRF file picker', () => {
+    const config = buildClientConfig(profile, { username: 'test', password: 'pass' });
+    expect(config.skipIntro).toBe(true);
+  });
 });

@@ -28,6 +28,7 @@ export interface V2ClientConfig {
   readonly statusDescriptionCharset: string;
   readonly networkCharset: string;
   readonly loadLua: true;
+  readonly skipIntro: true;
   readonly skipServerList: true;
   readonly enableCashShop: true;
   readonly customItemInfo: readonly string[];
@@ -75,7 +76,7 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
     resourceProfileId: available.resourceProfileId,
     remoteClient: 'https://game.lastro.cn/ro/client_re/',
     resourcePathCharset: 'gbk', lastroDataCharset: 'gbk', statusDescriptionCharset: 'big5', networkCharset: 'gbk',
-    loadLua: true, skipServerList: true, enableCashShop: true,
+    loadLua: true, skipIntro: true, skipServerList: true, enableCashShop: true,
     customItemInfo: Object.freeze(['System/itemInfo_re_59.lua', 'System/itemInfo_re_61.lua']),
   });
 }
