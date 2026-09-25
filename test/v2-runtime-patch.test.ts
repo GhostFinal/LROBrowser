@@ -10,7 +10,7 @@ if (!profile || profile.availability !== 'available') throw new Error('missing f
 describe('V2 runtime patch', () => {
   it('replaces the factory and removes legacy initialization regions', () => {
     const fixture = [
-      'import { existing } from "./existing.mjs";',
+      'import { existing } from "./existing.mjs?build=fixture-1";',
       'var root = freeGlobal || freeSelf || Function("return this")();',
       'function compileTemplate(importsKeys, sourceURL, source, importsValues) { return Function(importsKeys, sourceURL + "return " + source).apply(undefined, importsValues); }',
       '/** Earlier runtime documentation */\nconst retainedRuntime = 1;',
@@ -37,6 +37,7 @@ describe('V2 runtime patch', () => {
     expect(patched).toContain('globalThis;');
     expect(patched).toContain('Dynamic templates are disabled in the IWA runtime');
     expect(patched).toContain('const retainedRuntime = 1;');
+    expect(patched).not.toContain('?build=');
     expect(patched).not.toMatch(/WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i);
   });
 

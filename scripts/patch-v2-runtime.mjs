@@ -48,6 +48,7 @@ export function patchV2Runtime(source) {
   if (!source.startsWith('import ')) fail('anchor:runtime-imports');
   const normalizedSource = source.replace(/\r\n/g, '\n');
   let output = `import { decorateLastROLoginTemplate, decorateLastROLoginStyles, installLastROLogin } from "./lastro-account-login.mjs";\n${normalizedSource}`;
+  output = output.replace(/\?build=[A-Za-z0-9._-]+/g, '');
   output = replaceFunctionBody(output, 'defaultSocketFactory', '{\n\tif (typeof globalThis.LastRODirectSocketFactory !== "function") throw new Error("Direct TCP factory unavailable");\n\treturn globalThis.LastRODirectSocketFactory(host, port);\n}');
   output = replaceOnce(output, 'init_WebSocket();', '');
   output = replaceOnce(output, 'init_NodeSocket();', '');

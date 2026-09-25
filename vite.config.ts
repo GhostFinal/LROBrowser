@@ -9,7 +9,7 @@ function packageRuntime(): Plugin {
       let source: string | undefined;
       if (pathname === '/runtime/Online.js') source = path.resolve('.staging/runtime/Online.js');
       else if (pathname === '/runtime/lastro-account-login.mjs') source = path.resolve('src/runtime/lastro-account-login.mjs');
-      else if (pathname.startsWith('/runtime/')) source = path.resolve('.staging/core', pathname.slice('/runtime/'.length));
+      else if (pathname.startsWith('/runtime/')) source = path.resolve('.staging/core/runtime', pathname.slice('/runtime/'.length));
       else if (pathname.startsWith('/core/')) source = path.resolve('.staging/core', pathname.slice('/core/'.length));
       if (!source || !existsSync(source)) { next(); return; }
       const extension = path.extname(source).toLowerCase();
