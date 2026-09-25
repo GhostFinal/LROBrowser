@@ -1,0 +1,5 @@
+engineStrict: true
+storeDir: .tools/pnpm-store
+cacheDir: .tools/pnpm-cache
+allowBuilds:
+  esbuild: true

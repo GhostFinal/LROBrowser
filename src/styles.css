@@ -1,0 +1,33 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #202624;
+  background: #f5f6f5;
+  font-synthesis: none;
+  letter-spacing: 0;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 280px; }
+.app-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: 76px;
+  padding: 16px 24px;
+  background: #15231d;
+  color: #f6f8f6;
+}
+h1 { margin: 0; font-size: 24px; }
+h2 { margin: 0 0 16px; font-size: 16px; }
+#environment-status { margin: 0 0 0 auto; color: #ecd477; font-size: 14px; }
+.app-content { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: calc(100dvh - 76px); }
+.login-controls { border-right: 1px solid #dce2de; padding: 24px; }
+.login-controls section + section { margin-top: 32px; }
+#game-mount { min-width: 0; background: #ecefee; }
+@media (max-width: 640px) {
+  .app-header { padding: 16px; }
+  .app-content { grid-template-columns: minmax(0, 1fr); }
+  .login-controls { border-right: 0; border-bottom: 1px solid #dce2de; padding: 20px; }
+  #game-mount { min-height: 50dvh; }
+}

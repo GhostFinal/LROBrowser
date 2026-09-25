@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.staging/
+release/
+.tools/
+.superpowers/
+*.wbn
+*.swbn
+*.pem
+*.key
+*.passphrase
+.env
+.env.*
+!.env.example
+coverage/
+*.tsbuildinfo

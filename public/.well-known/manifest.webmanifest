@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "LastRO V2",
+  "short_name": "LastRO",
+  "version": "0.1.0",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "lang": "zh-CN",
+  "background_color": "#f5f6f5",
+  "theme_color": "#15231d",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "permissions_policy": {
+    "direct-sockets": ["self"],
+    "cross-origin-isolated": ["self"]
+  }
+}
