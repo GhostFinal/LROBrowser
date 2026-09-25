@@ -25,6 +25,8 @@
 - Node remains `>=24 <25` and pnpm remains `12.4.2`.
 - Use failing tests before production changes and keep one reviewable commit per task.
 - Before publicly committing third-party client scripts or publishing a `.swbn`, record license/redistribution evidence in `docs/iwa/third-party-licenses.md`. If redistribution is not confirmed, keep imported third-party artifacts in ignored staging and stop public release.
+- The immediate execution scope is Phase A (Tasks 1-12): produce and manually test a local IWA only. Do not configure production signing secrets, GitHub release workflows, public update manifests, or Surge deployment in this phase.
+- Phase A manifest must omit `update_manifest_url`; its local signing key and Web Bundle ID are disposable test identity and must never be reused as the production identity.
 
 ## Source Baselines
 
@@ -55,9 +57,9 @@
 - Produces standalone package `robrowser-v2`.
 - Produces root scripts `dev`, `build`, `test`, `typecheck`, `lint`, `audit:iwa`, `bundle:iwa`, and `sign:iwa`.
 - Produces `mountAppShell(root: HTMLElement): void`.
-- The manifest is served at `/.well-known/manifest.webmanifest` and contains `version`, `start_url`, `display`, and both required permission policies.
+- The Phase A manifest is served at `/.well-known/manifest.webmanifest` and contains `version`, `start_url`, `display`, and both required permission policies; it omits `update_manifest_url` so local test installs do not depend on an update host.
 
-- [ ] **Step 1: Write the manifest and shell tests.** In `test/manifest.test.ts`, read `public/.well-known/manifest.webmanifest` and assert `name === "LastRO V2"`, `version` matches `^\\d+(?:\\.\\d+)*$`, `start_url === "/"`, `display === "standalone"`, `permissions_policy["direct-sockets"]` and `permissions_policy["cross-origin-isolated"]` both equal `["self"]`, and no `socketProxy`, `WebSocket`, or WSS string exists in the manifest. Add a jsdom assertion that `mountAppShell` renders an environment status region, server region, account region, and game mount point.
+- [ ] **Step 1: Write the manifest and shell tests.** In `test/manifest.test.ts`, read `public/.well-known/manifest.webmanifest` and assert `name === "LastRO V2"`, `version` matches `^\\d+(?:\\.\\d+)*$`, `start_url === "/"`, `display === "standalone"`, `permissions_policy["direct-sockets"]` and `permissions_policy["cross-origin-isolated"]` both equal `["self"]`, `update_manifest_url` is absent in the Phase A build, and no `socketProxy`, `WebSocket`, or WSS string exists in the manifest. Add a jsdom assertion that `mountAppShell` renders an environment status region, server region, account region, and game mount point.
 - [ ] **Step 2: Run the focused test and verify failure.** Run `pnpm exec vitest run test/manifest.test.ts`; expect module/file-not-found failures.
 - [ ] **Step 3: Add the standalone package.** Create the root Vite TypeScript app with scripts `dev`, `build`, `test`, `typecheck`, `audit:iwa`, `bundle:iwa`, and `sign:iwa`. Pin the selected Vite/Vitest/TypeScript versions in this repository; add no UI framework.
 - [ ] **Step 4: Add the IWA manifest and app shell.** Place the manifest at the required well-known path, use a local SVG icon, import only local CSS/TypeScript, and render a minimal Chinese shell that can later host server/account controls and the V2 canvas.
@@ -301,7 +303,7 @@
 - [ ] **Step 4: Implement strict build auditing.** Require `/.well-known/manifest.webmanifest`, package-local scripts, correct MIME types, `Content-Security-Policy: script-src 'self' 'wasm-unsafe-eval'`, `Cross-Origin-Opener-Policy: same-origin`, `Cross-Origin-Embedder-Policy: require-corp`, and `Cross-Origin-Resource-Policy: same-origin`. Permit HTTPS only for passive fetch/img/media uses, allow only `https://game.lastro.cn` and `https://clientdata.ltsd.ro`, reject all HTTP/WS/WSS origins, and redact any rejected origin from the persisted audit report.
 - [ ] **Step 5: Pin bundling dependencies.** Add exact development versions `wbn@0.0.9` and `wbn-sign@0.3.1`; do not use unpinned `npx` in release scripts.
 - [ ] **Step 6: Implement unsigned and signed release scripts.** Require an absolute key path outside the repo, refuse keys located below the repository root, read `WEB_BUNDLE_SIGNING_PASSPHRASE` without logging it, and output SHA-256/Web Bundle ID/version/size. Signing without a key must fail with usage text.
-- [ ] **Step 7: Document development and release.** Include Dev Mode Proxy setup, local signed-bundle installation, production key backup, identity continuity, allowlist/distribution caveats, version updates, third-party license gate, and recovery if signing fails. Provide Linux shell commands first and PowerShell equivalents where behavior differs.
+- [ ] **Step 7: Document local development and test signing only.** Include Dev Mode Proxy setup, local signed-bundle installation, disposable test-key generation/storage, test Web Bundle ID, and that Phase A packages omit `update_manifest_url`. Describe the future production identity/update prerequisites without adding credentials or executing deployment. Provide Linux shell commands first and PowerShell equivalents where behavior differs.
 - [ ] **Step 8: Verify and commit.** Run focused tests, `pnpm build`, `pnpm audit:iwa`, unsigned bundle generation, and `git diff --check`; commit `build(iwa): add signed bundle pipeline`.
 
 ### Task 12: Run complete automated and manual release validation
@@ -319,15 +321,72 @@
 - 3转服 cannot move from candidate to released until `manual-validation-3x.md` records successful login, character selection, map entry, movement, and map transition.
 
 - [ ] **Step 1: Write the release-smoke test.** Assert audit report passes, signed bundle exists, checksum matches, manifest versions agree, all inventoried modules/core assets are in the bundle, App服 remains unavailable, and no ignored signing/staging file is tracked by Git.
-- [ ] **Step 2: Run the entire automated suite and sign a candidate.** Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm audit:iwa`, and `pnpm bundle:iwa`. On Linux set `LASTRO_IWA_SIGNING_KEY` to an absolute candidate-key path outside the repository; on PowerShell set `$env:LASTRO_IWA_SIGNING_KEY`. Run `pnpm sign:iwa -- --key "$LASTRO_IWA_SIGNING_KEY"` on Linux or the PowerShell equivalent, then run the release-smoke test. Run `git diff --check` and `git status --short`. If no authorized external key is available, stop before claiming release completion.
-- [ ] **Step 3: Validate the backup resource domain before release.** From at least one China network and one non-China network, verify `clientdata.ltsd.ro` resolves to the intended deployment, presents the expected TLS certificate, permits IWA cross-origin reads with compatible CORS/CORP headers, returns non-HTML bytes and correct content types for known `.str`, `.spr`, and audio samples, and supports the chosen cache/Range behavior. Record exact URLs, status codes, headers, hashes, and test date in `docs/iwa/resource-sources.md`; do not release while this gate fails.
+- [ ] **Step 2: Run the Phase A automated suite and sign a local test candidate.** Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm audit:iwa`, and `pnpm bundle:iwa`. Use a disposable local test key outside the repository; never use or create a production signing secret in Phase A. Run the release-smoke test and record the test Web Bundle ID separately from any future production identity. Run `git diff --check` and `git status --short`.
+- [ ] **Step 3: Validate resource fallback without requiring the future host.** Run resolver tests with deterministic mocked fetch responses for official failure followed by backup-source success. Do not require `clientdata.ltsd.ro` DNS, TLS, or live resources in Phase A; live China/non-China checks are deferred to Phase C/D release validation.
 - [ ] **Step 4: Install a signed candidate in Chrome IWA dev mode.** Record Chrome version, OS, Web Bundle ID, bundle SHA-256, install method, and whether Direct Sockets DevTools shows the login/character/map TCP connections.
 - [ ] **Step 5: Validate 2转服 end to end.** Add a local account, restart the IWA and confirm persistence, log in, select a character, enter a map, move, change map, load inventory/skills/quests/guild/card collection/auto-battle/quick teleport, then clear/passively refill resource cache. Record failures and rerun the relevant focused tests after fixes.
 - [ ] **Step 6: Validate 3转服 before release.** Repeat login, character selection, map entry, movement, and map transition using a 3转服 account. If any candidate parameter fails, leave 3转服 visibly unavailable and revise the spec/profile only with captured evidence; do not guess replacement values.
 - [ ] **Step 7: Validate App服 placeholder.** Confirm it cannot bind an account, does not call `TCPSocket`, and displays the exact unavailable reason.
 - [ ] **Step 8: Complete legal/release gates.** Confirm `docs/iwa/third-party-licenses.md` authorizes every artifact present in the public source tree and distributable `.swbn`. If not, stop at a private candidate and do not publish the bundle.
 - [ ] **Step 9: Update project handoff docs.** Add IWA build/test/release commands, known browser/distribution limitations, server verification status, backup-resource-domain launch status, and the exact location of generated reports.
-- [ ] **Step 10: Final commit.** After all applicable automated and manual gates pass, commit `docs(iwa): record client release validation`.
+- [ ] **Step 10: Final commit.** After all Phase A automated and manual gates pass, commit `docs(iwa): record local client validation`.
+
+## Deferred Update and Distribution Phases
+
+These phases are part of the long-term design but are **not authorized by the current execution handoff**. The executor must finish Tasks 1-12, report results, and stop for the user's manual IWA test. Do not implement these phases until the user approves the next phase.
+
+### Phase B: Local automatic-update proof
+
+**Files:**
+- Modify: `scripts/build-manifest.mjs`
+- Create: `scripts/build-update-manifest.mjs`
+- Create: `config/update-channels.json`
+- Create: `test/update-manifest.test.ts`
+- Modify: `test/manifest.test.ts`
+- Modify: `docs/iwa/development.md`
+
+- [ ] Make `update_manifest_url` an explicit build input: omit it by default; require a valid localhost URL for local update testing and an HTTPS stable URL for production builds. Never silently substitute a placeholder URL.
+- [ ] Generate Web Application Update Manifest JSON from reviewed release metadata. Validate exact IWA version syntax, unique monotonically increasing versions, unique bundle URLs, `default` and optional `beta` channel membership, and one immutable artifact per version/channel.
+- [ ] Add schema tests for valid and invalid manifests, channel selection, relative/absolute bundle URL handling, duplicate versions, and non-monotonic releases.
+- [ ] Build two local versions with one disposable test key and the localhost update manifest. Install the first signed bundle, force update checks at `chrome://web-app-internals`, install the second, and record the actual Chrome version and result.
+- [ ] Verify a normal forward update preserves saved accounts and cached resources and that IndexedDB schema migrations are backward-conscious. Do not claim storage preservation until the browser test passes.
+
+### Phase C: GitHub Actions build and signing
+
+**Files:**
+- Create: `.github/workflows/iwa-ci.yml`
+- Create: `.github/workflows/iwa-release.yml`
+- Create: `scripts/verify-release-inputs.mjs`
+- Create: `docs/iwa/ci-release.md`
+
+- [ ] Run lint, typecheck, tests, build, bundle audit, unsigned bundle generation, and release metadata validation for pull requests without secrets; do not sign or publish from pull-request workflows.
+- [ ] Sign only on protected version tags or an explicitly approved `workflow_dispatch`, using a protected GitHub Environment with required reviewers, minimum `contents: write` permissions, pinned action revisions, and concurrency protection.
+- [ ] Load an encrypted production key and its passphrase from separate protected environment secrets, write the temporary key only to a permission-restricted runner temp directory, mask outputs, and delete temporary material even on failure. If repository policy does not permit storing the IWA key in GitHub, stop and use an approved external signing service instead.
+- [ ] Verify the signed bundle Web Bundle ID matches the recorded production ID and the release version is strictly greater than every published version. Preserve each signed `.swbn` immutably; publish checksums, update metadata, and build provenance.
+- [ ] Add workflow static checks proving forks and pull requests cannot access release secrets and release jobs cannot run without protected-environment approval.
+
+### Phase D: Surge update hosting and rollout
+
+**Files:**
+- Create: `scripts/assemble-update-site.mjs`
+- Create: `scripts/verify-update-site.mjs`
+- Create: `test/update-site.test.ts`
+- Modify: `.github/workflows/iwa-release.yml`
+- Create: `docs/iwa/distribution.md`
+
+- [ ] Assemble a deployment directory with a stable `updates.json` plus immutable versioned bundle paths such as `releases/<version>/lastro-v2-<version>.swbn`; reject overwriting an existing version with different bytes.
+- [ ] Validate every update-manifest entry resolves to a present signed bundle, expected Web Bundle ID, matching version, and recorded SHA-256 before deployment.
+- [ ] Deploy to Surge only from the protected release workflow after explicit project-domain/token configuration. Read the Surge credential from a protected environment secret; never create or infer the project name/token in this phase.
+- [ ] Verify the deployed update manifest and each bundle over HTTPS, test from China and non-China networks, and record DNS/TLS, content-type, cache behavior, checksums, and update-check evidence.
+- [ ] Confirm the first public-install bundle contains the permanent `update_manifest_url`; users on Phase A builds without that field need a manual migration install before automatic updates can begin.
+- [ ] Document Stable/Beta rollout, retaining prior bundles, higher-version hotfixes, Chrome 150+ unmanaged-client requirement, 4-6 hour periodic checks, and manual update instructions for unsupported browsers.
+
+### Key and rollback safety requirements
+
+- The production signing key and production Web Bundle ID are independent from all disposable Phase A/B test keys and IDs.
+- Key loss or compromise is an incident, not a routine release. Follow Chrome's IWA key-rotation process where available; otherwise communicate that users may need to install a new app identity manually.
+- Do not use downgrade as routine rollback: Chrome's documented managed downgrade path clears IWA storage. Prefer publishing a higher-version fix and preserve prior immutable bundles for investigation.
+- Channel changes after a user-installed unmanaged IWA chooses its channel may require uninstall/reinstall; channel names and manifest entries must match exactly.
 
 ## Implementation Order and Checkpoints
 
@@ -335,7 +394,7 @@
 2. Tasks 4-6 produce a locally usable Direct TCP login path.
 3. Tasks 7-10 make the runtime self-contained, CSP-compliant, resource-efficient, and feature-complete.
 4. Task 11 creates the audited signed artifact.
-5. Task 12 is the release gate; do not call the work complete before its automated checks and required real-server validations pass.
+5. Task 12 is the local-test gate; do not call Phase A complete before its automated checks and required real-server validations pass.
 
 ## Self-Review Coverage
 
@@ -346,6 +405,6 @@
 - Package-local Lua/LUB and no remote code execution: Tasks 7, 8, and 11.
 - Preserve all V2 custom modules: Tasks 2 and 10.
 - Small package instead of full client resources: Tasks 7, 9, and 11.
-- IWA signing, identity, update readiness, and installation: Tasks 1, 11, and 12.
+- IWA signing, identity, and local installation: Tasks 1, 11, and 12; recurring update behavior is deferred to Phases B-D.
 - Standalone repository boundary with no LastROWeb runtime dependency: Tasks 1, 2, 11, and 12.
 - Credential, signing-key, and redistribution safety: Tasks 2, 11, and 12.

@@ -310,7 +310,38 @@ Vite 输出到 `dist`。构建脚本随后：
 - 可重复的 unsigned bundle 构建。
 - 使用外部私钥的手动签名流程。
 
-自动更新清单、Chrome IWA allowlist 申请和正式托管渠道可以在首个可安装版本通过后继续完成，但 release 文档必须说明这些限制。
+IWA 版本号与签名密钥共同决定可升级性：每个发布版都提高 manifest `version`，并使用同一把生产私钥签名，以维持 Web Bundle ID。更换签名密钥会改变应用身份，不能作为普通版本更新处理。生产密钥必须离线备份，并且不能进入 Git、构建产物或普通 pull request workflow。
+
+### 分阶段更新策略
+
+**阶段 A：本地功能验证（当前实施范围）**
+
+- 通过 IWA Dev Mode Proxy 调试，或使用本机专用测试密钥生成并手动安装 Signed Web Bundle。
+- manifest 包含合法 `version`，但不设置 `update_manifest_url`；不配置 GitHub Actions 发布密钥，不生成公网更新清单，也不部署 Surge。
+- 更新应用时手动构建并安装新测试包。测试密钥与未来生产密钥必须分开；阶段 A 的 Web Bundle ID 不是生产 ID。
+- `clientdata.ltsd.ro` 在产品上线前可以尚未有 DNS。阶段 A 使用 resolver 测试替身验证官方源失败后的备用源路径，不以公网备用域名可用作为本地 IWA 验收条件。
+
+**阶段 B：本地自动更新验证（阶段 A 经用户手动验收后再执行）**
+
+- 在 IWA manifest 构建输入中启用指向 `localhost` 更新清单的 `update_manifest_url`，并生成符合 Chrome schema 的 Web Application Update Manifest。
+- 使用同一把本地测试密钥生成两个严格递增版本，通过 `chrome://web-app-internals` 强制检查并验证升级；检查 IWA IndexedDB 中账号记录、资源缓存和版本化数据迁移。
+- 此测试安装包仍不得使用生产 Web Bundle ID 或生产密钥。
+
+**阶段 C/D：公网持续发布（本地 IWA 手动验收、更新设计确认后才实施）**
+
+- 生产安装包从首次公开安装起就必须内含稳定的 HTTPS `update_manifest_url`。已经安装阶段 A 且未设置更新地址的用户不能靠新增服务器文件获得自动更新；需要手动安装一个启用更新地址的过渡版本，之后才进入自动更新轨道。
+- GitHub Actions 对正式版本执行 lint、typecheck、测试、构建、审计和签名。签名只允许来自受保护的正式 release 环境或显式批准的手动 workflow；pull request workflow 不得读取生产签名材料。长期密钥保存在加密的受保护环境 secret 或独立签名服务中，key 与口令分开管理，workflow 权限最小化。
+- 正式 workflow 保留不可变的版本化 `.swbn`，并生成经过 schema、版本顺序、channel、bundle URL 和 Web Bundle ID 校验的 `updates.json`。Chrome channel 在首次安装时选择；本项目计划使用 `default`（Stable），可选 `beta`。同版本不得发布不同内容。
+- 后续由获授权的发布 workflow 将版本化 `.swbn`、`updates.json` 和必要的校验摘要发布到用户选择的 Surge 项目。Surge 的实际项目名/URL 与 token 只在用户配置后加入环境，不在当前任务中猜测或部署。
+
+Chrome 官方当前文档说明，用户自行安装（unmanaged）的 IWA 自动周期检查要求 Chrome 150 或更高版本，包内 manifest 必须包含有效 `update_manifest_url`，用户在初始安装时选择 channel，后续从所选 channel 检查更新，周期约为 4–6 小时。低于支持版本、使用不支持 IWA 的浏览器或缺少更新地址时，必须提供手动下载并安装新 `.swbn` 的说明，不能宣传自动更新。企业受管安装使用单独的管理策略。
+
+正常向前更新及账号数据迁移要通过真实 Chrome IWA 测试。不要把降级当作日常回滚：Chrome 官方版本管理说明指出受管 IWA 降级会完整重装，并清除该 IWA 的 IndexedDB、Cache 等存储。普通问题应发布一个更高版本的修复包。签名密钥丢失或泄露需要密钥轮换/重新安装流程，不能假设能静默换钥。
+
+更新机制的官方参考：
+
+- `https://developer.chrome.com/docs/iwa/version-management`
+- `https://developer.chrome.com/docs/iwa/key-rotation`
 
 ## 错误处理
 
@@ -349,6 +380,8 @@ Vite 输出到 `dist`。构建脚本随后：
 7. 清空资源缓存后观察一次官方优先、备用资源源 fallback；再次进入时命中本地缓存。
 8. 打开角色、地图、背包、技能、任务、公会、卡片典藏、自动战斗和快速传送功能，确认没有因瘦身漏包。
 9. 在 DevTools Direct Sockets 视图确认 TCP 目标与服务器返回的 handoff 地址一致。
+
+阶段 A 不要求真实公网 `clientdata.ltsd.ro` 已上线；必须通过自动化替身测试官方源失败后的备用源流程。真实 DNS/TLS/CORS/CORP 与跨区域资源检查属于阶段 C/D 的发布门槛。
 
 ## 发布完成标准
 
