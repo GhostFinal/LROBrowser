@@ -46,6 +46,9 @@ async function loadExecutableManifest(): Promise<ExecutableAssetManifest> {
 
 export async function bootstrapV2Client(options: BootstrapOptions): Promise<void> {
   globalThis.LastRODirectSocketsSupported = isDirectSocketsSupported();
+  if (!globalThis.LastRODirectSocketsSupported) {
+    throw new Error('当前页面不支持 Direct TCP。请安装客户端并从 Chrome 的 IWA 应用入口打开，不要直接访问本地开发服务器地址。');
+  }
   globalThis.ROConfig = buildClientConfig(options.profile, options.credentials);
   globalThis.LastRODirectSocketFactory = options.socketFactory ?? createDirectSocket;
   globalThis.LastROResourceRoots = LASTRO_RESOURCE_ROOTS;

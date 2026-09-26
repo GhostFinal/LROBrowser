@@ -106,10 +106,12 @@ export async function importCoreAssets({ clientRoot, roSourceRoot, runtimePath, 
   try {
     for (const relative of await filesUnder(stagedRuntime)) {
       if (relative === 'Online.js' || !/\.(?:[cm]?js)$/i.test(relative)) continue;
-      await addFile(entries, destinations, path.join(stagedRuntime, relative), `runtime/${path.basename(relative)}`, 'runtime', destinationRoot);
+      const patchedWorker = runtimePath && ['ThreadEventHandler.js', 'LastROThreadEventHandler.js'].includes(relative);
+      const inputRoot = patchedWorker ? path.dirname(runtimePath) : stagedRuntime;
+      await addFile(entries, destinations, path.join(inputRoot, relative), `runtime/${path.basename(relative)}`, 'runtime', destinationRoot);
     }
   } catch (error) {
-    if (error.code !== 'ENOENT') throw error;
+    if (error.code !== 'ENOENT' || runtimePath) throw error;
   }
   for (const name of ['world-data.json', 'mob-data.json']) {
     const generated = path.join(destinationRoot, 'data/world', name);
@@ -120,6 +122,10 @@ export async function importCoreAssets({ clientRoot, roSourceRoot, runtimePath, 
     } catch (error) {
       if (error.code !== 'ENOENT') throw error;
     }
+  }
+  if (runtimePath) {
+    await addFile(entries, destinations, path.join(path.dirname(runtimePath), 'lastro-resource-loader.js'),
+      'runtime/lastro-resource-loader.js', 'runtime', destinationRoot);
   }
   entries.sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
   const manifest = { files: entries };

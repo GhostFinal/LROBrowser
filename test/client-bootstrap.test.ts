@@ -1,7 +1,20 @@
-import { describe, expect, it } from 'vitest';
-import { parseExecutableAssetManifest } from '../src/runtime/client-bootstrap';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { bootstrapV2Client, parseExecutableAssetManifest } from '../src/runtime/client-bootstrap';
+import { getAvailableServerProfile } from '../src/servers/server-profiles';
+
+afterEach(() => vi.unstubAllGlobals());
 
 describe('executable asset manifest loading', () => {
+  it('blocks an ordinary browser before loading the runtime or its resources', async () => {
+    vi.stubGlobal('TCPSocket', undefined);
+    vi.stubGlobal('document', { baseURI: 'http://127.0.0.1:5173/' });
+    const requests: unknown[] = [];
+    vi.stubGlobal('fetch', (input: unknown) => { requests.push(input); throw new Error('unexpected fetch'); });
+    await expect(bootstrapV2Client({ mount: {} as HTMLElement,
+      profile: getAvailableServerProfile('lastro-2x'), credentials: { username: '', password: '' },
+    })).rejects.toThrow(/IWA/);
+    expect(requests).toEqual([]);
+  });
   it('reports an HTML fallback instead of attempting JSON parsing', async () => {
     const response = new Response('<!doctype html><html></html>', {
       status: 200,

@@ -1,0 +1,120 @@
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
+import { IDBFactory } from 'fake-indexeddb';
+import { describe, expect, it } from 'vitest';
+import { buildClientConfig } from '../src/runtime/client-config';
+import { getAvailableServerProfile } from '../src/servers/server-profiles';
+
+const source = readFileSync('.staging/runtime/Online.js', 'utf8');
+const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+const pieces = new Map<string, string>();
+function visit(node: ts.Node) {
+  if (ts.isFunctionDeclaration(node) && ['init', 'loadFiles', 'savingFiles', 'onFileLoaded', 'onFileGetted'].includes(node.name?.text ?? '')) {
+    pieces.set(node.name!.text, node.getText(file).replaceAll('import.meta.url', '"https://iwa.invalid/runtime/Online.js"'));
+  }
+  if (ts.isClassExpression(node) && node.name?.text === 'Client') pieces.set('Client', node.getText(file));
+  ts.forEachChild(node, visit);
+}
+visit(file);
+
+function harness() {
+  const requests: string[] = [];
+  const callbacks = new Map<number, (data: unknown, error: unknown, input: unknown) => void>();
+  let uid = 0;
+  let ready = false;
+  let advances = 0;
+  const manifest = { files: [{ path: 'System/test.lua', kind: 'lua' }] };
+  const worker = vm.createContext({
+    ArrayBuffer, Uint8Array, URL, Blob, TextDecoder, TextEncoder, AbortController,
+    indexedDB: new IDBFactory(), setTimeout, clearTimeout, console,
+    location: { href: 'https://iwa.invalid/runtime/LastROThreadEventHandler.js' },
+    // Legacy filesystem initialization must never be required by an IWA.
+    requestFileSystemSync: () => { throw new Error('legacy filesystem used'); },
+    requestFileSystem: () => { throw new Error('legacy filesystem used'); },
+    fetch: async (input: string | URL) => {
+      requests.push(String(input));
+      return new Response('test#table#', { headers: { 'content-type': 'application/octet-stream' } });
+    },
+    postMessage: (message: { type?: string; uid?: number; arguments?: [unknown, unknown, unknown] }) => {
+      if (message.type === 'THREAD_READY') ready = true;
+      if (message.uid) {
+        const callback = callbacks.get(message.uid);
+        callbacks.delete(message.uid);
+        if (callback && message.arguments) callback(...message.arguments);
+      }
+    },
+  });
+  worker.self = worker;
+  worker.importScripts = (...paths: string[]) => {
+    for (const path of paths) vm.runInContext(readFileSync(`.staging/core/runtime/${path.split('?')[0]}`, 'utf8'), worker);
+  };
+  vm.runInContext(readFileSync('.staging/runtime/LastROThreadEventHandler.js', 'utf8'), worker);
+  const send = (type: string, data: unknown, callback?: (data: unknown, error: unknown, input: unknown) => void) => {
+    const id = callback ? ++uid : 0;
+    if (callback) callbacks.set(id, callback);
+    worker.onmessage({ data: { type, data, uid: id } });
+  };
+  const config = buildClientConfig(getAvailableServerProfile('lastro-2x'), { username: '', password: '' });
+  const pending = new Map<string, { resolve: (data: unknown) => void; reject: (error: unknown) => void }>();
+  const main = vm.createContext({
+    ArrayBuffer, Uint8Array,
+    Configs: { get: (key: keyof typeof config) => config[key] },
+    LastROExecutableManifest: manifest,
+    Thread: { send }, PacketVerManager_default: { value: 0 },
+    MemoryManager: {
+      exist: () => false,
+      get: (path: string, resolve: (data: unknown) => void, reject: (error: unknown) => void) => pending.set(path, { resolve, reject }),
+      set: (path: string, data: unknown, error: unknown) => {
+        const callback = pending.get(path)!;
+        pending.delete(path);
+        if (error) callback.reject(error);
+        else callback.resolve(data);
+      },
+    },
+    navigator: { webkitTemporaryStorage: { queryUsageAndQuota: () => { throw new Error('legacy quota used'); } } },
+    document: { createElement: () => ({}) },
+    Queue: class {
+      tasks: Array<() => void> = [];
+      add(task: () => void) { this.tasks.push(task); }
+      run() { this.tasks[0]!(); }
+      _next() { advances++; }
+    },
+    Intro_default: { append: () => { throw new Error('GRF picker displayed'); } },
+  });
+  vm.runInContext(`${pieces.get('savingFiles')}\n${pieces.get('loadFiles')}\n${pieces.get('onFileLoaded')}\n${pieces.get('onFileGetted')}\nvar Client = ${pieces.get('Client')};`, main);
+  return { requests, ready, main, send, advances: () => advances };
+}
+
+describe('V2 native resource startup', () => {
+  it('removes the native loading overlay when WebGL startup throws', () => {
+    let visible = false;
+    const context = vm.createContext({
+      roInitSpinner: { add: () => { visible = true; }, remove: () => { visible = false; } },
+      Plugins: { init: () => {} },
+      GameEngine: { init: () => { throw new Error('WebGL2 unavailable'); } },
+      window: {},
+    });
+    expect(() => vm.runInContext(`${pieces.get('init')}\ninit();`, context)).toThrow('WebGL2 unavailable');
+    expect(visible).toBe(false);
+  });
+  it('passes THREAD_READY and CLIENT_INIT without a GRF picker or legacy filesystem', () => {
+    const runtime = harness();
+    expect(runtime.ready).toBe(true);
+    vm.runInContext('loadFiles(() => {});', runtime.main);
+    expect(runtime.advances()).toBe(1);
+  });
+
+  it('passes the manifest from Client.init to real Worker LOAD_FILE and GET_FILE handlers', async () => {
+    const runtime = harness();
+    vm.runInContext('loadFiles(() => {});', runtime.main);
+    const table = await vm.runInContext('new Promise((resolve, reject) => Client.loadFile("data/mp3nametable.txt", resolve, reject));', runtime.main);
+    expect(table).toBeInstanceOf(Uint8Array);
+    const script = await vm.runInContext('new Promise((resolve, reject) => Client.getFile("System/test.lua", resolve, reject));', runtime.main);
+    expect(script).toBeInstanceOf(ArrayBuffer);
+    expect(runtime.requests).toEqual([
+      'https://game.lastro.cn/ro/client_re/data/mp3nametable.txt',
+      'https://iwa.invalid/core/System/test.lua',
+    ]);
+  });
+});

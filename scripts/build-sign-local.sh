@@ -58,6 +58,7 @@ fi
   --input "$ROOT_DIR/.staging/v2/Online.js" \
   --output "$ROOT_DIR/.staging/runtime/Online.js" \
   --manifest "$ROOT_DIR/.staging/runtime-patch-manifest.json"
+"$NODE_BIN" scripts/patch-resource-worker.mjs
 "$NODE_BIN" scripts/import-core-assets.mjs \
   --client-root "$CLIENT_ROOT" \
   --ro-source-root "$RO_SOURCE_ROOT" \

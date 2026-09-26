@@ -47,6 +47,17 @@ describe('core executable asset importer', () => {
     await expect(importCoreAssets({ clientRoot: f.client, roSourceRoot: f.source, output: f.output })).rejects.toThrow();
   });
 
+  it('fails when a required patched worker is missing instead of emitting an incomplete manifest', async () => {
+    const f = await fixture();
+    const runtime = path.join(f.root, 'runtime');
+    await mkdir(runtime);
+    await writeFile(path.join(runtime, 'Online.js'), 'export {};');
+    await writeFile(path.join(runtime, 'lastro-resource-loader.js'), 'var LastROResources = {};');
+    await expect(importCoreAssets({ clientRoot: f.client, roSourceRoot: f.source, output: f.output,
+      runtimePath: path.join(runtime, 'Online.js'),
+    })).rejects.toThrow(/ENOENT/);
+  });
+
   it('matches the reviewed baseline counts and byte totals', async () => {
     const luaRoot = '/run/media/parker/7A9F-F871/ROWeb/ro/client_re/data/luafiles514/lua files';
     const systemRoot = '/run/media/parker/7A9F-F871/ROWeb/ro/client_re/System';
