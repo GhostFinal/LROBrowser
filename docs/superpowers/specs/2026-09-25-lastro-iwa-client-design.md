@@ -6,7 +6,7 @@
 
 在独立的 `RoBrowserV2` 仓库中构建一个可签名和安装的 Isolated Web App（IWA），保留现有 V2 客户端及所有 LastRO 定制模块，使用 Direct Sockets 的 `TCPSocket` 直接连接 LastRO 登录服、角色服和地图服，并彻底移除开源版本中的 WSS 连接路径。该仓库不属于也不依赖露天商店网站项目。
 
-客户端只把启动和执行所需的核心代码、Worker、WASM、Lua/LUB、协议配置及少量启动素材打包进 IWA。大型游戏资源在本地缓存未命中时先从 LastRO 官方站点获取，失败后再从 `clientdata.ltsd.ro` 备用资源源获取。
+客户端只把启动和执行所需的核心代码、Worker、WASM、Lua/LUB、协议配置及少量启动素材打包进 IWA。大型游戏资源在本地缓存未命中时先从 LastRO 官方站点获取，失败后再从 `rodata.ltsd.ro` 备用资源源获取。
 
 ## 已确认的产品约束
 
@@ -20,7 +20,7 @@
 8. IWA 不携带完整 `ro/client_re`；大型地图、纹理、Sprite、模型和音频按需下载。
 9. 开源包不得包含当前私人快捷登录账号、密码、XKore 账号或私人服务器入口。
 10. 首期以 Windows/Linux 桌面版 Chrome 的 IWA 能力为验收基线；Edge 只有在实机证明具备等价 IWA 与 Direct Sockets 能力后才列为支持环境。
-11. 生产代码允许的远程被动资源 origin 只有 `https://game.lastro.cn` 和 `https://clientdata.ltsd.ro`；导入快照或构建产物中出现其他绝对远程 origin 必须失败，避免私人基础设施地址进入公开仓库。
+11. 生产代码允许的远程被动资源 origin 只有 `https://game.lastro.cn` 和 `https://rodata.ltsd.ro`；导入快照或构建产物中出现其他绝对远程 origin 必须失败，避免私人基础设施地址进入公开仓库。
 
 ## 基线与迁移策略
 
@@ -244,14 +244,14 @@ IWA 包内核心
     ↓ 未命中
 https://game.lastro.cn/ro/client_re/
     ↓ Direct TCP HTTP/1.1 port 80 的网络错误、超时、404、5xx、HTML 响应或无效内容
-https://clientdata.ltsd.ro/ro/client_re/
+https://rodata.ltsd.ro/ro/client_re/
     ↓ 失败
 向客户端返回明确资源错误
 ```
 
 资源路径继续使用当前 `lastro-resource-path.js` 的 GBK/EUC-KR 混合路径恢复、扩展名小写、物品图标大小写和历史 Sprite 后缀 fallback。每个根地址都要尝试同一组候选路径，不能只在 404 时 fallback；CORS 和网络错误也必须进入下一来源。
 
-浏览器 Fetch 不能读取官方源，因为响应没有 `Access-Control-Allow-Origin`。因此 Worker 保留 canonical HTTPS resource roots 供审计和未来 TLS transport 使用；当前被动资源 cache miss 通过 IWA `TCPSocket` 连接相同 host 的 port 80，发送受限 HTTP/1.1 `GET`。`clientdata.ltsd.ro` 是为本产品规划的备用资源域名，当前产品尚未上线，因此暂未配置可解析 DNS；本文不声称它现已可访问。发布前必须验证该域名的 DNS、port 80 可达性、Range/缓存响应以及至少一组已知资源。备用资源源 fallback 是正常运行路径，不应被记录成异常崩溃。
+浏览器 Fetch 不能读取官方源，因为响应没有 `Access-Control-Allow-Origin`。因此 Worker 保留 canonical HTTPS resource roots 供审计和未来 TLS transport 使用；当前被动资源 cache miss 通过 IWA `TCPSocket` 连接相同 host 的 port 80，发送受限 HTTP/1.1 `GET`。`rodata.ltsd.ro` 是为本产品规划的备用资源域名，当前产品尚未上线，因此暂未配置可解析 DNS；本文不声称它现已可访问。发布前必须验证该域名的 DNS、port 80 可达性、Range/缓存响应以及至少一组已知资源。备用资源源 fallback 是正常运行路径，不应被记录成异常崩溃。
 
 音频不再直接把第一个 URL 交给 `<audio>`。Worker 应通过统一 resolver 获取 ArrayBuffer，保证官方失败时仍能切换备用资源源并写入本地缓存。
 
@@ -317,7 +317,7 @@ IWA 版本号与签名密钥共同决定可升级性：每个发布版都提高 
 - 通过 IWA Dev Mode Proxy 调试，或使用本机专用测试密钥生成并手动安装 Signed Web Bundle。
 - manifest 包含合法 `version`，但不设置 `update_manifest_url`；不配置 GitHub Actions 发布密钥，不生成公网更新清单，也不部署 Surge。
 - 更新应用时手动构建并安装新测试包。测试密钥与未来生产密钥必须分开；阶段 A 的 Web Bundle ID 不是生产 ID。
-- `clientdata.ltsd.ro` 在产品上线前可以尚未有 DNS。阶段 A 使用 resolver 测试替身验证官方源失败后的备用源路径，不以公网备用域名可用作为本地 IWA 验收条件。
+- `rodata.ltsd.ro` 在产品上线前可以尚未有 DNS。阶段 A 使用 resolver 测试替身验证官方源失败后的备用源路径，不以公网备用域名可用作为本地 IWA 验收条件。
 
 **阶段 B：本地自动更新验证（阶段 A 经用户手动验收后再执行）**
 
@@ -379,7 +379,7 @@ Chrome 官方当前文档说明，用户自行安装（unmanaged）的 IWA 自�
 8. 打开角色、地图、背包、技能、任务、公会、卡片典藏、自动战斗和快速传送功能，确认没有因瘦身漏包。
 9. 在 DevTools Direct Sockets 视图确认 TCP 目标与服务器返回的 handoff 地址一致。
 
-阶段 A 不要求真实公网 `clientdata.ltsd.ro` 已上线；必须通过自动化替身测试官方源失败后的备用源流程。真实 DNS、port 80 可达性、HTTP framing、内容类型与跨区域资源检查属于阶段 C/D 的发布门槛。当前 Direct TCP transport 不依赖浏览器 CORS；未来切换 TLS 时再验证证书和加密连接。
+阶段 A 不要求真实公网 `rodata.ltsd.ro` 已上线；必须通过自动化替身测试官方源失败后的备用源流程。真实 DNS、port 80 可达性、HTTP framing、内容类型与跨区域资源检查属于阶段 C/D 的发布门槛。当前 Direct TCP transport 不依赖浏览器 CORS；未来切换 TLS 时再验证证书和加密连接。
 
 ## 发布完成标准
 

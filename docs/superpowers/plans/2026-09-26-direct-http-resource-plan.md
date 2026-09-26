@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Only `TCPSocket` is used for the remote passive-resource transport.
-- The transport accepts only the already approved `https://game.lastro.cn` and `https://clientdata.ltsd.ro` resource origins and `/ro/client_re/` paths.
+- The transport accepts only the already approved `https://game.lastro.cn` and `https://rodata.ltsd.ro` resource origins and `/ro/client_re/` paths.
 - Remote content remains passive; `.js`, `.mjs`, `.cjs`, `.wasm`, `.lua`, and `.lub` stay package-only.
 - No WebSocket, WSS, proxy, bridge, Electron, Node `net`/`http`, or TLS dependency is added.
 - Canonical resource URLs remain HTTPS so origin auditing and a future TLS transport can reuse the same resolver contract; the current transport explicitly connects to port 80.

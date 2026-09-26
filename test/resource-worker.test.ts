@@ -16,7 +16,7 @@ async function loadWorker(responses: Array<Response | Error>, manifest: string[]
     ne: { saveFile: (_path: string, bytes: ArrayBuffer) => saved.push(bytes) },
     se: {
       resourcePathCharset: 'gbk',
-      lastroResourceRoots: ['https://game.lastro.cn/ro/client_re/', 'https://clientdata.ltsd.ro/ro/client_re/'],
+      lastroResourceRoots: ['https://game.lastro.cn/ro/client_re/', 'https://rodata.ltsd.ro/ro/client_re/'],
       lastroExecutableManifest: manifest.map((path) => ({ path }))
     },
     self: { location: { href: 'https://iwa.invalid/runtime/LastROThreadEventHandler.js' } },
@@ -86,7 +86,7 @@ describe('LastRO resource worker', () => {
       expect(worker.tcpRequests.map(value => decodeURIComponent(value.request.split('\r\n')[0]!)))
         .toEqual(Array(2).fill(`GET /ro/client_re/${publishedPath} HTTP/1.1`));
       expect(result.error).toContain(`https://game.lastro.cn/ro/client_re/${encodeURI(publishedPath)} [http-404]`);
-      expect(result.error).toContain(`https://clientdata.ltsd.ro/ro/client_re/${encodeURI(publishedPath)} [http-503]`);
+      expect(result.error).toContain(`https://rodata.ltsd.ro/ro/client_re/${encodeURI(publishedPath)} [http-503]`);
     }
   });
 
@@ -124,7 +124,7 @@ describe('LastRO resource worker', () => {
     expect(worker.urls).toEqual([]);
     expect(worker.tcpRequests.map(request => [request.host, request.port])).toEqual([
       ['game.lastro.cn', 80],
-      ['clientdata.ltsd.ro', 80],
+      ['rodata.ltsd.ro', 80],
     ]);
   });
 

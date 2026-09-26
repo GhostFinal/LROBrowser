@@ -26,7 +26,7 @@
 | `https://game.lastro.cn/ro/client_re/data/mapnametable.txt` | 200 | `DB.init()` 读取地图名称 |
 | `https://game.lastro.cn/ro/client_re/data/msgstringtable.txt` | 200 | `DB.init()` 读取界面字符串 |
 | `https://game.lastro.cn/ro/client_re/data/texture/%EC%9C%A0%EC%A0%80%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4/bgi_temp.bmp` | 404 | `Background.setImage("bgi_temp.bmp")`；失败回调允许继续启动 |
-| `https://clientdata.ltsd.ro/ro/client_re/data/mp3nametable.txt` | DNS `ENOTFOUND` | 官方源失败后的备用源 |
+| `https://rodata.ltsd.ro/ro/client_re/data/mp3nametable.txt` | DNS `ENOTFOUND` | 官方源失败后的备用源 |
 
 官方缺少 CORS 许可与备用源未解析是外部限制。客户端不再依赖浏览器 Fetch 读取官方源，而是通过受限 Direct TCP HTTP/1.1 transport 读取 port 80；未修改远端服务，未增加代理、任意 origin 或远程 executable fallback。启动代码不需要目录索引，也没有猜测索引 URL。
 

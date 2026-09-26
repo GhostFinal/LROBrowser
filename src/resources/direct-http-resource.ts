@@ -1,6 +1,6 @@
 const RESOURCE_ROOTS = new Map([
   ['https://game.lastro.cn', 'game.lastro.cn'],
-  ['https://clientdata.ltsd.ro', 'clientdata.ltsd.ro'],
+  ['https://rodata.ltsd.ro', 'rodata.ltsd.ro'],
 ]);
 
 const REQUEST_HEADERS = [

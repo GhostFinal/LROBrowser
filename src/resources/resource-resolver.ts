@@ -3,7 +3,7 @@ import { createResourceCache, type ResourceCache } from './resource-cache';
 
 export const DEFAULT_RESOURCE_ROOTS = Object.freeze([
   'https://game.lastro.cn/ro/client_re/',
-  'https://clientdata.ltsd.ro/ro/client_re/'
+  'https://rodata.ltsd.ro/ro/client_re/'
 ] as const);
 
 export class ResourceResolutionError extends Error {

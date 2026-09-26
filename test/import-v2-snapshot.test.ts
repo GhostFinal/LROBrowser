@@ -120,7 +120,7 @@ describe('reviewed V2 import gate', () => {
   it('accepts only the two approved HTTPS resource origins', async () => {
     const f = await fixture();
     await writeFile(path.join(f.source, 'lastro-example.mjs'),
-      'export const roots = ["https://game.lastro.cn/ro/client_re/", "https://clientdata.ltsd.ro/ro/client_re/"];');
+      'export const roots = ["https://game.lastro.cn/ro/client_re/", "https://rodata.ltsd.ro/ro/client_re/"];');
     expect(f.run().status).toBe(0);
   });
 

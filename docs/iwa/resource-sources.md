@@ -3,7 +3,7 @@
 Phase A 的 Worker 只允许使用以下两个被动资源源，并按顺序尝试：
 
 1. `https://game.lastro.cn/ro/client_re/`
-2. `https://clientdata.ltsd.ro/ro/client_re/`
+2. `https://rodata.ltsd.ro/ro/client_re/`
 
 浏览器 Fetch 不能读取官方源的跨域响应，因为响应没有 `Access-Control-Allow-Origin`。因此远程被动资源保留 canonical HTTPS URL，但 cache miss 时由 IWA `TCPSocket` 连接对应源的 port 80，发送受限的 HTTP/1.1 `GET`，再将二进制响应交给 resolver。备用源当前可以尚未配置 DNS；测试使用 fake `TCPSocket` 覆盖官方失败、备用成功、HTML、网络错误和 HTTP 错误路径。
 
@@ -19,7 +19,7 @@ Direct HTTP transport 只允许 `GET`、`/ro/client_re/` 下的路径和两个�
 
 正式发布前必须逐项验证：
 
-- `clientdata.ltsd.ro` 的 DNS、port 80 可达性和资源响应；
+- `rodata.ltsd.ro` 的 DNS、port 80 可达性和资源响应；
 - 两个源的 `Content-Type`、Range、缓存行为和非 2xx 响应；
 - Direct TCP 权限、DNS 失败、连接超时、HTTP 分片和二进制响应边界；
 - 已知地图、精灵、模型、纹理和音频资源的候选路径；

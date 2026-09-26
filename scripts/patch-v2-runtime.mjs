@@ -87,7 +87,7 @@ export function patchLegacyScriptSinks(source) {
   }
   const branch = /}\s*else if \(options\.flashcanvas !== undefined\) \{[\s\S]*?(?=\n\s*methods = \{)/;
   if (branch.test(source)) {
-    source = source.replace(branch, '} else {\n\t\t\t\tcanvasReadyToDraw = false;\n\t\t\t');
+    source = source.replace(branch, '} else {\n\t\t\t\tcanvasReadyToDraw = false;\n\t\t\t}');
   }
   if (/createElement\(\s*["']script["']\s*\)/.test(source)
     || /(?:\.src|setAttribute\(\s*["']src["'])\s*=?.*(?:proxy|flashcanvas)/i.test(source)) {

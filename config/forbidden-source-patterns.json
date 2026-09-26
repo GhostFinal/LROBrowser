@@ -1,7 +1,7 @@
 {
   "allowedOrigins": [
     "https://game.lastro.cn",
-    "https://clientdata.ltsd.ro"
+    "https://rodata.ltsd.ro"
   ],
   "credentialMarkers": ["quickLoginAccounts"],
   "privateProfileMarkers": ["xkore"],

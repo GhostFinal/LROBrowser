@@ -25,7 +25,7 @@ declare global {
 
 const LASTRO_RESOURCE_ROOTS = Object.freeze([
   'https://game.lastro.cn/ro/client_re/',
-  'https://clientdata.ltsd.ro/ro/client_re/'
+  'https://rodata.ltsd.ro/ro/client_re/'
 ] as const);
 
 export async function parseExecutableAssetManifest(response: Response): Promise<ExecutableAssetManifest> {

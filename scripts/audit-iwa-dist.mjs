@@ -4,7 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { auditRuntimeSource } from './audit-runtime-code.mjs';
 
-const ALLOWED_ORIGINS = new Set(['https://game.lastro.cn', 'https://clientdata.ltsd.ro']);
+const ALLOWED_ORIGINS = new Set(['https://game.lastro.cn', 'https://rodata.ltsd.ro']);
 const NON_RESOURCE_ORIGINS = new Set(['http://www.w3.org']);
 const REQUIRED_HEADERS = {
   'Content-Security-Policy': "script-src 'self' 'wasm-unsafe-eval'",
