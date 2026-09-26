@@ -60,6 +60,42 @@ function replacePathFindingWorkerCreation(source) {
     'const workerUrl = createLastROWorkerScriptUrl("PathFindingWorker.js");');
 }
 
+/**
+ * Remove legacy html2canvas script injection paths. IWA Trusted Types blocks
+ * dynamic TrustedScriptURL assignments, and these proxy/FlashCanvas branches
+ * are obsolete in the canvas-capable browser runtime.
+ */
+export function patchLegacyScriptSinks(source) {
+  const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const proxyFunctions = [];
+  function visit(node) {
+    if (ts.isFunctionDeclaration(node) && node.name?.text === 'proxyGetImage') proxyFunctions.push(node);
+    ts.forEachChild(node, visit);
+  }
+  visit(file);
+  if (proxyFunctions.length === 1) {
+    const node = proxyFunctions[0];
+    const bodyStart = node.body.getStart(file);
+    source = source.slice(0, bodyStart) + `{
+    imageObj.succeeded = false;
+    images.numLoaded++;
+    images.numFailed++;
+    start();
+  }` + source.slice(node.body.end);
+  } else if (proxyFunctions.length > 1) {
+    fail('function:proxyGetImage');
+  }
+  const branch = /}\s*else if \(options\.flashcanvas !== undefined\) \{[\s\S]*?(?=\n\s*methods = \{)/;
+  if (branch.test(source)) {
+    source = source.replace(branch, '} else {\n\t\t\t\tcanvasReadyToDraw = false;\n\t\t\t');
+  }
+  if (/createElement\(\s*["']script["']\s*\)/.test(source)
+    || /(?:\.src|setAttribute\(\s*["']src["'])\s*=?.*(?:proxy|flashcanvas)/i.test(source)) {
+    fail('legacy-script-sink');
+  }
+  return source;
+}
+
 export function patchTrustedTypesDomWrites(source) {
   const file = ts.createSourceFile('runtime.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
   const edits = [];
@@ -175,6 +211,7 @@ ${normalizedSource}`;
   output = replaceOnce(output, 'init_NodeSocket();', '');
   output = replaceWorkerCreation(output);
   output = replacePathFindingWorkerCreation(output);
+  output = patchLegacyScriptSinks(output);
   output = patchLuaValueFailure(output);
   for (const table of ['map', 'npc', 'link', 'linkdistance', 'npcdistance']) {
     output = replaceOnce(output, `DB.LUA_PATH + "navigation/navi_${table}_krpri.lub"`,

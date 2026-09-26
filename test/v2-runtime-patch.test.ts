@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
-import { patchTrustedTypesDomWrites, patchV2Runtime } from '../scripts/patch-v2-runtime.mjs';
+import { patchLegacyScriptSinks, patchTrustedTypesDomWrites, patchV2Runtime } from '../scripts/patch-v2-runtime.mjs';
 import { buildClientConfig } from '../src/runtime/client-config';
 import { LASTRO_SERVER_PROFILES } from '../src/servers/server-profiles';
 
@@ -8,6 +8,30 @@ const profile = LASTRO_SERVER_PROFILES[0];
 if (!profile || profile.availability !== 'available') throw new Error('missing fixture profile');
 
 describe('V2 runtime patch', () => {
+  it('removes legacy html2canvas proxy and FlashCanvas script sinks', () => {
+    const source = [
+      'function proxyGetImage(url, img, imageObj) {',
+      '  let script = document.createElement("script");',
+      '  script.setAttribute("src", options.proxy);',
+      '  document.body.appendChild(script);',
+      '}',
+      '_html2canvas.Renderer.Canvas = function(options) {',
+      '  let canvas = document.createElement("canvas");',
+      '  if (canvas.getContext) { canvasReadyToDraw = true; }',
+      '  else if (options.flashcanvas !== undefined) {',
+      '    let script = document.createElement("script");',
+      '    script.src = options.flashcanvas;',
+      '    document.body.appendChild(script);',
+      '  }',
+      '  methods = { _create() {} };',
+      '};',
+    ].join('\n');
+    const patched = patchLegacyScriptSinks(source);
+    expect(patched).not.toContain('createElement("script")');
+    expect(patched).not.toContain('options.proxy');
+    expect(patched).not.toContain('options.flashcanvas');
+  });
+
   it('rewrites executable DOM HTML sinks, including Background.setImage', () => {
     const source = [
       'class Background {',

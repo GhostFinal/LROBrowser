@@ -6,7 +6,36 @@ import ts from 'typescript';
 export function auditRuntimeSource(source, file = 'runtime.js') {
   const parsed = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
   const violations = [];
+  const executableElements = new Set();
   function visit(node) {
+    if (ts.isVariableDeclaration(node) && node.initializer
+      && ts.isCallExpression(node.initializer)
+      && ts.isPropertyAccessExpression(node.initializer.expression)
+      && node.initializer.expression.name.text === 'createElement'
+      && node.initializer.arguments.length === 1
+      && ts.isStringLiteralLike(node.initializer.arguments[0])
+      && node.initializer.arguments[0].text.toLowerCase() === 'script'
+      && ts.isIdentifier(node.name)) {
+      executableElements.add(node.name.text);
+      violations.push({ file, code: 'executable-script-element' });
+    }
+    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)
+      && node.expression.name.text === 'createElement'
+      && node.arguments.length === 1 && ts.isStringLiteralLike(node.arguments[0])
+      && node.arguments[0].text.toLowerCase() === 'script') {
+      violations.push({ file, code: 'executable-script-element' });
+    }
+    if (ts.isBinaryExpression(node) && ts.isPropertyAccessExpression(node.left)
+      && node.left.name.text === 'src' && ts.isIdentifier(node.left.expression)
+      && executableElements.has(node.left.expression.text)) {
+      violations.push({ file, code: 'trusted-script-url-assignment' });
+    }
+    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)
+      && node.expression.name.text === 'setAttribute' && ts.isIdentifier(node.expression.expression)
+      && executableElements.has(node.expression.expression.text) && node.arguments.length >= 2
+      && ts.isStringLiteralLike(node.arguments[0]) && node.arguments[0].text.toLowerCase() === 'src') {
+      violations.push({ file, code: 'trusted-script-url-assignment' });
+    }
     if (ts.isCallExpression(node)) {
       const name = ts.isIdentifier(node.expression) ? node.expression.text : '';
       if (name === 'eval' || name === 'Function') violations.push({ file, code: name });

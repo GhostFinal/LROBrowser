@@ -10,6 +10,8 @@ describe('isolated app CSP audit', () => {
     'eval(code);',
     'const script = document.createElement("script"); script.src = "https://bad.invalid/app.js";',
     'fetch("/core/data.lua");',
+    'const script = document.createElement("script"); script.src = dynamicUrl;',
+    'const script = document.createElement("script"); script.setAttribute("src", dynamicUrl);',
   ])('rejects executable construction or executable network loading: %s', source => {
     expect(() => auditRuntimeSource(source, 'fixture.js')).toThrow();
   });
