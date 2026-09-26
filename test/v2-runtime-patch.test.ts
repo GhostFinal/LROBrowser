@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
-import { patchLegacyScriptSinks, patchTrustedTypesDomWrites, patchV2Runtime } from '../scripts/patch-v2-runtime.mjs';
+import { patchGuildEmblemRequestCallbacks, patchLegacyScriptSinks, patchTrustedTypesDomWrites, patchV2Runtime } from '../scripts/patch-v2-runtime.mjs';
 import { buildClientConfig } from '../src/runtime/client-config';
 import { LASTRO_SERVER_PROFILES } from '../src/servers/server-profiles';
 
@@ -8,6 +8,11 @@ const profile = LASTRO_SERVER_PROFILES[0];
 if (!profile || profile.availability !== 'available') throw new Error('missing fixture profile');
 
 describe('V2 runtime patch', () => {
+  it('keeps guild emblem callback arguments image-first', () => {
+    const source = 'this.onSuccess(entry.guildId, entry.version, entry.image, entry.gif);';
+    expect(patchGuildEmblemRequestCallbacks(source)).toBe('this.onSuccess(entry.guildId, entry.image, entry.gif);');
+  });
+
   it('removes legacy html2canvas proxy and FlashCanvas script sinks', () => {
     const source = [
       'function proxyGetImage(url, img, imageObj) {',

@@ -96,6 +96,15 @@ export function patchLegacyScriptSinks(source) {
   return source;
 }
 
+export function patchGuildEmblemRequestCallbacks(source) {
+  const callback = 'this.onSuccess(entry.guildId, entry.version, entry.image, entry.gif);';
+  const replacement = 'this.onSuccess(entry.guildId, entry.image, entry.gif);';
+  const count = source.split(callback).length - 1;
+  if (count === 0) return source;
+  if (count !== 1) fail('anchor:guild-emblem-onSuccess');
+  return source.replace(callback, replacement);
+}
+
 export function patchTrustedTypesDomWrites(source) {
   const file = ts.createSourceFile('runtime.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
   const edits = [];
