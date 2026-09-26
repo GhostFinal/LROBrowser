@@ -7,11 +7,43 @@ function response(status: number, bytes = new Uint8Array([1, 2]).buffer, content
 }
 
 describe('passive resource resolver', () => {
+  it('loads native login assets from the official GBK interface directory after HTML or 404 candidates', async () => {
+    for (const [input, available] of [
+      ['data/texture/유저인터페이스/login_interface/win_login.bmp', 'data/texture/蜡历牢磐其捞胶/login_interface/win_login.bmp'],
+      ['data/texture/유저인터페이스/t_¹è°æ1-1.bmp', 'data/texture/蜡历牢磐其捞胶/t_硅版1-1.bmp'],
+    ]) {
+      const urls: string[] = [];
+      const cache = new MemoryResourceCache();
+      const fetch = async (url: string) => {
+        urls.push(url);
+        if (url === DEFAULT_RESOURCE_ROOTS[0] + encodeURI(available!)) return response(200, new Uint8Array([66, 77]).buffer);
+        return urls.length === 1 ? response(200, new TextEncoder().encode('<html>missing</html>').buffer, 'text/html') : response(404);
+      };
+      await expect(resolvePassiveResource(input!, { cache, fetch: fetch as typeof globalThis.fetch }))
+        .resolves.toEqual(new Uint8Array([66, 77]).buffer);
+      expect(urls.every(url => url.startsWith(DEFAULT_RESOURCE_ROOTS[0]))).toBe(true);
+      expect((await cache.match(input!))?.sourceUrl).toBe(DEFAULT_RESOURCE_ROOTS[0] + encodeURI(available!));
+    }
+  });
+
   it('serves a cache hit without calling fetch', async () => {
     const cache = new MemoryResourceCache();
     await cache.put('data/map/prt.gat', new Uint8Array([7]).buffer, { sourceUrl: 'cache://test' });
     const fetch = async () => { throw new Error('fetch should not run'); };
     await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch })).resolves.toEqual(new Uint8Array([7]).buffer);
+  });
+
+  it('keeps original logical paths for existing caches and packaged executables', async () => {
+    const cache = new MemoryResourceCache();
+    const path = 'data/wav/버튼소리.wav';
+    await cache.put(path, new Uint8Array([7]).buffer, { sourceUrl: 'cache://test' });
+    const fetch = async () => { throw new Error('unexpected remote request'); };
+    await expect(resolvePassiveResource(path, { cache, fetch })).resolves.toEqual(new Uint8Array([7]).buffer);
+    const script = 'data/배경.lua';
+    await expect(resolvePassiveResource(script, { fetch, packageLookup: async name => {
+      expect(name).toBe(script);
+      return new Uint8Array([8]).buffer;
+    } })).resolves.toEqual(new Uint8Array([8]).buffer);
   });
 
   it('tries official candidates before the backup source', async () => {
@@ -57,23 +89,41 @@ describe('passive resource resolver', () => {
     await expect(resolvePassiveResource('../secret.exe', { fetch })).rejects.toMatchObject({ name: 'ResourceResolutionError' });
   });
 
-  it('keeps legacy GBK/EUC-KR candidate order and sprite fallbacks', () => {
+  it('uses GBK-decoded legacy bytes and keeps sprite fallbacks without Korean URLs', () => {
     const mojibake = `data/sprite/${String.fromCharCode(0xb0, 0xa1)}/normal.act`;
     expect(buildResourcePathCandidates(mojibake)).toEqual([
-      encodeURI(mojibake).replace(/%25/g, '%'),
-      'data/sprite/%E5%95%8A/normal.act',
-      'data/sprite/%EA%B0%80/normal.act'
+      'data/sprite/%E5%95%8A/normal.act'
     ]);
     const sprite = buildResourcePathCandidates('data/sprite/normal_검광.ACT');
     expect(sprite).toContain('data/sprite/normal.ACT');
     expect(sprite).toContain('data/sprite/normal.act');
   });
 
-  it('recovers mixed CJK segments without exceeding the candidate bound', () => {
+  it('preserves already published CJK names without converting them back to Korean', () => {
     const path = 'data/sprite/牢埃练/鸥炼胶唱捞欺/鸥炼胶唱捞欺_巢_劝.act';
     const candidates = buildResourcePathCandidates(path);
     expect(candidates[0]).toBe('data/sprite/%E7%89%A2%E5%9F%83%E7%BB%83/%E9%B8%A5%E7%82%BC%E8%83%B6%E5%94%B1%E6%8D%9E%E6%AC%BA/%E9%B8%A5%E7%82%BC%E8%83%B6%E5%94%B1%E6%8D%9E%E6%AC%BA_%E5%B7%A2_%E5%8A%9D.act');
-    expect(candidates).toContain('data/sprite/%EC%9D%B8%EA%B0%84%EC%A1%B1/%ED%83%80%EC%A1%B0%EC%8A%A4%EB%82%98%EC%9D%B4%ED%8D%BC/%ED%83%80%EC%A1%B0%EC%8A%A4%EB%82%98%EC%9D%B4%ED%8D%BC_%EB%82%A8_%ED%99%9C.act');
+    expect(candidates.map(decodeURIComponent)).toEqual([path]);
     expect(candidates.length).toBeLessThanOrEqual(12);
+  });
+
+  it.each([
+    ['data/texture/유저인터페이스/t_¹è°æ1-1.bmp', 'data/texture/蜡历牢磐其捞胶/t_硅版1-1.bmp'],
+    ['data/sprite/인간족/몸통/남/초보자_남.spr', 'data/sprite/牢埃练/个烹/巢/檬焊磊_巢.spr'],
+    ['data/sprite/인간족/몸통/여/초보자_여.act', 'data/sprite/牢埃练/个烹/咯/檬焊磊_咯.act'],
+    ['data/model/배경/검사.rsm', 'data/model/硅版/八荤.rsm'],
+    ['data/texture/배경/검사.bmp', 'data/texture/硅版/八荤.bmp'],
+    ['data/wav/버튼소리.wav', 'data/wav/滚瓢家府.wav'],
+    ['data/배경.gnd', 'data/硅版.gnd'],
+    ['data/배경.gat', 'data/硅版.gat'],
+    ['data/배경.rsw', 'data/硅版.rsw'],
+    ['BGM/01.mp3', 'BGM/01.mp3'],
+    ['data/model/中文_배경.rsm', 'data/model/中文_硅版.rsm'],
+  ])('normalizes the entire remote path %s before either origin is contacted', async (input, expected) => {
+    const urls: string[] = [];
+    const fetch = async (url: string) => { urls.push(url); return response(url.startsWith(DEFAULT_RESOURCE_ROOTS[0]) ? 404 : 200); };
+    await resolvePassiveResource(input, { cache: new MemoryResourceCache(), fetch: fetch as typeof globalThis.fetch });
+    expect(urls).toEqual(DEFAULT_RESOURCE_ROOTS.map(root => root + encodeURI(expected)));
+    expect(urls.map(decodeURIComponent).join('\n')).not.toMatch(/[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af]/);
   });
 });

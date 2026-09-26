@@ -17,6 +17,8 @@ export interface V2ClientConfig {
   readonly clientVer: number;
   readonly lastroNid: number;
   readonly packetver: number;
+  readonly renewal: true;
+  readonly forceLegacyLoginSkin: true;
   readonly clientRoot: 'core/';
   readonly luaRoot: 'core/data/luafiles514/lua files/';
   readonly systemRoot: 'core/System/';
@@ -32,6 +34,8 @@ export interface V2ClientConfig {
   readonly skipServerList: true;
   readonly enableCashShop: true;
   readonly customItemInfo: readonly string[];
+  readonly development: boolean;
+  readonly enableConsole: boolean;
 }
 
 export function buildClientConfig(profile: AvailableServerProfile, credentials: ClientCredentials): V2ClientConfig {
@@ -46,7 +50,11 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
     port: available.loginPort,
     version: available.version,
     langtype: available.langtype,
+    disableKorean: true,
+    // Character/map servers can advertise loopback addresses behind the public host.
+    forceUseAddress: true,
     packetver: available.packetver,
+    renewal: true,
   });
   const loginServerProfiles = Object.freeze([
     ...LASTRO_SERVER_PROFILES.map(candidate => candidate.availability === 'available'
@@ -54,6 +62,7 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
         id: candidate.id, label: candidate.displayName, availability: candidate.availability,
         address: candidate.loginAddress, port: candidate.loginPort, version: candidate.version,
         langtype: candidate.langtype, packetver: candidate.packetver,
+        disableKorean: true, forceUseAddress: true,
       })
       : Object.freeze({ id: candidate.id, label: candidate.displayName, availability: candidate.availability,
         unavailableReason: candidate.unavailableReason }),
@@ -69,6 +78,9 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
     clientVer: available.clientVer,
     lastroNid: available.lastroNid,
     packetver: available.packetver,
+    // PacketStructure reads the global mode before LoginEngine selects a server.
+    renewal: true,
+    forceLegacyLoginSkin: true,
     clientRoot: 'core/',
     luaRoot: 'core/data/luafiles514/lua files/',
     systemRoot: 'core/System/',
@@ -78,5 +90,7 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
     resourcePathCharset: 'gbk', lastroDataCharset: 'gbk', statusDescriptionCharset: 'big5', networkCharset: 'gbk',
     loadLua: true, skipIntro: true, skipServerList: true, enableCashShop: true,
     customItemInfo: Object.freeze(['System/itemInfo_re_59.lua', 'System/itemInfo_re_61.lua']),
+    development: true,
+    enableConsole: true,
   });
 }

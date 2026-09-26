@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DirectTcpSocket } from '../src/network/direct-tcp-socket';
 
 function deferred<T>() {
@@ -32,7 +32,25 @@ function harness(write?: (chunk: Uint8Array) => Promise<void>) {
     open: async () => { opened.resolve({ readable, writable }); await vi.waitFor(() => expect(socket.connected).toBe(true)); } };
 }
 
+afterEach(() => vi.unstubAllGlobals());
+
 describe('Direct TCP lifecycle', () => {
+  it('opens asynchronously when the browser scheduler requires the global receiver', async () => {
+    const schedule = globalThis.queueMicrotask;
+    vi.stubGlobal('queueMicrotask', function (this: unknown, callback: () => void) {
+      if (this !== globalThis) throw new TypeError('Illegal invocation');
+      schedule(callback);
+    });
+
+    const h = harness();
+    expect(h.options).toEqual([]);
+    expect(h.socket.onComplete).not.toHaveBeenCalled();
+    await h.open();
+    expect(h.socket.onComplete).toHaveBeenCalledExactlyOnceWith(true);
+    h.socket.close();
+    await vi.waitFor(() => expect(h.close).toHaveBeenCalledOnce());
+  });
+
   it('opens once with latency options and copies exact read view boundaries', async () => {
     const h = harness();
     await h.open();

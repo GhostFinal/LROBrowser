@@ -48,14 +48,12 @@ RoBrowserV2/
     core-asset-roots.json
   src/
     main.ts
-    app-shell.ts
     styles.css
     direct-sockets.d.ts
     network/direct-tcp-socket.ts
     servers/server-profile.ts
     servers/server-profiles.ts
-    accounts/account-store.ts
-    accounts/account-ui.ts
+    runtime/lastro-account-login.mjs
     resources/resource-policy.ts
     resources/resource-resolver.ts
     runtime/client-bootstrap.ts
@@ -245,7 +243,7 @@ IWA 包内核心
 现有本地持久缓存
     ↓ 未命中
 https://game.lastro.cn/ro/client_re/
-    ↓ 网络错误、CORS、超时、404、5xx、HTML 响应或无效内容
+    ↓ Direct TCP HTTP/1.1 port 80 的网络错误、超时、404、5xx、HTML 响应或无效内容
 https://clientdata.ltsd.ro/ro/client_re/
     ↓ 失败
 向客户端返回明确资源错误
@@ -253,7 +251,7 @@ https://clientdata.ltsd.ro/ro/client_re/
 
 资源路径继续使用当前 `lastro-resource-path.js` 的 GBK/EUC-KR 混合路径恢复、扩展名小写、物品图标大小写和历史 Sprite 后缀 fallback。每个根地址都要尝试同一组候选路径，不能只在 404 时 fallback；CORS 和网络错误也必须进入下一来源。
 
-2026-09-25 的抽样表明，`game.lastro.cn/ro/client_re/...` 对已知特效资源返回 404。`clientdata.ltsd.ro` 是为本产品规划的备用资源域名，当前产品尚未上线，因此暂未配置可解析 DNS；本文不声称它现已可访问。发布前必须验证该域名的 DNS、TLS、CORS/CORP、Range/缓存响应以及至少一组已知资源。备用资源源 fallback 是正常运行路径，不应被记录成异常崩溃。
+浏览器 Fetch 不能读取官方源，因为响应没有 `Access-Control-Allow-Origin`。因此 Worker 保留 canonical HTTPS resource roots 供审计和未来 TLS transport 使用；当前被动资源 cache miss 通过 IWA `TCPSocket` 连接相同 host 的 port 80，发送受限 HTTP/1.1 `GET`。`clientdata.ltsd.ro` 是为本产品规划的备用资源域名，当前产品尚未上线，因此暂未配置可解析 DNS；本文不声称它现已可访问。发布前必须验证该域名的 DNS、port 80 可达性、Range/缓存响应以及至少一组已知资源。备用资源源 fallback 是正常运行路径，不应被记录成异常崩溃。
 
 音频不再直接把第一个 URL 交给 `<audio>`。Worker 应通过统一 resolver 获取 ArrayBuffer，保证官方失败时仍能切换备用资源源并写入本地缓存。
 
@@ -381,7 +379,7 @@ Chrome 官方当前文档说明，用户自行安装（unmanaged）的 IWA 自�
 8. 打开角色、地图、背包、技能、任务、公会、卡片典藏、自动战斗和快速传送功能，确认没有因瘦身漏包。
 9. 在 DevTools Direct Sockets 视图确认 TCP 目标与服务器返回的 handoff 地址一致。
 
-阶段 A 不要求真实公网 `clientdata.ltsd.ro` 已上线；必须通过自动化替身测试官方源失败后的备用源流程。真实 DNS/TLS/CORS/CORP 与跨区域资源检查属于阶段 C/D 的发布门槛。
+阶段 A 不要求真实公网 `clientdata.ltsd.ro` 已上线；必须通过自动化替身测试官方源失败后的备用源流程。真实 DNS、port 80 可达性、HTTP framing、内容类型与跨区域资源检查属于阶段 C/D 的发布门槛。当前 Direct TCP transport 不依赖浏览器 CORS；未来切换 TLS 时再验证证书和加密连接。
 
 ## 发布完成标准
 

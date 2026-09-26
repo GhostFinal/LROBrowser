@@ -6,7 +6,7 @@
     "itemInfo_re_59.lua",
     "itemInfo_re_61.lua"
   ],
-  "runtimeFiles": ["src/runtime/lastro-account-login.mjs"],
+  "runtimeFiles": ["src/runtime/lastro-account-login.mjs", "src/runtime/lastro-trusted-dom.mjs"],
   "worldDataInputs": [
     "src/DB/worldData.js",
     "src/DB/Mobs/mob_db.js"

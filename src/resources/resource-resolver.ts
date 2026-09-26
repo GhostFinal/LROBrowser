@@ -11,7 +11,7 @@ export class ResourceResolutionError extends Error {
   readonly attempts: readonly ResourceAttempt[];
 
   constructor(path: string, attempts: ResourceAttempt[]) {
-    super(`Unable to resolve passive resource: ${path}`);
+    super(`Unable to resolve resource (logical path): ${path}\nResolution attempts:\n${attempts.map(attempt => `${attempt.url} [${attempt.reason}]`).join('\n')}`);
     this.name = 'ResourceResolutionError';
     this.path = path;
     this.attempts = attempts;
@@ -77,21 +77,20 @@ function getLegacyEncoder(charset: string): Map<string, number[]> | null {
   return encoder;
 }
 
-function transcodeCjkRuns(segment: string, sourceCharset: string, targetCharset: string): string {
-  if (!sourceCharset || !targetCharset || !/[\u3400-\u9fff\uf900-\ufaff]/.test(segment)) return segment;
+function transcodeKoreanRuns(segment: string, sourceCharset: string, targetCharset: string): string {
+  const korean = /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7ff]+/g;
+  if (!korean.test(segment)) return segment;
   const encoder = getLegacyEncoder(sourceCharset);
-  if (!encoder) return segment;
-  let decoder: TextDecoder;
-  try { decoder = new TextDecoder(targetCharset); } catch { return segment; }
-  return segment.replace(/[\u3400-\u9fff\uf900-\ufaff]+/g, (run) => {
+  if (!encoder) throw new Error('Resource filename encoding unavailable');
+  const decoder = new TextDecoder(targetCharset, { fatal: true });
+  return segment.replace(korean, (run) => {
     const bytes: number[] = [];
     for (const character of run) {
       const encoded = encoder.get(character);
-      if (!encoded) return run;
+      if (!encoded) throw new Error('Resource filename cannot be encoded');
       bytes.push(...encoded);
     }
-    const decoded = decoder.decode(Uint8Array.from(bytes));
-    return decoded.includes('\ufffd') || !/[\u3131-\u318e\uac00-\ud7a3]/.test(decoded) ? run : decoded;
+    return decoder.decode(Uint8Array.from(bytes));
   });
 }
 
@@ -105,18 +104,13 @@ function addLegacySpriteFallbacks(resourcePath: string): string[] {
 }
 
 export function buildResourcePathCandidates(resourcePath: string, primaryCharset = 'gbk', fallbackCharset = 'euc-kr'): string[] {
-  const normalizedPath = resourcePath.replace(/\\/g, '/');
-  const variants = [
-    normalizedPath,
-    normalizedPath.split('/').map((segment) => decodeMixedSegment(segment, primaryCharset)).join('/'),
-    normalizedPath.split('/').map((segment) => decodeMixedSegment(segment, fallbackCharset)).join('/'),
-    normalizedPath.split('/').map((segment) => transcodeCjkRuns(segment, primaryCharset, fallbackCharset)).join('/'),
-  ];
-  const restoredCjkPath = variants[3] ?? normalizedPath;
-  variants.push(
-    restoredCjkPath.split('/').map((segment) => decodeMixedSegment(segment, primaryCharset)).join('/'),
-    restoredCjkPath.split('/').map((segment) => decodeMixedSegment(segment, fallbackCharset)).join('/')
-  );
+  // Published filenames are legacy Korean bytes decoded as GBK, across every
+  // directory and basename. Do not restore Chinese names back to Korean URLs.
+  const normalizedPath = resourcePath.replace(/\\/g, '/').split('/').map(segment =>
+    transcodeKoreanRuns(decodeMixedSegment(segment, primaryCharset), fallbackCharset, primaryCharset)
+  ).join('/');
+  if (!normalizeResourcePath(normalizedPath)) throw new Error('Invalid encoded resource path');
+  const variants = [normalizedPath];
   const candidates: string[] = [];
   const addCandidate = (value: string) => {
     const encoded = encodeResourcePath(value);
@@ -194,7 +188,7 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
       } catch (error) {
         const reason = error instanceof Error ? error.message : 'fetch-failed';
         attempts.push({ url, reason });
-        if (!reason.startsWith('http-404')) break;
+        if (reason !== 'http-404' && reason !== 'html-response') break;
       }
     }
   }

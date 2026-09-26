@@ -124,6 +124,8 @@ export function decorateLastROLoginTemplate(name, htmlText) {
 
 export function decorateLastROLoginStyles(name, cssText) {
   if (!name.startsWith('WinLogin') || cssText.includes('.lastro-login-panel')) return cssText;
+  // The legacy skin positions every #WinLogin input, including panel descendants.
+  cssText += '\n#WinLogin .lastro-login-panel input { position: static; left: auto; width: 100%; height: 22px; border: 1px solid #8799b0; background: #fff; padding: 2px 4px; }';
   return `${cssText}\n.lastro-login-panel { position: absolute; top: 0; left: calc(100% + 12px); z-index: 20; width: 300px; max-height: 370px; overflow-y: auto; box-sizing: border-box; padding: 8px; color: #171717; background: rgba(245, 248, 252, 0.98); border: 1px solid #8799b0; font: 12px sans-serif; }\n.lastro-login-panel h2, .lastro-login-panel h3 { margin: 0 0 6px; font-size: 13px; font-weight: bold; }\n.lastro-login-panel h3 { margin-top: 8px; font-size: 12px; }\n.lastro-login-panel label { display: block; margin: 5px 0; }\n.lastro-login-panel input { display: block; width: 100%; height: 22px; box-sizing: border-box; margin-top: 3px; padding: 2px 4px; border: 1px solid #8799b0; background: #fff; color: #182b40; font: 12px sans-serif; }\n.lastro-login-environment, .lastro-login-message { min-height: 16px; margin: 4px 0; color: #38546f; white-space: pre-wrap; }\n.lastro-login-servers [data-lastro-server-list], .lastro-account-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }\n.lastro-login-panel button { min-height: 24px; overflow: hidden; border: 1px solid #8799b0; background: #fff; color: #182b40; font: 11px sans-serif; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }\n.lastro-login-panel button[data-selected="true"] { background: #c9def4; border-color: #356b9e; font-weight: bold; }\n.lastro-login-panel button:disabled { opacity: .5; cursor: default; }\n.lastro-account-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: 7px; }`;
 }
 
@@ -227,7 +229,7 @@ export function installLastROLogin({ root, component, configs }) {
     environment.textContent = '当前页面不是 Direct Sockets IWA。请安装 signed .swbn 后再登录。';
     if (nativeConnect) nativeConnect.disabled = true;
   } else {
-    environment.textContent = 'Direct TCP 已就绪';
+    environment.textContent = 'Direct TCP API 可用；尚未连接游戏服务器';
   }
 
   panel.querySelector('[data-lastro-action="new"]')?.addEventListener('click', clearForm);

@@ -1,4 +1,5 @@
 import { createResourceCache } from './resource-cache';
+import { createDirectHttpFetch } from './direct-http-resource';
 import { normalizeResourcePath } from './resource-policy';
 import { resolvePassiveResource } from './resource-resolver';
 
@@ -11,8 +12,10 @@ interface RuntimeResourceOptions {
 // Bundled as a classic worker script; all reads share one IndexedDB connection.
 export function createRuntimeResourceLoader(options: RuntimeResourceOptions): (path: string) => Promise<ArrayBuffer> {
   const cache = createResourceCache();
+  const directHttpFetch = createDirectHttpFetch();
   return (path) => resolvePassiveResource(path, {
     cache,
+    fetch: directHttpFetch,
     primaryCharset: options.getCharset(),
     packageLookup: async (normalizedPath) => {
       const entry = options.getManifest()?.find(file => file.path.toLowerCase() === normalizedPath.toLowerCase());

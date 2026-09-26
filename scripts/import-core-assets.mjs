@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 import { parseArgs } from 'node:util';
 import process from 'node:process';
+import { patchTrustedTypesDomWrites } from './patch-v2-runtime.mjs';
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
 const config = JSON.parse(await readFile(new URL('../config/core-asset-roots.json', import.meta.url), 'utf8'));
@@ -56,7 +57,11 @@ async function addFile(entries, destinations, source, destination, kind, output)
   safeRelative(destination);
   if (destinations.has(destination)) fail('duplicate-destination', destination);
   destinations.add(destination);
-  const bytes = await readFile(source);
+  let bytes = await readFile(source);
+  if (kind === 'runtime' && /runtime\/(?:Online\.js|[^/]+\.mjs)$/.test(destination)
+    && path.basename(destination) !== 'lastro-trusted-dom.mjs') {
+    bytes = Buffer.from(patchTrustedTypesDomWrites(bytes.toString('utf8')));
+  }
   const target = path.join(output, destination);
   await mkdir(path.dirname(target), { recursive: true });
   await writeFile(target, bytes);

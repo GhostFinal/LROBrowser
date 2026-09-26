@@ -20,13 +20,14 @@ visit(file);
 
 function harness() {
   const requests: string[] = [];
+  const tcpRequests: { host: string; port: number; request: string }[] = [];
   const callbacks = new Map<number, (data: unknown, error: unknown, input: unknown) => void>();
   let uid = 0;
   let ready = false;
   let advances = 0;
   const manifest = { files: [{ path: 'System/test.lua', kind: 'lua' }] };
   const worker = vm.createContext({
-    ArrayBuffer, Uint8Array, URL, Blob, TextDecoder, TextEncoder, AbortController,
+    ArrayBuffer, Uint8Array, URL, Blob, TextDecoder, TextEncoder, Response, Headers, AbortController,
     indexedDB: new IDBFactory(), setTimeout, clearTimeout, console,
     location: { href: 'https://iwa.invalid/runtime/LastROThreadEventHandler.js' },
     // Legacy filesystem initialization must never be required by an IWA.
@@ -35,6 +36,25 @@ function harness() {
     fetch: async (input: string | URL) => {
       requests.push(String(input));
       return new Response('test#table#', { headers: { 'content-type': 'application/octet-stream' } });
+    },
+    TCPSocket: class {
+      readonly opened: Promise<{ readable: ReadableStream<Uint8Array>; writable: WritableStream<Uint8Array> }>;
+      readonly closed = new Promise<void>(() => {});
+      constructor(host: string, port: number) {
+        let controller!: ReadableStreamDefaultController<Uint8Array>;
+        const readable = new ReadableStream<Uint8Array>({ start(value) { controller = value; } });
+        const writable = new WritableStream<Uint8Array>({
+          write: (chunk) => {
+            tcpRequests.push({ host, port, request: new TextDecoder().decode(chunk) });
+            const body = new TextEncoder().encode('test#table#');
+            controller.enqueue(new TextEncoder().encode(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${body.byteLength}\r\nConnection: close\r\n\r\n`));
+            controller.enqueue(body);
+            controller.close();
+          },
+        });
+        this.opened = Promise.resolve({ readable, writable });
+      }
+      close = async () => {};
     },
     postMessage: (message: { type?: string; uid?: number; arguments?: [unknown, unknown, unknown] }) => {
       if (message.type === 'THREAD_READY') ready = true;
@@ -47,7 +67,10 @@ function harness() {
   });
   worker.self = worker;
   worker.importScripts = (...paths: string[]) => {
-    for (const path of paths) vm.runInContext(readFileSync(`.staging/core/runtime/${path.split('?')[0]}`, 'utf8'), worker);
+    for (const path of paths) {
+      const filename = String(path).split('/').pop()!.split('?')[0];
+      vm.runInContext(readFileSync(`.staging/core/runtime/${filename}`, 'utf8'), worker);
+    }
   };
   vm.runInContext(readFileSync('.staging/runtime/LastROThreadEventHandler.js', 'utf8'), worker);
   const send = (type: string, data: unknown, callback?: (data: unknown, error: unknown, input: unknown) => void) => {
@@ -83,7 +106,7 @@ function harness() {
     Intro_default: { append: () => { throw new Error('GRF picker displayed'); } },
   });
   vm.runInContext(`${pieces.get('savingFiles')}\n${pieces.get('loadFiles')}\n${pieces.get('onFileLoaded')}\n${pieces.get('onFileGetted')}\nvar Client = ${pieces.get('Client')};`, main);
-  return { requests, ready, main, send, advances: () => advances };
+  return { requests, tcpRequests, ready, main, send, advances: () => advances };
 }
 
 describe('V2 native resource startup', () => {
@@ -112,9 +135,9 @@ describe('V2 native resource startup', () => {
     expect(table).toBeInstanceOf(Uint8Array);
     const script = await vm.runInContext('new Promise((resolve, reject) => Client.getFile("System/test.lua", resolve, reject));', runtime.main);
     expect(script).toBeInstanceOf(ArrayBuffer);
-    expect(runtime.requests).toEqual([
-      'https://game.lastro.cn/ro/client_re/data/mp3nametable.txt',
-      'https://iwa.invalid/core/System/test.lua',
-    ]);
+    expect(runtime.requests).toEqual(['https://iwa.invalid/core/System/test.lua']);
+    expect(runtime.tcpRequests).toHaveLength(1);
+    expect(runtime.tcpRequests[0]).toMatchObject({ host: 'game.lastro.cn', port: 80 });
+    expect(runtime.tcpRequests[0]?.request).toContain('GET /ro/client_re/data/mp3nametable.txt HTTP/1.1');
   });
 });

@@ -58,6 +58,22 @@ describe('core executable asset importer', () => {
     })).rejects.toThrow(/ENOENT/);
   });
 
+  it('does not rewrite the Trusted Types helper into a self-import', async () => {
+    const f = await fixture();
+    const runtime = path.join(f.root, 'runtime');
+    await mkdir(runtime);
+    await writeFile(path.join(runtime, 'Online.js'), 'export const start = () => true;');
+    await writeFile(path.join(runtime, 'lastro-resource-loader.js'), 'var LastROResources = {};');
+    await writeFile(path.join(runtime, 'LastROThreadEventHandler.js'), 'var LastROThreadEventHandler = {};');
+    await writeFile(path.join(runtime, 'ThreadEventHandler.js'), 'var ThreadEventHandler = {};');
+    const output = path.join(f.root, 'output-with-helper');
+    await importCoreAssets({ clientRoot: f.client, roSourceRoot: f.source,
+      runtimePath: path.join(runtime, 'Online.js'), output });
+    const helper = await readFile(path.join(output, 'runtime/lastro-trusted-dom.mjs'), 'utf8');
+    expect(helper).toContain('const POLICY_KEY');
+    expect(helper).not.toContain('from "./lastro-trusted-dom.mjs"');
+  });
+
   it('matches the reviewed baseline counts and byte totals', async () => {
     const luaRoot = '/run/media/parker/7A9F-F871/ROWeb/ro/client_re/data/luafiles514/lua files';
     const systemRoot = '/run/media/parker/7A9F-F871/ROWeb/ro/client_re/System';

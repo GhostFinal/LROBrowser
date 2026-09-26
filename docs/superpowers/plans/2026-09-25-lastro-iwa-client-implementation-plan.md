@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-25-lastro-iwa-client-design.md`
 
+> **入口架构修订（2026-09-26）**：本计划早期版本中的 `app-shell`、左侧账号表单和“先点击登录再启动 V2”方案全部废弃，不得实现或挂载。现行入口在页面加载时直接启动 `Online.js` 及其 Worker/资源清单；账号保存和服务器选择由 `lastro-account-login.mjs` 注入游戏内 `WinLogin` 完成。`test/main-entry.test.ts` 锁定该契约。
+
 ## Global Constraints
 
 - The production client uses Direct TCP only. Do not add WebSocket, WSS, proxy, bridge, Electron, or ordinary-browser fallback code.
@@ -17,7 +19,7 @@
 - `lastro-app` must remain unavailable until a separate approved design supplies verified protocol parameters.
 - Stored account passwords are plaintext local data and every account binds to one available server profile.
 - All executable JS, MJS, Worker, WASM, Lua, and LUB content is inside the signed IWA. Remote sources may return passive game data only.
-- Remote passive resource order is persistent cache, `https://game.lastro.cn/ro/client_re/`, then `https://clientdata.ltsd.ro/ro/client_re/`.
+- Remote passive resource order is persistent cache, then a Direct TCP HTTP/1.1 request to `game.lastro.cn:80`, then the same request to `clientdata.ltsd.ro:80`; the canonical resource roots remain HTTPS URLs for policy and cache metadata.
 - Production runtime remote origins are allowlisted, not blocklisted: only `https://game.lastro.cn` and `https://clientdata.ltsd.ro` are permitted for passive resources. Any other absolute HTTP(S)/WS(S) origin in imported or built runtime code is a hard failure without adding that origin to public configuration or documentation.
 - Preserve every current LastRO V2 module and regression test unless the spec explicitly removes it.
 - Do not copy personal quick-login accounts, XKore profiles, private server profiles, credentials, signing keys, or production secrets into this repository.
@@ -40,6 +42,8 @@
 
 ### Task 1: Scaffold the standalone IWA project and manifest
 
+> **已废弃的早期 shell 方案**：本任务原先的 `src/app-shell.ts` 和 shell 测试不再适用。入口必须直接加载 V2 runtime；请以 `test/main-entry.test.ts` 为准。
+
 **Files:**
 - Create: `package.json`
 - Create: `tsconfig.json`
@@ -48,7 +52,6 @@
 - Create: `public/.well-known/manifest.webmanifest`
 - Create: `public/icons/icon.svg`
 - Create: `src/main.ts`
-- Create: `src/app-shell.ts`
 - Create: `src/styles.css`
 - Create: `test/manifest.test.ts`
 - Create: `.gitignore`
@@ -56,13 +59,12 @@
 **Interfaces:**
 - Produces standalone package `robrowser-v2`.
 - Produces root scripts `dev`, `build`, `test`, `typecheck`, `lint`, `audit:iwa`, `bundle:iwa`, and `sign:iwa`.
-- Produces `mountAppShell(root: HTMLElement): void`.
 - The Phase A manifest is served at `/.well-known/manifest.webmanifest` and contains `version`, `start_url`, `display`, and both required permission policies; it omits `update_manifest_url` so local test installs do not depend on an update host.
 
-- [ ] **Step 1: Write the manifest and shell tests.** In `test/manifest.test.ts`, read `public/.well-known/manifest.webmanifest` and assert `name === "LastRO V2"`, `version` matches `^\\d+(?:\\.\\d+)*$`, `start_url === "/"`, `display === "standalone"`, `permissions_policy["direct-sockets"]` and `permissions_policy["cross-origin-isolated"]` both equal `["self"]`, `update_manifest_url` is absent in the Phase A build, and no `socketProxy`, `WebSocket`, or WSS string exists in the manifest. Add a jsdom assertion that `mountAppShell` renders an environment status region, server region, account region, and game mount point.
+- [ ] **Step 1: Write the direct-entry tests.** In `test/manifest.test.ts`, validate the IWA manifest and in `test/main-entry.test.ts` assert that importing `src/main.ts` immediately calls `bootstrapV2Client` without mounting an account shell. The in-game login module owns account UI and persistence.
 - [ ] **Step 2: Run the focused test and verify failure.** Run `pnpm exec vitest run test/manifest.test.ts`; expect module/file-not-found failures.
 - [ ] **Step 3: Add the standalone package.** Create the root Vite TypeScript app with scripts `dev`, `build`, `test`, `typecheck`, `audit:iwa`, `bundle:iwa`, and `sign:iwa`. Pin the selected Vite/Vitest/TypeScript versions in this repository; add no UI framework.
-- [ ] **Step 4: Add the IWA manifest and app shell.** Place the manifest at the required well-known path, use a local SVG icon, import only local CSS/TypeScript, and render a minimal Chinese shell that can later host server/account controls and the V2 canvas.
+- [ ] **Step 4: Add the IWA manifest and direct entry.** Place the manifest at the required well-known path, use a local SVG icon, import only local CSS/TypeScript, and load the V2 runtime directly. Do not render a separate account shell.
 - [ ] **Step 5: Wire standalone scripts and ignores.** Add root scripts for development, build, testing, type checking, import, audit, bundle, and signing. Ignore `dist`, `.staging`, `release`, `*.wbn`, `*.swbn`, `*.pem`, and signing passphrase files.
 - [ ] **Step 6: Verify and commit.** Run `pnpm exec vitest run test/manifest.test.ts`, `pnpm build`, `pnpm typecheck`, and `git diff --check`; commit `feat(iwa): scaffold isolated LastRO client`.
 
@@ -110,6 +112,8 @@
 - [ ] **Step 5: Verify and commit.** Run the focused test, `pnpm typecheck`, and `git diff --check`; commit `feat(iwa): add LastRO server profiles`.
 
 ### Task 4: Implement plaintext server-bound account storage
+
+> **废弃说明**：本任务中独立的 `account-ui.ts`、`app-shell.ts` 和 `mountAccountManager` 方案已被游戏内 `lastro-account-login.mjs` 取代。保留这些文件仅用于历史兼容测试时，不得从 `src/main.ts` 导入或在页面中挂载；新的账号 UI 必须附加到 V2 的 `WinLogin`。
 
 **Files:**
 - Create: `src/accounts/account-store.ts`
@@ -250,12 +254,12 @@
 - Worker receives ordered resource roots and package-executable manifest through initialization messages.
 
 - [ ] **Step 1: Write classification tests.** Assert JS/MJS/Worker/WASM/Lua/LUB are package-only; map/sprite/model/texture/audio extensions are remote-passive; unknown executable-looking extensions are forbidden. Assert case and slash normalization cannot bypass the rule.
-- [ ] **Step 2: Write resolver tests.** Cover cache hit without fetch, official success, official 404 then backup-source success, official CORS/network/timeout/5xx/HTML response then backup-source success, both roots failing with a structured error, and successful backup-source bytes entering persistent cache.
+- [ ] **Step 2: Write resolver tests.** Cover cache hit without a socket, official success, official 404 then backup-source success, official socket/timeout/5xx/HTML response then backup-source success, both roots failing with a structured error, and successful backup-source bytes entering persistent cache.
 - [ ] **Step 3: Preserve path-candidate behavior.** Port the existing GBK/EUC-KR mixed segment recovery, lowercase extension, item-icon lowercase, and historical Sprite suffix tests. Assert every encoded candidate is tried against official before the backup source and the candidate order is deterministic.
 - [ ] **Step 4: Run focused tests and verify failure.** Run `pnpm exec vitest run test/resource-policy.test.ts test/resource-resolver.test.ts`.
-- [ ] **Step 5: Implement the resolver and cache.** Use package-local executable lookups first, persistent cached passive data second, official HTTPS third, and `clientdata.ltsd.ro` HTTPS fourth. Apply a bounded per-attempt timeout. Treat non-2xx, HTML content, zero-length content where invalid, abort, DNS/fetch rejection, and decode failures as fallback conditions.
+- [ ] **Step 5: Implement the resolver and cache.** Use package-local executable lookups first, persistent cached passive data second, official Direct TCP HTTP third, and `clientdata.ltsd.ro` Direct TCP HTTP fourth. Keep canonical HTTPS roots in resolver metadata, but send only bounded HTTP/1.1 GET requests over `TCPSocket` port 80 because the official source cannot be changed to add CORS. Apply a bounded per-attempt timeout. Treat non-2xx, HTML content, zero-length content where invalid, abort, DNS/socket rejection, and decode failures as fallback conditions.
 - [ ] **Step 6: Patch the resource Worker.** Replace single-root `se.remoteClient` behavior with ordered roots and the executable manifest. Make audio pass through the same ArrayBuffer resolver and object-URL conversion so it receives fallback/cache behavior.
-- [ ] **Step 7: Document source policy and launch checks.** Record the 2026-09-25 sample where the official path returned 404. State that `clientdata.ltsd.ro` is intentionally not DNS-resolvable before product launch and make DNS, TLS, CORS/CORP, content type, Range/cache behavior, and known-resource checks mandatory before release. Document cache invalidation metadata and the rule that remote content is never executable.
+- [ ] **Step 7: Document source policy and launch checks.** Record the 2026-09-25 sample where the official path returned 404. State that `clientdata.ltsd.ro` is intentionally not DNS-resolvable before product launch and make DNS, port 80 reachability, HTTP framing, content type, Range/cache behavior, and known-resource checks mandatory before release. Document cache invalidation metadata, the accepted current plaintext transport, the future TLS upgrade boundary, and the rule that remote content is never executable.
 - [ ] **Step 8: Verify and commit.** Run focused tests, the migrated `lastro-resource-path` tests, build, and `git diff --check`; commit `feat(iwa): add official-first resource fallback`.
 
 ### Task 10: Preserve and verify every LastRO V2 module
@@ -322,7 +326,7 @@
 
 - [ ] **Step 1: Write the release-smoke test.** Assert audit report passes, signed bundle exists, checksum matches, manifest versions agree, all inventoried modules/core assets are in the bundle, App服 remains unavailable, and no ignored signing/staging file is tracked by Git.
 - [ ] **Step 2: Run the Phase A automated suite and sign a local test candidate.** Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm audit:iwa`, and `pnpm bundle:iwa`. Use a disposable local test key outside the repository; never use or create a production signing secret in Phase A. Run the release-smoke test and record the test Web Bundle ID separately from any future production identity. Run `git diff --check` and `git status --short`.
-- [ ] **Step 3: Validate resource fallback without requiring the future host.** Run resolver tests with deterministic mocked fetch responses for official failure followed by backup-source success. Do not require `clientdata.ltsd.ro` DNS, TLS, or live resources in Phase A; live China/non-China checks are deferred to Phase C/D release validation.
+- [ ] **Step 3: Validate resource fallback without requiring the future host.** Run resolver tests with deterministic fake `TCPSocket` responses for official failure followed by backup-source success. Do not require `clientdata.ltsd.ro` DNS or live resources in Phase A; live China/non-China checks are deferred to Phase C/D release validation.
 - [ ] **Step 4: Install a signed candidate in Chrome IWA dev mode.** Record Chrome version, OS, Web Bundle ID, bundle SHA-256, install method, and whether Direct Sockets DevTools shows the login/character/map TCP connections.
 - [ ] **Step 5: Validate 2转服 end to end.** Add a local account, restart the IWA and confirm persistence, log in, select a character, enter a map, move, change map, load inventory/skills/quests/guild/card collection/auto-battle/quick teleport, then clear/passively refill resource cache. Record failures and rerun the relevant focused tests after fixes.
 - [ ] **Step 6: Validate 3转服 before release.** Repeat login, character selection, map entry, movement, and map transition using a 3转服 account. If any candidate parameter fails, leave 3转服 visibly unavailable and revise the spec/profile only with captured evidence; do not guess replacement values.
@@ -401,7 +405,7 @@ These phases are part of the long-term design but are **not authorized by the cu
 - Direct TCP only: Tasks 5, 6, 11, and 12.
 - Three LastRO server entries and App placeholder: Tasks 3, 4, and 12.
 - Plaintext local accounts bound to servers: Task 4.
-- Official-first resource fallback through `clientdata.ltsd.ro`, including pre-launch DNS/TLS/CORS validation: Tasks 9 and 12.
+- Official-first resource fallback through Direct TCP HTTP to `clientdata.ltsd.ro:80`, including pre-launch DNS and socket validation: Tasks 9 and 12.
 - Package-local Lua/LUB and no remote code execution: Tasks 7, 8, and 11.
 - Preserve all V2 custom modules: Tasks 2 and 10.
 - Small package instead of full client resources: Tasks 7, 9, and 11.

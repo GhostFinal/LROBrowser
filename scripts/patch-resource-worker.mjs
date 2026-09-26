@@ -75,7 +75,37 @@ export function patchResourceHandler(source) {
   ].join('\n') + normalized.slice(finish + '\n  };'.length);
   output = replaceOnce(output,
     'importScripts("lastro-resource-path.js?build=20260923-v2-skill-icons-1","ThreadEventHandler.js");',
-    'importScripts("lastro-resource-loader.js", "ThreadEventHandler.js");');
+    [
+      '(() => {',
+      '  const allowedWorkerScriptUrls = new Set([',
+      '    new URL("lastro-resource-loader.js", self.location.href).href,',
+      '    new URL("ThreadEventHandler.js", self.location.href).href,',
+      '  ]);',
+      '  const trustedTypes = globalThis.trustedTypes;',
+      '  const policyKey = "__lastroIwaWorkerPolicy";',
+      '  const policy = trustedTypes',
+      '    ? (globalThis[policyKey] ?? (globalThis[policyKey] = trustedTypes.createPolicy("lastro-iwa-worker", {',
+      '        createScriptURL: (value) => {',
+      '          const candidate = new URL(value, self.location.href);',
+      '          if (!allowedWorkerScriptUrls.has(candidate.href)) throw new TypeError("Unexpected worker URL");',
+      '          return candidate.href;',
+      '        },',
+      '      })))',
+      '    : null;',
+      '  function createLastROWorkerScriptUrl(relativePath) {',
+      '    if (relativePath !== "lastro-resource-loader.js" && relativePath !== "ThreadEventHandler.js") {',
+      '      throw new TypeError("Unexpected worker path");',
+      '    }',
+      '    const scriptUrl = new URL(relativePath, self.location.href);',
+      '    if (!allowedWorkerScriptUrls.has(scriptUrl.href)) throw new TypeError("Unexpected worker URL");',
+      '    return policy ? policy.createScriptURL(scriptUrl.href) : scriptUrl.href;',
+      '  }',
+      '  importScripts(',
+      '    createLastROWorkerScriptUrl("lastro-resource-loader.js"),',
+      '    createLastROWorkerScriptUrl("ThreadEventHandler.js")',
+      '  );',
+      '})();',
+    ].join('\n'));
   return output;
 }
 

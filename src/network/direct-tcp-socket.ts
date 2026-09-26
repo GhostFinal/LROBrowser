@@ -33,7 +33,7 @@ export class DirectTcpSocket implements LegacyClientSocket {
     this.host = host;
     this.port = port;
     this.constructorForSocket = dependencies.TCPSocket ?? globalThis.TCPSocket;
-    this.schedule = dependencies.schedule ?? queueMicrotask;
+    this.schedule = dependencies.schedule ?? ((callback) => globalThis.queueMicrotask(callback));
     this.reportError = dependencies.reportError ?? ((error) => {
       globalThis.reportError?.(error);
     });

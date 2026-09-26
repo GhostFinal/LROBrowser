@@ -1,6 +1,5 @@
 import { bootstrapV2Client } from './runtime/client-bootstrap';
 import { getAvailableServerProfile } from './servers/server-profiles';
-import './styles.css';
 
 const root = document.getElementById('app');
 if (!root) throw new Error('Missing app mount point');

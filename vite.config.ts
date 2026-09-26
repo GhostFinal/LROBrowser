@@ -2,12 +2,17 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { defineConfig, type Plugin, type ViteDevServer } from 'vite';
 
+export function stripViteClientInjection(html: string): string {
+  return html.replace(/<script\b(?=[^>]*\bsrc=["'][^"']*\/@vite\/client["'])[^>]*>\s*<\/script>\s*/g, '');
+}
+
 function packageRuntime(): Plugin {
   function serveStagedRuntime(server: ViteDevServer) {
     server.middlewares.use((request, response, next) => {
       const pathname = decodeURIComponent((request.url ?? '').split('?')[0] ?? '');
       let source: string | undefined;
       if (pathname === '/runtime/Online.js') source = path.resolve('.staging/runtime/Online.js');
+      else if (pathname === '/runtime/LastROThreadEventHandler.js') source = path.resolve('.staging/runtime/LastROThreadEventHandler.js');
       else if (pathname === '/runtime/lastro-account-login.mjs') source = path.resolve('src/runtime/lastro-account-login.mjs');
       else if (pathname.startsWith('/runtime/')) source = path.resolve('.staging/core/runtime', pathname.slice('/runtime/'.length));
       else if (pathname.startsWith('/core/')) source = path.resolve('.staging/core', pathname.slice('/core/'.length));
@@ -26,6 +31,10 @@ function packageRuntime(): Plugin {
   return {
     name: 'package-patched-runtime',
     configureServer: serveStagedRuntime,
+    transformIndexHtml: {
+      order: 'post',
+      handler: stripViteClientInjection,
+    },
     generateBundle() {
       const runtime = path.resolve('.staging/runtime/Online.js');
       if (existsSync(runtime)) this.emitFile({ type: 'asset', fileName: 'runtime/Online.js', source: readFileSync(runtime) });
