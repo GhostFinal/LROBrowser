@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import { IDBFactory } from 'fake-indexeddb';
 import { IndexedDbAccountStore } from '../src/accounts/account-store';
 import { buildClientConfig } from '../src/runtime/client-config';
+import { buildLastROLoginRequest } from '../src/network/lastro-login-http';
 import { getAvailableServerProfile } from '../src/servers/server-profiles';
 
 // The runtime module is deliberately shipped as an executable MJS asset.
@@ -44,6 +45,73 @@ describe('LastRO native login integration', () => {
     } finally { root.remove(); style.remove(); }
   });
 
+
+
+  it('builds the LastRO login registration request with the nid-specific form fields', () => {
+    const request = buildLastROLoginRequest('checkin', 5, 'testbot1', '123123');
+    expect(request.path).toBe('/?r=mg/checkin&nid=5');
+    expect(request.body).toBe('Login_debug%5Buserid%5D=testbot1&Login_debug%5Buser_pass%5D=123123');
+  });
+
+  it('sends login checks without observing the response and keeps check disabled by default', async () => {
+    const calls: Array<{ phase: string; username: string; password: string }> = [];
+    const config = buildClientConfig(getAvailableServerProfile('lastro-2x'), { username: '', password: '' });
+    expect(config.lastroLoginCheck).toBe(false);
+    expect(config.lastroLoginCheckin).toBe(true);
+    const html = '<div id="WinLogin"><input class="user"><input class="pass"><button class="connect"></button></div>';
+    const host = document.createElement('div');
+    const root = host.attachShadow({ mode: 'open' });
+    root.innerHTML = decorateLastROLoginTemplate('WinLogin', html);
+    document.body.append(host);
+    vi.stubGlobal('LastRODirectSocketsSupported', true);
+    vi.stubGlobal('LastROLoginRegistration', (phase: string, _nid: number, username: string, password: string) => {
+      calls.push({ phase, username, password });
+    });
+    try {
+      installLastROLogin({ root, component: {}, configs: {
+        get: (key: keyof typeof config) => config[key], getServer: () => config.servers[0],
+      } });
+      const before = Reflect.get(globalThis, 'LastROLoginBeforeConnect') as (username: string, password: string) => boolean;
+      const after = Reflect.get(globalThis, 'LastROLoginAfterPassword') as (username: string, password: string) => void;
+      expect(before('testbot1', '123123')).toBe(true);
+      expect(calls).toEqual([]);
+      after('testbot1', '123123');
+      expect(calls).toEqual([{ phase: 'checkin', username: 'testbot1', password: '123123' }]);
+    } finally {
+      host.remove();
+      Reflect.deleteProperty(globalThis, 'LastROLoginBeforeConnect');
+      Reflect.deleteProperty(globalThis, 'LastROLoginAfterPassword');
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('sends the optional check before checkin when explicitly enabled', () => {
+    const calls: string[] = [];
+    vi.stubGlobal('LastRODirectSocketsSupported', true);
+    vi.stubGlobal('LastROLoginRegistration', (phase: string) => { calls.push(phase); });
+    const base = buildClientConfig(getAvailableServerProfile('lastro-2x'), { username: '', password: '' });
+    const config = { ...base, lastroLoginCheck: true };
+    const host = document.createElement('div');
+    const root = host.attachShadow({ mode: 'open' });
+    root.innerHTML = decorateLastROLoginTemplate('WinLogin', '<div id="WinLogin"><input class="user"><input class="pass"></div>');
+    document.body.append(host);
+    try {
+      installLastROLogin({ root, component: {}, configs: {
+        get: (key: keyof typeof config) => config[key], getServer: () => config.servers[0],
+      } });
+      const before = Reflect.get(globalThis, 'LastROLoginBeforeConnect') as (username: string, password: string) => boolean;
+      const after = Reflect.get(globalThis, 'LastROLoginAfterPassword') as (username: string, password: string) => void;
+      expect(before('testbot1', '123123')).toBe(true);
+      after('testbot1', '123123');
+      expect(calls).toEqual(['check', 'checkin']);
+    } finally {
+      host.remove();
+      Reflect.deleteProperty(globalThis, 'LastROLoginBeforeConnect');
+      Reflect.deleteProperty(globalThis, 'LastROLoginAfterPassword');
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('fills the original login fields from this IWA IndexedDB without submitting a login', async () => {
     const factory = new IDBFactory();
     vi.stubGlobal('indexedDB', factory);
@@ -74,6 +142,7 @@ describe('LastRO native login integration', () => {
     } finally {
       host.remove();
       Reflect.deleteProperty(globalThis, 'LastROLoginBeforeConnect');
+      Reflect.deleteProperty(globalThis, 'LastROLoginAfterPassword');
       vi.unstubAllGlobals();
     }
   });

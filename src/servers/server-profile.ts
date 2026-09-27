@@ -1,5 +1,5 @@
 export type ServerAvailability = 'available' | 'unavailable';
-export type AvailableServerId = 'lastro-3x' | 'lastro-2x';
+export type AvailableServerId = 'lastro-3x' | 'lastro-2x' | 'lastro-app';
 export type ServerProfileId = AvailableServerId | 'lastro-app';
 
 interface BaseProfile {

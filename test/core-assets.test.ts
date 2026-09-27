@@ -10,41 +10,55 @@ afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, {
 async function fixture() {
   const root = await mkdtemp(path.resolve('.staging/core-fixtures-'));
   roots.push(root);
-  const client = path.join(root, 'client');
-  const source = path.join(root, 'source');
+  const core = path.join(root, 'core');
+  const modules = path.join(root, 'modules');
   const output = path.join(root, 'output');
-  await mkdir(path.join(client, 'data/luafiles514/lua files/sub'), { recursive: true });
-  await mkdir(path.join(client, 'System'), { recursive: true });
-  await mkdir(path.join(source, 'src/DB/Mobs'), { recursive: true });
-  await writeFile(path.join(client, 'data/luafiles514/lua files/sub/Case.LUB'), 'lub');
-  await writeFile(path.join(client, 'data/luafiles514/lua files/sub/ignored.bmp'), 'passive');
-  for (const name of ['Towninfo_cn2_1.lua', 'achievement_list_cn2_06.lua', 'itemInfo_re_59.lua', 'itemInfo_re_61.lua']) await writeFile(path.join(client, 'System', name), name);
-  await writeFile(path.join(source, 'src/DB/worldData.js'), 'export const world = true;');
-  await writeFile(path.join(source, 'src/DB/Mobs/mob_db.js'), 'export const mobs = true;');
-  return { root, client, source, output };
+  await mkdir(path.join(core, 'data/luafiles514/lua files/sub'), { recursive: true });
+  await mkdir(path.join(core, 'data'), { recursive: true });
+  await mkdir(path.join(core, 'System/Font'), { recursive: true });
+  await mkdir(modules, { recursive: true });
+  await writeFile(path.join(core, 'data/luafiles514/lua files/sub/Case.LUB'), 'lub');
+  await writeFile(path.join(core, 'data/msgstringtable.csv'), 'message-table');
+  await writeFile(path.join(core, 'System/Font/Source Han Sans CN4.otf'), 'Source Han Sans CN4');
+  await writeFile(path.join(core, 'System/Font/Source Han Sans CN6.otf'), 'Source Han Sans CN6');
+  for (const name of ['Towninfo_cn2_1.lua', 'achievement_list_cn2_06.lua', 'itemInfo_re_59.lua', 'itemInfo_re_61.lua']) await writeFile(path.join(core, 'System', name), name);
+  await writeFile(path.join(core, 'data/world.json'), '{}');
+  await writeFile(path.join(modules, 'lastro-example.mjs'), 'export const example = 1;');
+  await writeFile(path.join(modules, 'ThreadEventHandler.js'), 'var ThreadEventHandler = {};');
+  await writeFile(path.join(modules, 'LastROThreadEventHandler.js'), 'var LastROThreadEventHandler = {};');
+  return { root, core, modules, output };
 }
 
 describe('core executable asset importer', () => {
-  it('preserves Lua/LUB case, ignores passive files, and produces sorted hashes', async () => {
+  it('preserves core asset paths, imports bundled fonts, and produces sorted hashes', async () => {
     const f = await fixture();
-    const first = await importCoreAssets({ clientRoot: f.client, roSourceRoot: f.source, output: f.output });
+    const first = await importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules, output: f.output });
     expect(first.files.map(file => file.path)).toEqual([...first.files].map(file => file.path).sort());
+    expect(new Set(first.files.map(file => file.path)).size).toBe(first.files.length);
     expect(first.files.map(file => file.path)).toContain('data/luafiles514/lua files/sub/Case.LUB');
-    expect(first.files.map(file => file.path)).not.toContain('data/luafiles514/lua files/sub/ignored.bmp');
-    const second = await importCoreAssets({ clientRoot: f.client, roSourceRoot: f.source, output: f.output });
+    expect(first.files).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: 'data/msgstringtable.csv', kind: 'passive' }),
+      expect.objectContaining({ path: 'System/Font/Source Han Sans CN4.otf', kind: 'passive' }),
+      expect.objectContaining({ path: 'System/Font/Source Han Sans CN6.otf', kind: 'passive' }),
+      expect.objectContaining({ path: 'runtime/lastro-example.mjs', kind: 'runtime' }),
+    ]));
+    expect(await readFile(path.join(f.output, 'data/msgstringtable.csv'), 'utf8')).toBe('message-table');
+    expect(await readFile(path.join(f.output, 'System/Font/Source Han Sans CN4.otf'), 'utf8')).toBe('Source Han Sans CN4');
+    expect(await readFile(path.join(f.output, 'System/Font/Source Han Sans CN6.otf'), 'utf8')).toBe('Source Han Sans CN6');
+    const second = await importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules, output: f.output });
     expect(second).toEqual(first);
   });
 
   it('rejects symlinked executable inputs', async () => {
     const f = await fixture();
-    await symlink(path.join(f.root, 'outside.lua'), path.join(f.client, 'data/luafiles514/lua files/sub/outside.lua'));
-    await expect(importCoreAssets({ clientRoot: f.client, roSourceRoot: f.source, output: f.output })).rejects.toThrow(/symlink/);
+    await symlink(path.join(f.root, 'outside.lua'), path.join(f.core, 'data/luafiles514/lua files/sub/outside.lua'));
+    await expect(importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules, output: f.output })).rejects.toThrow(/symlink/);
   });
 
-  it('rejects missing fixed System files instead of silently changing the baseline', async () => {
+  it('rejects unsupported core assets instead of silently changing the package', async () => {
     const f = await fixture();
-    await rm(path.join(f.client, 'System/itemInfo_re_61.lua'));
-    await expect(importCoreAssets({ clientRoot: f.client, roSourceRoot: f.source, output: f.output })).rejects.toThrow();
+    await writeFile(path.join(f.core, 'data/luafiles514/lua files/sub/ignored.bmp'), 'unsupported');
+    await expect(importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules, output: f.output })).rejects.toThrow(/unsupported-executable/);
   });
 
   it('fails when a required patched worker is missing instead of emitting an incomplete manifest', async () => {
@@ -52,8 +66,7 @@ describe('core executable asset importer', () => {
     const runtime = path.join(f.root, 'runtime');
     await mkdir(runtime);
     await writeFile(path.join(runtime, 'Online.js'), 'export {};');
-    await writeFile(path.join(runtime, 'lastro-resource-loader.js'), 'var LastROResources = {};');
-    await expect(importCoreAssets({ clientRoot: f.client, roSourceRoot: f.source, output: f.output,
+    await expect(importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules, output: f.output,
       runtimePath: path.join(runtime, 'Online.js'),
     })).rejects.toThrow(/ENOENT/);
   });
@@ -62,12 +75,12 @@ describe('core executable asset importer', () => {
     const f = await fixture();
     const runtime = path.join(f.root, 'runtime');
     await mkdir(runtime);
-    await writeFile(path.join(runtime, 'Online.js'), 'export const start = () => true;');
+    await writeFile(path.join(runtime, 'Online.js'), 'const node = {}; node.innerHTML = value;');
     await writeFile(path.join(runtime, 'lastro-resource-loader.js'), 'var LastROResources = {};');
     await writeFile(path.join(runtime, 'LastROThreadEventHandler.js'), 'var LastROThreadEventHandler = {};');
     await writeFile(path.join(runtime, 'ThreadEventHandler.js'), 'var ThreadEventHandler = {};');
     const output = path.join(f.root, 'output-with-helper');
-    await importCoreAssets({ clientRoot: f.client, roSourceRoot: f.source,
+    await importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules,
       runtimePath: path.join(runtime, 'Online.js'), output });
     const helper = await readFile(path.join(output, 'runtime/lastro-trusted-dom.mjs'), 'utf8');
     expect(helper).toContain('const POLICY_KEY');
@@ -75,8 +88,8 @@ describe('core executable asset importer', () => {
   });
 
   it('matches the reviewed baseline counts and byte totals', async () => {
-    const luaRoot = '/run/media/parker/7A9F-F871/ROWeb/ro/client_re/data/luafiles514/lua files';
-    const systemRoot = '/run/media/parker/7A9F-F871/ROWeb/ro/client_re/System';
+    const luaRoot = path.resolve('vendor/core/data/luafiles514/lua files');
+    const systemRoot = path.resolve('vendor/core/System');
     const walk = async (root: string, relative = ''): Promise<number[]> => {
       const values: number[] = [];
       for (const entry of await readdir(path.join(root, relative), { withFileTypes: true })) {

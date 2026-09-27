@@ -54,7 +54,7 @@ describe('Direct TCP lifecycle', () => {
   it('opens once with latency options and copies exact read view boundaries', async () => {
     const h = harness();
     await h.open();
-    expect(h.options).toEqual([['45.248.8.68', 26569, { noDelay: true, keepAlive: true }]]);
+    expect(h.options).toEqual([['45.248.8.68', 26569, { noDelay: true, keepAliveDelay: 60_000 }]]);
     expect(h.socket.onComplete).toHaveBeenCalledExactlyOnceWith(true);
     const bytes = new Uint8Array([99, 1, 2, 98]);
     h.controller.enqueue(bytes.subarray(1, 3));

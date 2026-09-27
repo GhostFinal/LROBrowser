@@ -125,7 +125,6 @@ export function mountAccountManager({ root, profiles, store, onLogin }: {
     ++revision;
     list.replaceChildren();
     clear();
-    if (select.value === 'lastro-app') { message.textContent = unavailable.textContent; return; }
     message.textContent = '';
     void refresh();
   });

@@ -16,6 +16,7 @@ const DEFAULT_MAX_BODY_BYTES = 128 * 1024 * 1024;
 
 interface DirectHttpOptions {
   TCPSocket?: DirectTcpConstructor;
+  nativeFetch?: typeof globalThis.fetch;
   openTimeoutMs?: number;
   readTimeoutMs?: number;
   maxHeaderBytes?: number;
@@ -114,17 +115,30 @@ function parseChunkedBody(body: Uint8Array, maxBodyBytes: number): Uint8Array {
   }
 }
 
-function parseResponse(bytes: Uint8Array, maxHeaderBytes: number, maxBodyBytes: number): DirectHttpResponseParts {
+interface ParsedResponseHead {
+  status: number;
+  statusText: string;
+  headers: Headers;
+  bodyStart: number;
+  contentLength?: number;
+  transferEncoding?: 'chunked';
+}
+
+function parseResponseHead(bytes: Uint8Array, maxHeaderBytes: number): ParsedResponseHead | null {
   const separator = findBytes(bytes, [13, 10, 13, 10]);
-  const headerBytes = separator < 0 ? -1 : separator + 4;
-  if (separator < 0 || headerBytes > maxHeaderBytes) throw new Error('Direct HTTP response headers are incomplete or too large');
+  if (separator < 0) {
+    if (bytes.byteLength > maxHeaderBytes) throw new Error('Direct HTTP response headers are incomplete or too large');
+    return null;
+  }
+  const headerBytes = separator + 4;
+  if (headerBytes > maxHeaderBytes) throw new Error('Direct HTTP response headers are incomplete or too large');
   const lines = ascii(bytes.subarray(0, separator)).split('\r\n');
   const statusLine = lines.shift();
   const statusMatch = statusLine ? /^HTTP\/1\.[01] ([1-5][0-9]{2})(?: (.*))?$/.exec(statusLine) : null;
   if (!statusMatch) throw new Error('Direct HTTP response status is invalid');
   const headers = new Headers();
   let contentLength: number | undefined;
-  let transferEncoding: string | undefined;
+  let transferEncoding: 'chunked' | undefined;
   for (const line of lines) {
     const colon = line.indexOf(':');
     if (colon <= 0) throw new Error('Direct HTTP response header is invalid');
@@ -154,13 +168,25 @@ function parseResponse(bytes: Uint8Array, maxHeaderBytes: number, maxBodyBytes: 
   if (contentLength !== undefined && transferEncoding !== undefined) {
     throw new Error('Direct HTTP response has both content-length and transfer-encoding');
   }
-  const bodyStart = separator + 4;
-  const rawBody = bytes.subarray(bodyStart);
+  return {
+    status: Number(statusMatch[1]),
+    statusText: statusMatch[2] ?? '',
+    headers,
+    bodyStart: headerBytes,
+    ...(contentLength === undefined ? {} : { contentLength }),
+    ...(transferEncoding === undefined ? {} : { transferEncoding }),
+  };
+}
+
+function parseResponse(bytes: Uint8Array, maxHeaderBytes: number, maxBodyBytes: number): DirectHttpResponseParts {
+  const head = parseResponseHead(bytes, maxHeaderBytes);
+  if (!head) throw new Error('Direct HTTP response headers are incomplete or too large');
+  const rawBody = bytes.subarray(head.bodyStart);
   let body: Uint8Array;
-  if (transferEncoding === 'chunked') {
+  if (head.transferEncoding === 'chunked') {
     body = parseChunkedBody(rawBody, maxBodyBytes);
-  } else if (contentLength !== undefined) {
-    if (contentLength > maxBodyBytes || rawBody.byteLength !== contentLength) {
+  } else if (head.contentLength !== undefined) {
+    if (head.contentLength > maxBodyBytes || rawBody.byteLength !== head.contentLength) {
       throw new Error('Direct HTTP content-length does not match the response body');
     }
     body = rawBody.slice();
@@ -169,9 +195,9 @@ function parseResponse(bytes: Uint8Array, maxHeaderBytes: number, maxBodyBytes: 
     if (body.byteLength > maxBodyBytes) throw new Error('Direct HTTP response body is too large');
   }
   return {
-    status: Number(statusMatch[1]),
-    statusText: statusMatch[2] ?? '',
-    headers,
+    status: head.status,
+    statusText: head.statusText,
+    headers: head.headers,
     body: body.slice().buffer as ArrayBuffer,
   };
 }
@@ -216,6 +242,11 @@ async function readResponse(
       total += result.value.byteLength;
       if (total > options.maxHeaderBytes + options.maxBodyBytes) throw new Error('Direct HTTP response is too large');
       chunks.push(result.value.slice());
+      const bytes = joinBytes(chunks, options.maxHeaderBytes + options.maxBodyBytes);
+      const head = parseResponseHead(bytes, options.maxHeaderBytes);
+      if (head?.contentLength !== undefined && bytes.byteLength - head.bodyStart >= head.contentLength) {
+        return parseResponse(bytes, options.maxHeaderBytes, options.maxBodyBytes);
+      }
     }
     return parseResponse(joinBytes(chunks, options.maxHeaderBytes + options.maxBodyBytes), options.maxHeaderBytes, options.maxBodyBytes);
   } finally {
@@ -229,6 +260,7 @@ async function readResponse(
 
 export function createDirectHttpFetch(options: DirectHttpOptions = {}): typeof globalThis.fetch {
   const constructorForSocket = options.TCPSocket ?? globalThis.TCPSocket;
+  const nativeFetch = options.nativeFetch ?? globalThis.fetch;
   const openTimeoutMs = Math.max(1, options.openTimeoutMs ?? DEFAULT_OPEN_TIMEOUT_MS);
   const readTimeoutMs = Math.max(1, options.readTimeoutMs ?? DEFAULT_READ_TIMEOUT_MS);
   const maxHeaderBytes = Math.max(1, options.maxHeaderBytes ?? DEFAULT_MAX_HEADER_BYTES);
@@ -243,9 +275,18 @@ export function createDirectHttpFetch(options: DirectHttpOptions = {}): typeof g
     if (requestMethod(input, init) !== 'GET' || init?.body !== undefined) {
       throw new Error('Direct HTTP only supports GET requests');
     }
-    if (!constructorForSocket) throw new Error('Direct TCP is unavailable');
     const signal = requestSignal(input, init);
-    const native = new constructorForSocket(host, 80, { noDelay: true, keepAlive: true });
+    if (url.origin === 'https://rodata.ltsd.ro') {
+      if (!nativeFetch) throw new Error('HTTPS fetch is unavailable for the backup resource origin');
+      return nativeFetch(url, {
+        ...init,
+        signal,
+        redirect: 'error',
+        credentials: 'omit',
+      });
+    }
+    if (!constructorForSocket) throw new Error('Direct TCP is unavailable');
+    const native = new constructorForSocket(host, 80, { noDelay: true, keepAliveDelay: 60_000 });
     void native.closed.catch(() => undefined);
     let opened = false;
     try {

@@ -6,7 +6,7 @@ import { patchV2Runtime } from '../scripts/patch-v2-runtime.mjs';
 let inputSource: string;
 let loopSource: string;
 beforeAll(async () => {
-  const patched = patchV2Runtime(await readFile('.staging/v2/Online.js', 'utf8'));
+  const patched = patchV2Runtime(await readFile('vendor/v2/Online.js', 'utf8'));
   const region = (name: string) => patched.split('//#region src/UI/Components/JoystickUI/' + name + '.js')[1]!.split('//#endregion')[0]!;
   inputSource = region('JoystickInputService');
   loopSource = region('JoystickPollingLoop');

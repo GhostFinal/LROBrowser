@@ -1,5 +1,6 @@
 import type { LegacyClientSocket } from '../network/client-socket';
 import { createDirectSocket, isDirectSocketsSupported } from '../network/socket-factory';
+import { prepareLastROLoginSession, sendLastROLoginPost, type LastROLoginPhase } from '../network/lastro-login-http';
 import type { AvailableServerProfile } from '../servers/server-profile';
 import { buildClientConfig, type ClientCredentials, type V2ClientConfig } from './client-config';
 
@@ -18,6 +19,7 @@ interface ExecutableAssetManifest {
 declare global {
   var ROConfig: V2ClientConfig | undefined;
   var LastRODirectSocketFactory: ((host: string, port: number) => LegacyClientSocket) | undefined;
+  var LastROLoginRegistration: ((phase: LastROLoginPhase, nid: number, username: string, password: string) => void) | undefined;
   var LastRODirectSocketsSupported: boolean | undefined;
   var LastROResourceRoots: readonly string[] | undefined;
   var LastROExecutableManifest: ExecutableAssetManifest | undefined;
@@ -51,6 +53,13 @@ export async function bootstrapV2Client(options: BootstrapOptions): Promise<void
   }
   globalThis.ROConfig = buildClientConfig(options.profile, options.credentials);
   globalThis.LastRODirectSocketFactory = options.socketFactory ?? createDirectSocket;
+  globalThis.LastROLoginRegistration = (phase, nid, username, password) => {
+    void sendLastROLoginPost(phase, nid, username, password).catch(() => undefined);
+  };
+  // Fetch Yii2's CSRF cookie/token before the login packet is sent. The checkin POST
+  // is intentionally fire-and-forget, so doing this work here avoids delaying it
+  // until after the game connection has already switched to the map server.
+  void prepareLastROLoginSession().catch(() => undefined);
   globalThis.LastROResourceRoots = LASTRO_RESOURCE_ROOTS;
   globalThis.LastROExecutableManifest = await loadExecutableManifest();
   const runtimeUrl = options.runtimeUrl ?? '/runtime/Online.js';

@@ -84,7 +84,8 @@ describe('LastRO resource worker', () => {
       const publishedPath = `data/texture/蜡历牢磐其捞胶/${file}`;
       expect(result.data).toBeNull();
       expect(worker.tcpRequests.map(value => decodeURIComponent(value.request.split('\r\n')[0]!)))
-        .toEqual(Array(2).fill(`GET /ro/client_re/${publishedPath} HTTP/1.1`));
+        .toEqual([`GET /ro/client_re/${publishedPath} HTTP/1.1`]);
+      expect(worker.urls).toEqual([`https://rodata.ltsd.ro/ro/client_re/${encodeURI(publishedPath)}`]);
       expect(result.error).toContain(`https://game.lastro.cn/ro/client_re/${encodeURI(publishedPath)} [http-404]`);
       expect(result.error).toContain(`https://rodata.ltsd.ro/ro/client_re/${encodeURI(publishedPath)} [http-503]`);
     }
@@ -104,11 +105,12 @@ describe('LastRO resource worker', () => {
     const loader = await readFile('.staging/runtime/lastro-resource-loader.js', 'utf8');
     expect(loader).toContain('function createDirectHttpFetch');
     expect(loader).toContain('new constructorForSocket(host, 80');
+    expect(loader).toContain('nativeFetch');
     expect(loader).toContain('Direct HTTP only permits approved resource origins');
   });
 
   it('uses TrustedScriptURL values for worker bootstrap scripts', async () => {
-    const handler = await readFile('.staging/v2/LastROThreadEventHandler.js', 'utf8');
+    const handler = await readFile('vendor/v2/LastROThreadEventHandler.js', 'utf8');
     const patched = patchResourceHandler(handler);
     expect(patched).toContain('trustedTypes.createPolicy("lastro-iwa-worker"');
     expect(patched).toContain('createLastROWorkerScriptUrl("lastro-resource-loader.js")');
@@ -121,10 +123,9 @@ describe('LastRO resource worker', () => {
     const result = await worker.load('data/map/prt.gat');
     expect(result.error).toBeUndefined();
     expect(result.data?.byteLength).toBe(1);
-    expect(worker.urls).toEqual([]);
+    expect(worker.urls).toEqual(['https://rodata.ltsd.ro/ro/client_re/data/map/prt.gat']);
     expect(worker.tcpRequests.map(request => [request.host, request.port])).toEqual([
       ['game.lastro.cn', 80],
-      ['rodata.ltsd.ro', 80],
     ]);
   });
 
@@ -133,6 +134,26 @@ describe('LastRO resource worker', () => {
     const result = await worker.load('data/mp3nametable.txt');
     expect(result.error).toBeUndefined();
     expect(new Uint8Array(result.data!)).toEqual(new Uint8Array([35]));
+  });
+
+  it('loads startup fonts from the package manifest before opening a TCP socket', async () => {
+    const fontBytes = new Uint8Array([79, 84, 84, 79]).buffer;
+    const worker = await loadWorker([response(200, fontBytes)], ['System/Font/Source Han Sans CN4.otf']);
+    const result = await worker.load('System/Font/Source Han Sans CN4.otf');
+    expect(result.error).toBeUndefined();
+    expect(new Uint8Array(result.data!)).toEqual(new Uint8Array(fontBytes));
+    expect(worker.urls).toEqual(['https://iwa.invalid/core/System/Font/Source%20Han%20Sans%20CN4.otf']);
+    expect(worker.tcpRequests).toEqual([]);
+  });
+
+  it('loads the startup message table from the package manifest before opening a TCP socket', async () => {
+    const tableBytes = new TextEncoder().encode('message-table').buffer;
+    const worker = await loadWorker([response(200, tableBytes)], ['data/msgstringtable.csv']);
+    const result = await worker.load('data/msgstringtable.csv');
+    expect(result.error).toBeUndefined();
+    expect(new Uint8Array(result.data!)).toEqual(new Uint8Array(tableBytes));
+    expect(worker.urls).toEqual(['https://iwa.invalid/core/data/msgstringtable.csv']);
+    expect(worker.tcpRequests).toEqual([]);
   });
 
   it('serves a second request from IndexedDB without fetching again', async () => {
@@ -149,8 +170,8 @@ describe('LastRO resource worker', () => {
       const worker = await loadWorker([response(200, invalid), response(200, new Uint8Array([7]).buffer)]);
       const result = await worker.load('data/map/prt.gat');
       expect(new Uint8Array(result.data!)).toEqual(new Uint8Array([7]));
-      expect(worker.urls).toHaveLength(0);
-      expect(worker.tcpRequests).toHaveLength(2);
+      expect(worker.urls).toHaveLength(1);
+      expect(worker.tcpRequests).toHaveLength(1);
     }
   });
 
@@ -181,8 +202,8 @@ describe('LastRO resource worker', () => {
   });
 
   it('fails the build when worker or handler anchors disappear or are duplicated', async () => {
-    const worker = await readFile('.staging/v2/ThreadEventHandler.js', 'utf8');
-    const handler = await readFile('.staging/v2/LastROThreadEventHandler.js', 'utf8');
+    const worker = await readFile('vendor/v2/ThreadEventHandler.js', 'utf8');
+    const handler = await readFile('vendor/v2/LastROThreadEventHandler.js', 'utf8');
     expect(() => patchResourceWorker(worker.replace('static getHTTP(', 'static changedHTTP('))).toThrow(/anchor/);
     expect(() => patchResourceWorker(worker + worker)).toThrow(/anchor/);
     expect(() => patchResourceHandler(handler.replace('getLastROHTTP', 'changedHTTP'))).toThrow(/anchor/);

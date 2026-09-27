@@ -1,5 +1,6 @@
 {
-  "baselineRoot": "/run/media/parker/7A9F-F871/ROWeb/v2",
+  "sourceRoot": "vendor/v2",
+  "testRoot": "vendor/v2",
   "entries": [
     { "module": "LastROThreadEventHandler.js", "tests": ["lastro-resource-path.test.mjs"], "capability": "official-first passive resource worker", "required": true },
     { "module": "PathFindingWorker.js", "tests": ["lastro-navigation-packet.test.mjs"], "capability": "grid pathfinding worker", "required": true },

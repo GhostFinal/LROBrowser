@@ -9,8 +9,10 @@
   "packageManager": "pnpm@12.4.2",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build",
-    "test": "vitest run",
+    "prepare:runtime": "node scripts/prepare-runtime.mjs",
+    "build": "pnpm prepare:runtime && vite build",
+    "test": "pnpm prepare:runtime && vitest run --exclude test/release-smoke.test.ts",
+    "test:release": "pnpm build && vitest run test/release-smoke.test.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "import:v2": "node scripts/import-v2-snapshot.mjs",

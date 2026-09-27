@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "LastRO V2",
-  "short_name": "LastRO",
+  "name": "LRO进阶客户端(Powered by LTSD.Ro)",
+  "short_name": "LRO进阶客户端",
   "version": "0.1.0",
   "start_url": "/",
   "scope": "/",
@@ -15,6 +15,7 @@
   "permissions_policy": {
     "direct-sockets": ["self"],
     "gamepad": ["self"],
-    "cross-origin-isolated": ["self"]
+    "cross-origin-isolated": ["self"],
+    "autoplay": ["self"]
   }
 }

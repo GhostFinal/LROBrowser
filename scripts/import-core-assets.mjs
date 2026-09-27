@@ -49,6 +49,8 @@ function kindFor(file) {
   if (extension === '.lua') return 'lua';
   if (extension === '.lub') return 'lub';
   if (extension === '.wasm') return 'wasm';
+  if (extension === '.json') return 'data-json';
+  if (extension === '.csv' || extension === '.otf' || extension === '.ttf' || extension === '.txt') return 'passive';
   if (extension === '.js' || extension === '.mjs' || extension === '.cjs') return 'runtime';
   fail('unsupported-executable', file);
 }
@@ -72,25 +74,17 @@ async function addFile(entries, destinations, source, destination, kind, output)
   entries.push({ path: destination, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), kind });
 }
 
-export async function importCoreAssets({ clientRoot, roSourceRoot, runtimePath, output }) {
-  const client = requireAbsolute(clientRoot, 'client-root');
-  const source = requireAbsolute(roSourceRoot, 'ro-source-root');
+export async function importCoreAssets({ coreRoot, moduleRoot, runtimePath, output }) {
+  const core = requireAbsolute(coreRoot, 'core-root');
+  const modules = requireAbsolute(moduleRoot ?? path.join(repo, 'vendor/v2'), 'module-root');
   const destinationRoot = path.resolve(output ?? path.join(repo, '.staging/core'));
-  await ensureSafeRoot(client, 'client');
-  await ensureSafeRoot(source, 'ro-source');
+  await ensureSafeRoot(core, 'core');
+  await ensureSafeRoot(modules, 'module');
   const entries = [];
   const destinations = new Set();
-  const luaRoot = path.join(client, config.luaRelativeRoot);
-  await ensureSafeRoot(luaRoot, 'lua');
-  for (const relative of await filesUnder(luaRoot)) {
-    if (!/\.(?:lua|lub)$/i.test(relative)) continue;
-    const kind = kindFor(relative);
-    await addFile(entries, destinations, path.join(luaRoot, relative), `${config.luaRelativeRoot}/${relative}`, kind, destinationRoot);
-  }
-  const systemRoot = path.join(client, 'System');
-  for (const relative of config.systemFiles) {
-    safeRelative(relative);
-    await addFile(entries, destinations, path.join(systemRoot, relative), `System/${relative}`, 'lua', destinationRoot);
+  for (const relative of await filesUnder(core)) {
+    if (relative === 'executable-assets.json') continue;
+    await addFile(entries, destinations, path.join(core, relative), relative, kindFor(relative), destinationRoot);
   }
   if (runtimePath) {
     const runtime = requireAbsolute(runtimePath, 'runtime');
@@ -98,11 +92,12 @@ export async function importCoreAssets({ clientRoot, roSourceRoot, runtimePath, 
     const text = runtimeBytes.toString('utf8');
     const wasmMatches = [...text.matchAll(/data:application\/wasm;base64,([A-Za-z0-9+/=]+)/g)];
     if (wasmMatches.length > 1) fail('duplicate-wasm');
-    if (wasmMatches.length === 1) {
+    if (wasmMatches.length === 1 && !destinations.has('wasm/liblua5.1.wasm')) {
       const wasmPath = path.join(destinationRoot, 'wasm/liblua5.1.wasm');
       const wasmBytes = Buffer.from(wasmMatches[0][1], 'base64');
       await mkdir(path.dirname(wasmPath), { recursive: true });
       await writeFile(wasmPath, wasmBytes);
+      destinations.add('wasm/liblua5.1.wasm');
       entries.push({ path: 'wasm/liblua5.1.wasm', bytes: wasmBytes.length, sha256: createHash('sha256').update(wasmBytes).digest('hex'), kind: 'wasm' });
     }
     await addFile(entries, destinations, runtime, 'runtime/Online.js', 'runtime', destinationRoot);
@@ -111,26 +106,11 @@ export async function importCoreAssets({ clientRoot, roSourceRoot, runtimePath, 
     safeRelative(relative);
     await addFile(entries, destinations, path.join(repo, relative), `runtime/${path.basename(relative)}`, 'runtime', destinationRoot);
   }
-  const stagedRuntime = path.join(repo, '.staging/v2');
-  try {
-    for (const relative of await filesUnder(stagedRuntime)) {
-      if (relative === 'Online.js' || !/\.(?:[cm]?js)$/i.test(relative)) continue;
-      const patchedWorker = runtimePath && ['ThreadEventHandler.js', 'LastROThreadEventHandler.js'].includes(relative);
-      const inputRoot = patchedWorker ? path.dirname(runtimePath) : stagedRuntime;
-      await addFile(entries, destinations, path.join(inputRoot, relative), `runtime/${path.basename(relative)}`, 'runtime', destinationRoot);
-    }
-  } catch (error) {
-    if (error.code !== 'ENOENT' || runtimePath) throw error;
-  }
-  for (const name of ['world-data.json', 'mob-data.json']) {
-    const generated = path.join(destinationRoot, 'data/world', name);
-    try {
-      const bytes = await readFile(generated);
-      const destination = `data/world/${name}`;
-      if (!destinations.has(destination)) entries.push({ path: destination, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), kind: 'data-json' });
-    } catch (error) {
-      if (error.code !== 'ENOENT') throw error;
-    }
+  for (const relative of await filesUnder(modules)) {
+    if (relative === 'Online.js' || !/\.(?:[cm]?js)$/i.test(relative) || /\.test\.mjs$/i.test(relative)) continue;
+    const patchedWorker = runtimePath && ['ThreadEventHandler.js', 'LastROThreadEventHandler.js'].includes(relative);
+    const inputRoot = patchedWorker ? path.dirname(runtimePath) : modules;
+    await addFile(entries, destinations, path.join(inputRoot, relative), `runtime/${path.basename(relative)}`, 'runtime', destinationRoot);
   }
   if (runtimePath) {
     await addFile(entries, destinations, path.join(path.dirname(runtimePath), 'lastro-resource-loader.js'),
@@ -145,11 +125,13 @@ export async function importCoreAssets({ clientRoot, roSourceRoot, runtimePath, 
 
 async function main() {
   const { values } = parseArgs({ args: process.argv.slice(2), options: {
-    'client-root': { type: 'string' }, 'ro-source-root': { type: 'string' }, runtime: { type: 'string' }, output: { type: 'string' },
+    'core-root': { type: 'string' }, 'module-root': { type: 'string' }, runtime: { type: 'string' }, output: { type: 'string' },
   } });
-  if (!values['client-root'] || !values['ro-source-root']) fail('explicit-roots-required');
-  const manifest = await importCoreAssets({ clientRoot: values['client-root'], roSourceRoot: values['ro-source-root'],
-    runtimePath: values.runtime ?? path.join(repo, '.staging/runtime/Online.js'), output: values.output });
+  const manifest = await importCoreAssets({
+    coreRoot: values['core-root'] ?? path.join(repo, 'vendor/core'),
+    moduleRoot: values['module-root'] ?? path.join(repo, 'vendor/v2'),
+    runtimePath: values.runtime ?? path.join(repo, '.staging/runtime/Online.js'), output: values.output,
+  });
   process.stdout.write(JSON.stringify({ files: manifest.files.length, bytes: manifest.files.reduce((sum, file) => sum + file.bytes, 0) }) + '\n');
 }
 

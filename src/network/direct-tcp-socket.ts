@@ -65,7 +65,7 @@ export class DirectTcpSocket implements LegacyClientSocket {
   private async initialize(): Promise<void> {
     try {
       if (!this.constructorForSocket) throw new Error('Direct TCP 不受当前环境支持');
-      const native = new this.constructorForSocket(this.host, this.port, { noDelay: true, keepAlive: true });
+      const native = new this.constructorForSocket(this.host, this.port, { noDelay: true, keepAliveDelay: 60_000 });
       this.native = native;
       void native.closed.then(() => this.handleNativeClosed(), error => this.handleNativeClosed(error));
       void native.opened.then(info => this.handleOpened(info), error => this.handleOpenFailure(error));

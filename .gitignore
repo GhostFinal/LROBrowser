@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .staging/
+.codegraph/
 release/
 .tools/
 .superpowers/

@@ -110,7 +110,7 @@ export function patchResourceHandler(source) {
 }
 
 async function main() {
-  const [input = '.staging/v2', output = '.staging/runtime'] = process.argv.slice(2);
+  const [input = 'vendor/v2', output = '.staging/runtime'] = process.argv.slice(2);
   const worker = patchResourceWorker(await readFile(path.join(input, 'ThreadEventHandler.js'), 'utf8'));
   const handler = patchResourceHandler(await readFile(path.join(input, 'LastROThreadEventHandler.js'), 'utf8'));
   await mkdir(output, { recursive: true });

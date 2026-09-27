@@ -12,7 +12,7 @@ interface RuntimeResourceOptions {
 // Bundled as a classic worker script; all reads share one IndexedDB connection.
 export function createRuntimeResourceLoader(options: RuntimeResourceOptions): (path: string) => Promise<ArrayBuffer> {
   const cache = createResourceCache();
-  const directHttpFetch = createDirectHttpFetch();
+  const directHttpFetch = createDirectHttpFetch({ nativeFetch: globalThis.fetch });
   return (path) => resolvePassiveResource(path, {
     cache,
     fetch: directHttpFetch,

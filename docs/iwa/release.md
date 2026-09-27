@@ -9,6 +9,7 @@ rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/nod
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm audit:iwa
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm bundle:iwa
 ./scripts/build-sign-local.sh
+rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm test:release
 ```
 
 PowerShell 使用相同的 `pnpm build`、`pnpm audit:iwa`、`pnpm bundle:iwa` 和 `pnpm sign:iwa -- --key <path>` 参数；将路径改为 PowerShell 的绝对路径格式。

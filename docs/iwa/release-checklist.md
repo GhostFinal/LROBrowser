@@ -9,7 +9,7 @@
 - [x] `pnpm audit:iwa`
 - [x] `pnpm bundle:iwa`
 - [x] 使用 `.local/keys/` 中被 Git 忽略的 disposable test key 生成 `.swbn`
-- [x] `pnpm test -- --run test/release-smoke.test.ts`
+- [x] `pnpm test:release`（需要先由 `scripts/build-sign-local.sh` 生成被 Git 忽略的本地候选包）
 - [x] `git diff --check` 和 `git status --short`
 
 Phase A 的本地候选包记录：

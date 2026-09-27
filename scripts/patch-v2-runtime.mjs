@@ -44,6 +44,55 @@ function replaceFunctionBody(source, name, body) {
   return source.slice(0, start) + body + source.slice(node.body.end);
 }
 
+function patchLoginRegistrationHook(source) {
+  const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const matches = [];
+  function visit(node) {
+    if (ts.isFunctionDeclaration(node) && node.name?.text === 'onConnectionRequest') matches.push(node);
+    ts.forEachChild(node, visit);
+  }
+  visit(file);
+  if (matches.length !== 1) fail('function:onConnectionRequest');
+  const node = matches[0];
+  let body = source.slice(node.body.getStart(file), node.body.end);
+  const hook = '\n\t\t\t\tif (typeof globalThis.LastROLoginAfterPassword === "function") globalThis.LastROLoginAfterPassword(username, password);';
+  const hanMarker = '\t\t\t\tNetwork.sendPacket(pkt);\n\t\t\t} else {';
+  const normalMarker = '\t\t\t\tNetwork.sendPacket(pkt);\n\t\t\t}\n\t\t}\n\t});\n}';
+  if (count(body, hanMarker) !== 1) fail('anchor:login-han-send');
+  if (count(body, normalMarker) !== 1) fail('anchor:login-send');
+  body = body.replace(hanMarker, `\t\t\t\tNetwork.sendPacket(pkt);${hook}\n\t\t\t} else {`);
+  body = body.replace(normalMarker, `\t\t\t\tNetwork.sendPacket(pkt);${hook}\n\t\t\t}\n\t\t}\n\t});\n}`);
+  return source.slice(0, node.body.getStart(file)) + body + source.slice(node.body.end);
+}
+
+function patchRuntimeTypography(source) {
+  const commonPattern = /(Common_default\$1\s*=\s*)("(?:\\.|[^"\\])*")/;
+  const match = source.match(commonPattern);
+  if (!match) fail('anchor:common-css');
+  let commonCss;
+  try {
+    const escapeMap = { '\\r': '\r', '\\n': '\n', '\\t': '\t', '\\b': '\b', '\\f': '\f', '\\v': '\v', '\\\\': '\\', '\\"': '"' };
+    commonCss = match[2].slice(1, -1).replace(/\\(?:r|n|t|b|f|v|\\|")/g, (escape) => escapeMap[escape]);
+  } catch {
+    fail('anchor:common-css-json');
+  }
+  commonCss = commonCss
+    .replaceAll('font-size-adjust: 0.5186', 'font-size-adjust: none')
+    .replaceAll('SCDream', 'Source Han Sans CN')
+    .replaceAll('Arial', "'Source Han Sans CN'")
+    + '\r\n\r\n/* LastRO IWA bundled Chinese typography */\r\n'
+    + ':host, body {\r\n'
+    + '\tfont-family: \'Source Han Sans CN\', sans-serif;\r\n'
+    + '\tfont-size-adjust: none;\r\n'
+    + '}\r\n'
+    + 'body, .title, .ui-btn {\r\n'
+    + '\tfont-size: 13px;\r\n'
+    + '}\r\n';
+  return source.replace(match[0], `${match[1]}${JSON.stringify(commonCss)}`)
+    .replaceAll('SCDream', 'Source Han Sans CN')
+    .replaceAll('Arial', "'Source Han Sans CN'");
+}
+
 function replaceWorkerCreation(source) {
   const pattern = /if \(!_source\) _source = new Worker\(new URL\(\s*\/\* @vite-ignore \*\/\s*"" \+ new URL\("LastROThreadEventHandler\.js", import\.meta\.url\)\.href,\s*"" \+ import\.meta\.url\s*\), \{ type: "classic" \}\);/g;
   const matches = [...source.matchAll(pattern)];
@@ -58,6 +107,20 @@ function replacePathFindingWorkerCreation(source) {
   return replaceOnce(source,
     'const workerUrl = new URL("PathFindingWorker.js", import.meta.url).href;',
     'const workerUrl = createLastROWorkerScriptUrl("PathFindingWorker.js");');
+}
+
+function patchAudioPlayback(source) {
+  let output = source;
+  output = replaceOnce(output, 'const playPromise = BGM.audio.play();',
+    'const playPromise = LastROAudioPlay(BGM.audio, true);');
+  output = replaceOnce(output, 'BGM.audio.play();', 'LastROAudioPlay(BGM.audio, true);');
+  output = replaceOnce(output, 'const playPromise = sound.play();',
+    'const playPromise = LastROAudioPlay(sound);');
+  output = replaceOnce(output, 'audio.play().catch((err) => {',
+    'LastROAudioPlay(audio).catch((err) => {');
+  output = replaceOnce(output, 'this.audioCtx = new AudioContext();',
+    'this.audioCtx = LastROAudioRegisterContext(new AudioContext());');
+  return output;
 }
 
 /**
@@ -207,6 +270,68 @@ function createLastROWorkerScriptUrl(relativePath) {
 	}));
 	return policy.createScriptURL(workerUrl.href);
 }
+function installLastROAudioUnlock() {
+	const stateKey = "__lastroAudioUnlock";
+	if (globalThis[stateKey]) return globalThis[stateKey];
+	let unlocked = false;
+	let pendingBgm;
+	const audioContexts = new Set();
+	const resumeAudioContexts = () => {
+		for (const context of audioContexts) {
+			if (!context || typeof context.resume !== "function") continue;
+			const promise = context.resume();
+			if (promise && typeof promise.catch === "function") promise.catch(() => {});
+		}
+	};
+	const retryBgm = () => {
+		const audio = pendingBgm;
+		pendingBgm = undefined;
+		if (!audio || typeof audio.play !== "function") return;
+		const promise = audio.play();
+		if (promise && typeof promise.catch === "function") promise.catch((error) => {
+			if (error?.name === "NotAllowedError") pendingBgm = audio;
+		});
+	};
+	const unlock = () => {
+		unlocked = true;
+		resumeAudioContexts();
+		retryBgm();
+	};
+	const registerContext = (context) => {
+		if (!context || typeof context.resume !== "function") return context;
+		audioContexts.add(context);
+		if (unlocked && context.state === "suspended") {
+			const promise = context.resume();
+			if (promise && typeof promise.catch === "function") promise.catch(() => {});
+		}
+		return context;
+	};
+	const state = {
+		unlock,
+		registerContext,
+		play(audio, retryOnUnlock = false) {
+			const promise = audio.play();
+			if (promise && typeof promise.catch === "function") promise.catch((error) => {
+				if (error?.name === "NotAllowedError" && retryOnUnlock && !unlocked) pendingBgm = audio;
+			});
+			return promise;
+		},
+	};
+	for (const event of ["pointerdown", "keydown", "touchstart", "click"])
+		document.addEventListener(event, unlock, { capture: true, passive: true });
+	globalThis[stateKey] = state;
+	return state;
+}
+function LastROAudioPlay(audio, retryOnUnlock) {
+	return installLastROAudioUnlock().play(audio, retryOnUnlock);
+}
+function LastROAudioUnlock() {
+	installLastROAudioUnlock().unlock();
+}
+function LastROAudioRegisterContext(context) {
+	return installLastROAudioUnlock().registerContext(context);
+}
+installLastROAudioUnlock();
 ${normalizedSource}`;
   output = output.replace(/\?build=[A-Za-z0-9._-]+/g, '');
   output = replaceOnce(output, '\troInitSpinner.add();\n\tPlugins.init();\n\tGameEngine.init();',
@@ -216,6 +341,8 @@ ${normalizedSource}`;
   output = replaceOnce(output, '_thread_ready = true;', '_thread_ready = true;\n\t\t\t\t\t\tconsole.info("[LastRO IWA] resource worker ready; initializing renderer");');
   output = replaceOnce(output, 'savingFiles(files);', 'console.info("[LastRO IWA] initializing remote client resources");\n\t\t\tThread.send("CLIENT_INIT", { files: [], save: false }, (...args) => Client.onFilesLoaded(...args));');
   output = replaceFunctionBody(output, 'defaultSocketFactory', '{\n\tif (typeof globalThis.LastRODirectSocketFactory !== "function") throw new Error("Direct TCP factory unavailable");\n\treturn globalThis.LastRODirectSocketFactory(host, port);\n}');
+  output = patchLoginRegistrationHook(output);
+  output = patchAudioPlayback(output);
   output = replaceOnce(output, 'init_WebSocket();', '');
   output = replaceOnce(output, 'init_NodeSocket();', '');
   output = replaceWorkerCreation(output);
@@ -287,6 +414,7 @@ ${normalizedSource}`;
     '\t\tinstallLastROLogin({ root, component: Component, configs: Configs });');
   output = replaceOnce(output, '\t\tconst pass = _inputPassword.value;\n\t\tapplyDebugLoginFields();',
     '\t\tconst pass = _inputPassword.value;\n\t\tconst beforeConnect = globalThis.LastROLoginBeforeConnect;\n\t\tif (typeof beforeConnect === "function" && beforeConnect(user, pass) === false) return false;\n\t\tapplyDebugLoginFields();');
+  output = patchRuntimeTypography(output);
   if (/new WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i.test(output)) fail('legacy-transport');
   return patchTrustedTypesDomWrites(output);
 }

@@ -1,6 +1,8 @@
 import { classifyResource, normalizeResourcePath } from './resource-policy';
 import { createResourceCache, type ResourceCache } from './resource-cache';
 
+export const RESOURCE_CACHE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+
 export const DEFAULT_RESOURCE_ROOTS = Object.freeze([
   'https://game.lastro.cn/ro/client_re/',
   'https://rodata.ltsd.ro/ro/client_re/'
@@ -169,7 +171,11 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
   if (classification === 'packaged-executable') throw new ResourceResolutionError(normalizedPath, [{ url: normalizedPath, reason: 'package-only-resource' }]);
   const cache = options.cache ?? createResourceCache();
   const cached = await cache.match(normalizedPath).catch(() => null);
-  if (cached?.bytes.byteLength) return cached.bytes.slice(0);
+  if (cached?.bytes.byteLength) {
+    const age = Date.now() - cached.savedAt;
+    if (Number.isFinite(age) && age >= 0 && age <= RESOURCE_CACHE_MAX_AGE_MS) return cached.bytes.slice(0);
+    await cache.delete(normalizedPath).catch(() => {});
+  }
   const candidates = buildResourcePathCandidates(normalizedPath, options.primaryCharset, options.fallbackCharset);
   const roots = (options.resourceRoots ?? DEFAULT_RESOURCE_ROOTS).map(normalizeRoot);
   if (roots.join('|') !== DEFAULT_RESOURCE_ROOTS.join('|')) throw new Error('Resource root order is fixed');

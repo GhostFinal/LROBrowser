@@ -18,18 +18,18 @@ function mount(store = new IndexedDbAccountStore({ indexedDB: new IDBFactory() }
 }
 
 describe('server-bound account manager', () => {
-  it('shows all servers, masks passwords, and blocks the App placeholder', async () => {
+  it('shows all servers, masks passwords, and allows the verified App server', async () => {
     const ui = mount();
     expect([...ui.select.options].map(o => o.textContent?.slice(0, 3))).toEqual(['3转服', '2转服', 'App']);
-    expect(ui.select.querySelector<HTMLOptionElement>('[value="lastro-app"]')!.disabled).toBe(true);
-    expect(ui.root.textContent).toContain('App服协议参数尚未完成验证');
+    expect(ui.select.querySelector<HTMLOptionElement>('[value="lastro-app"]')!.disabled).toBe(false);
     expect(ui.input('password').type).toBe('password');
     ui.select.value = 'lastro-app';
     ui.select.dispatchEvent(new Event('change'));
     ui.input('username').value = 'fixture-user';
     ui.input('password').value = 'fixture-password';
     ui.button('login').click();
-    expect(ui.onLogin).not.toHaveBeenCalled();
+    await vi.waitFor(() => expect(ui.onLogin).toHaveBeenCalledOnce());
+    expect(ui.onLogin.mock.calls[0]![0]).toMatchObject({ profile: { id: 'lastro-app' } });
   });
 
   it('allows unsaved login without writing accounts or marking successful use early', async () => {

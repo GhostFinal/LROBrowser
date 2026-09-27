@@ -1,7 +1,7 @@
 declare global {
   interface DirectTcpSocketOptions {
     noDelay?: boolean;
-    keepAlive?: boolean;
+    keepAliveDelay?: number;
   }
 
   interface DirectTcpConnection {

@@ -123,8 +123,8 @@ export interface LastROServerProfile {
 | `version` | `45` | `45` | 不设置 |
 | `langtype` | `3` | `4` | 不设置 |
 | `packetver` | `20211103` | `20211103` | 不设置 |
-| packet key 1 | `1205481659` | `1205481659` | 不设置 |
-| packet key 2 | `453061308` | `453065404` | 不设置 |
+| packet key 1 | `1205481659` | `1205481642` | 不设置 |
+| packet key 2 | `453061308` | `453065386` | 不设置 |
 | packet key 3 | `592073252` | `592073252` | 不设置 |
 | `clientHash` | `83ba069fd7c9e7683c435cecd507b18d` | `83ba069fd7c9e7683c435cecd507b18d` | 不设置 |
 | `clientVer` / `lastroNid` | `3` | `5` | 不设置 |
@@ -164,7 +164,7 @@ export interface LegacyClientSocket {
 }
 ```
 
-实现使用 `new TCPSocket(host, port, { noDelay: true, keepAlive: true })`，等待 `opened` 后保存 `ReadableStream` 和 `WritableStream`，启动单一读循环，并用有序 Promise 队列串行写入封包。读到的 `Uint8Array` 转成边界准确的 `ArrayBuffer` 后交给现有 `NetworkManager.receive`。
+实现使用 `new TCPSocket(host, port, { noDelay: true, keepAliveDelay: 60000 })`，等待 `opened` 后保存 `ReadableStream` 和 `WritableStream`，启动单一读循环，并用有序 Promise 队列串行写入封包。读到的 `Uint8Array` 转成边界准确的 `ArrayBuffer` 后交给现有 `NetworkManager.receive`。
 
 登录服返回的角色服和地图服地址继续由现有 V2 协议处理，所有阶段都通过同一个 Direct TCP factory 建立连接。角色服/地图服不是写死在 profile 中。
 
@@ -251,7 +251,7 @@ https://rodata.ltsd.ro/ro/client_re/
 
 资源路径继续使用当前 `lastro-resource-path.js` 的 GBK/EUC-KR 混合路径恢复、扩展名小写、物品图标大小写和历史 Sprite 后缀 fallback。每个根地址都要尝试同一组候选路径，不能只在 404 时 fallback；CORS 和网络错误也必须进入下一来源。
 
-浏览器 Fetch 不能读取官方源，因为响应没有 `Access-Control-Allow-Origin`。因此 Worker 保留 canonical HTTPS resource roots 供审计和未来 TLS transport 使用；当前被动资源 cache miss 通过 IWA `TCPSocket` 连接相同 host 的 port 80，发送受限 HTTP/1.1 `GET`。`rodata.ltsd.ro` 是为本产品规划的备用资源域名，当前产品尚未上线，因此暂未配置可解析 DNS；本文不声称它现已可访问。发布前必须验证该域名的 DNS、port 80 可达性、Range/缓存响应以及至少一组已知资源。备用资源源 fallback 是正常运行路径，不应被记录成异常崩溃。
+浏览器 Fetch 不能读取官方源，因为响应没有 `Access-Control-Allow-Origin`。因此 Worker 保留 canonical HTTPS resource roots 供审计和缓存元数据使用；官方被动资源 cache miss 通过 IWA `TCPSocket` 连接 `game.lastro.cn:80`，发送受限 HTTP/1.1 `GET`。`rodata.ltsd.ro` 由 Chrome 原生 HTTPS `fetch` 获取，因为该源提供 CORS；不增加 TLS socket、代理或 WebSocket。发布前必须验证两个源的 DNS/可达性、官方 port 80、备用 HTTPS/CORS、Range/缓存响应以及至少一组已知资源。备用资源源 fallback 是正常运行路径，不应被记录成异常崩溃。
 
 音频不再直接把第一个 URL 交给 `<audio>`。Worker 应通过统一 resolver 获取 ArrayBuffer，保证官方失败时仍能切换备用资源源并写入本地缓存。
 

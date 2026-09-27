@@ -4,19 +4,19 @@
 
 **Goal:** Load approved passive LastRO resources through IWA `TCPSocket` HTTP/1.1 requests so the client no longer depends on source-server CORS headers.
 
-**Architecture:** Keep canonical approved resource URLs and the existing passive-resource resolver contract. Add a browser/IWA-compatible transport that validates the approved HTTPS origins, connects to their port 80 endpoints through `TCPSocket`, sends a bounded HTTP/1.1 GET, parses binary responses, and returns a Fetch-compatible `Response`. Package the transport through the existing esbuild resource-worker bundle; do not reuse the game packet socket adapter or add a Node/WebSocket/proxy dependency.
+**Architecture:** Keep canonical approved resource URLs and the existing passive-resource resolver contract. Add a browser/IWA-compatible transport that validates the approved origins, connects to `game.lastro.cn:80` through `TCPSocket`, and sends a bounded HTTP/1.1 GET; `rodata.ltsd.ro` is fetched through Chrome's native HTTPS `fetch`. Both branches return a Fetch-compatible `Response`. Package the transport through the existing esbuild resource-worker bundle; do not reuse the game packet socket adapter or add a Node/WebSocket/proxy dependency.
 
 **Tech Stack:** TypeScript, Web Streams, IWA Direct Sockets `TCPSocket`, Vite/esbuild worker bundling, Vitest.
 
-**Spec:** `docs/superpowers/specs/2026-09-25-lastro-iwa-client-design.md`, with the current user directive overriding its passive-resource CORS/HTTPS-fetch assumption: source-side changes are unavailable, resource transport uses Direct TCP over port 80, and TLS is deferred.
+**Spec:** `docs/superpowers/specs/2026-09-25-lastro-iwa-client-design.md`, with the current user directive overriding its passive-resource CORS assumption: source-side changes are unavailable, so the official source uses Direct TCP over port 80 while the CORS-enabled backup uses native HTTPS `fetch`.
 
 ## Global Constraints
 
-- Only `TCPSocket` is used for the remote passive-resource transport.
+- `TCPSocket` is used only for the official `game.lastro.cn:80` passive-resource transport; the backup uses native browser HTTPS `fetch`.
 - The transport accepts only the already approved `https://game.lastro.cn` and `https://rodata.ltsd.ro` resource origins and `/ro/client_re/` paths.
 - Remote content remains passive; `.js`, `.mjs`, `.cjs`, `.wasm`, `.lua`, and `.lub` stay package-only.
 - No WebSocket, WSS, proxy, bridge, Electron, Node `net`/`http`, or TLS dependency is added.
-- Canonical resource URLs remain HTTPS so origin auditing and a future TLS transport can reuse the same resolver contract; the current transport explicitly connects to port 80.
+- Canonical resource URLs remain HTTPS so origin auditing and cache metadata use the real source URLs; only the official transport connects to port 80.
 - Existing package lookup and cache behavior is preserved as infrastructure, but a cache miss must reach the approved source through Direct TCP.
 
 ### Task 1: Add the Direct HTTP/1.1 transport
@@ -61,7 +61,7 @@
 
 - [ ] Add a failing assertion that the generated resource loader contains the Direct TCP transport and does not issue remote `fetch` calls for passive resources.
 - [ ] Run the focused packaging/audit tests and verify the assertion fails before the integration is bundled.
-- [ ] Update the generated-resource test contract and documentation to describe HTTP/1.1 over Direct TCP port 80, canonical source allowlisting, and the deferred TLS upgrade.
+- [ ] Update the generated-resource test contract and documentation to describe official HTTP/1.1 over Direct TCP port 80, backup native HTTPS fetch, and canonical source allowlisting.
 - [ ] Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm audit:iwa`, and `git diff --check`.
 
 ## Review Focus

@@ -19,7 +19,7 @@
 - `lastro-app` must remain unavailable until a separate approved design supplies verified protocol parameters.
 - Stored account passwords are plaintext local data and every account binds to one available server profile.
 - All executable JS, MJS, Worker, WASM, Lua, and LUB content is inside the signed IWA. Remote sources may return passive game data only.
-- Remote passive resource order is persistent cache, then a Direct TCP HTTP/1.1 request to `game.lastro.cn:80`, then the same request to `rodata.ltsd.ro:80`; the canonical resource roots remain HTTPS URLs for policy and cache metadata.
+- Remote passive resource order is persistent cache, then a Direct TCP HTTP/1.1 request to `game.lastro.cn:80`, then a native HTTPS `fetch` request to `rodata.ltsd.ro`; the canonical resource roots remain HTTPS URLs for policy and cache metadata.
 - Production runtime remote origins are allowlisted, not blocklisted: only `https://game.lastro.cn` and `https://rodata.ltsd.ro` are permitted for passive resources. Any other absolute HTTP(S)/WS(S) origin in imported or built runtime code is a hard failure without adding that origin to public configuration or documentation.
 - Preserve every current LastRO V2 module and regression test unless the spec explicitly removes it.
 - Do not copy personal quick-login accounts, XKore profiles, private server profiles, credentials, signing keys, or production secrets into this repository.
@@ -105,7 +105,7 @@
 - Exports `ServerAvailability`, `LastROServerProfile`, `LASTRO_SERVER_PROFILES`, `getServerProfile(id)`, and `getAvailableServerProfile(id)`.
 - `getAvailableServerProfile("lastro-app")` throws `ServerUnavailableError` before any network call.
 
-- [ ] **Step 1: Write exact profile tests.** Assert 3转服 is `45.248.8.68:28569`, `version=45`, `langtype=3`, `packetver=20211103`, keys `[1205481659,453061308,592073252]`, hash `83ba069fd7c9e7683c435cecd507b18d`, `clientVer=3`, and `lastroNid=3`. Assert 2转服 is `45.248.8.68:26569`, `version=45`, `langtype=4`, keys `[1205481659,453065404,592073252]`, the same packetver/hash, `clientVer=5`, and `lastroNid=5`. Assert App服 has no address/port/keys/hash and is unavailable.
+- [ ] **Step 1: Write exact profile tests.** Assert 3转服 is `45.248.8.68:28569`, `version=45`, `langtype=3`, `packetver=20211103`, keys `[1205481659,453061308,592073252]`, hash `83ba069fd7c9e7683c435cecd507b18d`, `clientVer=3`, and `lastroNid=3`. Assert 2转服 is `45.248.8.68:26569`, `version=45`, `langtype=4`, keys `[1205481642,453065386,592073252]`, the same packetver/hash, `clientVer=5`, and `lastroNid=5`. Assert App服 has no address/port/keys/hash and is unavailable.
 - [ ] **Step 2: Run the focused test.** Run `pnpm exec vitest run test/server-profiles.test.ts`; expect missing module failures.
 - [ ] **Step 3: Implement frozen profiles and lookup helpers.** Return readonly records; do not expose an editor or permit query parameters to override protocol values.
 - [ ] **Step 4: Document evidence and the validation gap.** In `docs/iwa/server-profiles.md`, record the official `Online.js?70.84` extraction date, the `ClientVer=3` candidate values, the retained 2转服 `langtype=4` decision, and that 3转服 is not release-ready until a real login/character/map flow succeeds.
@@ -155,7 +155,7 @@
 - [ ] **Step 2: Write error and handoff tests.** Assert constructor/open rejection calls `onComplete(false)` once, read failure calls `onClose` once, repeated close is a no-op, close during a queued write does not send later packets, and setting `handoffPending=true` survives until the existing NetworkManager close callback reads it. Task 6 covers the session-wide disconnect suppression at the integration boundary.
 - [ ] **Step 3: Write factory tests.** When `globalThis.TCPSocket` is absent, `isDirectSocketsSupported()` is false and factory creation throws `UnsupportedDirectSocketsError`; assert the source has no reference to `WebSocket`, WSS, proxy URLs, or Electron.
 - [ ] **Step 4: Run focused tests and verify failure.** Run `pnpm exec vitest run test/direct-tcp-socket.test.ts test/socket-factory.test.ts`; expect missing modules.
-- [ ] **Step 5: Implement type declarations and adapter.** Use `new TCPSocket(host, port, { noDelay: true, keepAlive: true })`, a single reader loop, and a serialized write promise. Convert `Uint8Array` with `chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength)`.
+- [ ] **Step 5: Implement type declarations and adapter.** Use `new TCPSocket(host, port, { noDelay: true, keepAliveDelay: 60000 })`, a single reader loop, and a serialized write promise. Convert `Uint8Array` with `chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength)`.
 - [ ] **Step 6: Implement deterministic teardown.** Abort/cancel the reader, close or abort the writer, close the socket, clear flags, and guard callbacks with `completed`/`closed` booleans.
 - [ ] **Step 7: Verify and commit.** Run both focused tests, `pnpm typecheck`, and `git diff --check`; commit `feat(iwa): add Direct TCP socket adapter`.
 
@@ -257,9 +257,9 @@
 - [ ] **Step 2: Write resolver tests.** Cover cache hit without a socket, official success, official 404 then backup-source success, official socket/timeout/5xx/HTML response then backup-source success, both roots failing with a structured error, and successful backup-source bytes entering persistent cache.
 - [ ] **Step 3: Preserve path-candidate behavior.** Port the existing GBK/EUC-KR mixed segment recovery, lowercase extension, item-icon lowercase, and historical Sprite suffix tests. Assert every encoded candidate is tried against official before the backup source and the candidate order is deterministic.
 - [ ] **Step 4: Run focused tests and verify failure.** Run `pnpm exec vitest run test/resource-policy.test.ts test/resource-resolver.test.ts`.
-- [ ] **Step 5: Implement the resolver and cache.** Use package-local executable lookups first, persistent cached passive data second, official Direct TCP HTTP third, and `rodata.ltsd.ro` Direct TCP HTTP fourth. Keep canonical HTTPS roots in resolver metadata, but send only bounded HTTP/1.1 GET requests over `TCPSocket` port 80 because the official source cannot be changed to add CORS. Apply a bounded per-attempt timeout. Treat non-2xx, HTML content, zero-length content where invalid, abort, DNS/socket rejection, and decode failures as fallback conditions.
+- [ ] **Step 5: Implement the resolver and cache.** Use package-local executable lookups first, persistent cached passive data second, official Direct TCP HTTP third, and native HTTPS `fetch` to `rodata.ltsd.ro` fourth. Keep canonical HTTPS roots in resolver metadata; send the official request over `TCPSocket` port 80 because that source cannot be changed to add CORS, and let Chrome handle TLS for the CORS-enabled backup. Apply a bounded per-attempt timeout and retain successful passive bytes for at least 30 days. Treat non-2xx, HTML content, zero-length content where invalid, abort, DNS/socket rejection, and decode failures as fallback conditions.
 - [ ] **Step 6: Patch the resource Worker.** Replace single-root `se.remoteClient` behavior with ordered roots and the executable manifest. Make audio pass through the same ArrayBuffer resolver and object-URL conversion so it receives fallback/cache behavior.
-- [ ] **Step 7: Document source policy and launch checks.** Record the 2026-09-25 sample where the official path returned 404. State that `rodata.ltsd.ro` is intentionally not DNS-resolvable before product launch and make DNS, port 80 reachability, HTTP framing, content type, Range/cache behavior, and known-resource checks mandatory before release. Document cache invalidation metadata, the accepted current plaintext transport, the future TLS upgrade boundary, and the rule that remote content is never executable.
+- [ ] **Step 7: Document source policy and launch checks.** Record the 2026-09-25 sample where the official path returned 404. Make official port 80 reachability, backup HTTPS/CORS reachability, content type, Range/cache behavior, and known-resource checks mandatory before release. Document cache invalidation metadata, the 30-day local retention policy, the split transport boundary, and the rule that remote content is never executable.
 - [ ] **Step 8: Verify and commit.** Run focused tests, the migrated `lastro-resource-path` tests, build, and `git diff --check`; commit `feat(iwa): add official-first resource fallback`.
 
 ### Task 10: Preserve and verify every LastRO V2 module
@@ -405,7 +405,7 @@ These phases are part of the long-term design but are **not authorized by the cu
 - Direct TCP only: Tasks 5, 6, 11, and 12.
 - Three LastRO server entries and App placeholder: Tasks 3, 4, and 12.
 - Plaintext local accounts bound to servers: Task 4.
-- Official-first resource fallback through Direct TCP HTTP to `rodata.ltsd.ro:80`, including pre-launch DNS and socket validation: Tasks 9 and 12.
+- Official-first resource fallback through Direct TCP HTTP to `game.lastro.cn:80` followed by native HTTPS fetch to `rodata.ltsd.ro`, including DNS, CORS and socket validation: Tasks 9 and 12.
 - Package-local Lua/LUB and no remote code execution: Tasks 7, 8, and 11.
 - Preserve all V2 custom modules: Tasks 2 and 10.
 - Small package instead of full client resources: Tasks 7, 9, and 11.

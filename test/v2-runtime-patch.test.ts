@@ -60,12 +60,45 @@ describe('V2 runtime patch', () => {
     const fixture = [
       'import { existing } from "./existing.mjs?build=fixture-1";',
       'var root = freeGlobal || freeSelf || Function("return this")();',
+      'var Common_default$1 = "body {\\r\\n\\tfont-size: 12px;\\r\\n\\tfont-family: \'SCDream\', Arial, sans-serif;\\r\\n\\tfont-size-adjust: 0.5186;\\r\\n}\\r\\n:host {\\r\\n\\ttouch-action: manipulation;\\r\\n}";',
+      'function drawLabel(ctx) { ctx.font = "10px Arial"; }',
+      'function playBgm(BGM) {',
+      '\tBGM.audio.play();',
+      '\tconst playPromise = BGM.audio.play();',
+      '\treturn playPromise;',
+      '}',
+      'function playSound(sound) {',
+      '\tconst playPromise = sound.play();',
+      '\treturn playPromise;',
+      '}',
+      'function playFreshAudio(audio) {',
+      '\taudio.play().catch((err) => {});',
+      '}',
+      'function createRainAudio() {',
+      '\tconst AudioContext = window.AudioContext || window.webkitAudioContext;',
+      '\tthis.audioCtx = new AudioContext();',
+      '}',
       'function compileTemplate(importsKeys, sourceURL, source, importsValues) { return Function(importsKeys, sourceURL + "return " + source).apply(undefined, importsValues); }',
       'function addPreloader(el) { el.innerHTML = PRELOADER_INNER_HTML; }',
       '/** Earlier runtime documentation */\nconst retainedRuntime = 1;',
       '//#region src/Network/SocketHelpers/WebSocket.js\nfunction Socket$1() {}\n//#endregion',
       '//#region src/Network/SocketHelpers/NodeSocket.js\nvar Socket;\n//#endregion',
       'function defaultSocketFactory(host, port) { return new Socket(host, port); }',
+      'function onConnectionRequest(username, password) {',
+      '\tNetwork.connect(_server.address, _server.port, (success) => {',
+      '\t\tif (!success) return;',
+      '\t\tlet pkt;',
+      '\t\tfunction sendLogin() {',
+      '\t\t\tif (Configs.get("loginMode") == "han") {',
+      '\t\t\t\tpkt = new PACKET.CA.LOGIN_HAN();',
+      '\t\t\t\tNetwork.sendPacket(pkt);',
+      '\t\t\t} else {',
+      '\t\t\t\tpkt = new PACKET.CA.LOGIN();',
+      '\t\t\t\tNetwork.sendPacket(pkt);',
+      '\t\t\t}',
+      '\t\t}',
+      '\t});',
+      '}',
       'function init_NetworkManager() { init_WebSocket(); init_NodeSocket(); }',
       'function init() {\n\troInitSpinner.add();\n\tPlugins.init();\n\tGameEngine.init();\n}',
       'function initThread() {\n\tif (!_source) _source = new Worker(new URL(\n\t\t/* @vite-ignore */\n\t\t"" + new URL("LastROThreadEventHandler.js", import.meta.url).href,\n\t\t"" + import.meta.url\n\t), { type: "classic" });\n\tif (_source instanceof Worker) _source.addEventListener("message", Thread.receive, false);\n}',
@@ -90,9 +123,23 @@ describe('V2 runtime patch', () => {
     ].join('\n');
     const patched = patchV2Runtime(fixture);
     expect(patched).toContain('globalThis.LastRODirectSocketFactory(host, port)');
+    expect(patched).toContain("font-family: 'Source Han Sans CN', sans-serif");
+    expect(patched).toContain('font-size: 13px');
+    expect(patched).toContain('font-size-adjust: none');
+    expect(patched).toContain('ctx.font = "10px \'Source Han Sans CN\'"');
+    expect(patched).not.toContain('Arial');
+    expect(patched).toContain('function installLastROAudioUnlock()');
+    expect(patched).toContain('installLastROAudioUnlock();\nimport { existing }');
+    expect(patched).toContain('LastROAudioPlay(BGM.audio, true)');
+    expect(patched).toContain('const playPromise = LastROAudioPlay(sound);');
+    expect(patched).toContain('LastROAudioPlay(audio).catch((err) => {});');
+    expect(patched).toContain('this.audioCtx = LastROAudioRegisterContext(new AudioContext());');
+    expect(patched).toContain('const resumeAudioContexts = () => {');
     expect(patched).toContain('lastro-account-login.mjs');
     expect(patched).toContain('installLastROLogin({ root, component: Component, configs: Configs })');
     expect(patched).toContain('LastROLoginBeforeConnect');
+    expect(patched).toContain('LastROLoginAfterPassword');
+    expect(patched).toContain('Network.sendPacket(pkt);\n\t\t\t\tif (typeof globalThis.LastROLoginAfterPassword');
     expect(patched).toContain('globalThis;');
     expect(patched).toContain('Dynamic templates are disabled in the IWA runtime');
     expect(patched).toContain('trustedTypes.createPolicy("lastro-iwa-worker"');
@@ -128,7 +175,21 @@ describe('V2 runtime patch', () => {
   });
 
   it('keeps the real imported runtime source available for the next patch step', async () => {
-    await expect(readFile('.staging/v2/Online.js', 'utf8')).resolves.toContain('defaultSocketFactory');
+    await expect(readFile('vendor/v2/Online.js', 'utf8')).resolves.toContain('defaultSocketFactory');
+  });
+
+  it('applies bundled Chinese typography to the generated runtime', async () => {
+    const runtime = await readFile('.staging/runtime/Online.js', 'utf8');
+    expect(runtime).toContain("font-family: 'Source Han Sans CN'");
+    expect(runtime).toContain('font-size: 13px');
+    expect(runtime).not.toContain('SCDream');
+    expect(runtime).not.toContain('Arial');
+  });
+
+  it('registers Web Audio contexts in the generated runtime for activation resume', async () => {
+    const runtime = await readFile('.staging/runtime/Online.js', 'utf8');
+    expect(runtime).toContain('this.audioCtx = LastROAudioRegisterContext(new AudioContext());');
+    expect(runtime).toContain('const resumeAudioContexts = () => {');
   });
 
   it('sets skipIntro to bypass local GRF file picker', () => {

@@ -1,16 +1,7 @@
 {
-  "luaRelativeRoot": "data/luafiles514/lua files",
-  "systemFiles": [
-    "Towninfo_cn2_1.lua",
-    "achievement_list_cn2_06.lua",
-    "itemInfo_re_59.lua",
-    "itemInfo_re_61.lua"
-  ],
+  "coreRoot": "vendor/core",
+  "moduleRoot": "vendor/v2",
   "runtimeFiles": ["src/runtime/lastro-account-login.mjs", "src/runtime/lastro-trusted-dom.mjs"],
-  "worldDataInputs": [
-    "src/DB/worldData.js",
-    "src/DB/Mobs/mob_db.js"
-  ],
   "baseline": {
     "luaCount": 473,
     "luaBytes": 49723747,

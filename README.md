@@ -2,7 +2,13 @@
 
 这是独立的 LastRO V2 Isolated Web App 客户端。生产网络连接只使用 Direct TCP / `TCPSocket`；WSS、WebSocket、proxy、bridge、Electron 和 NodeSocket fallback 不属于客户端路径。
 
-Phase A 支持本地构建、审计、unsigned Web Bundle 和被 Git 忽略的本地 disposable test key 签名。账号密码由用户在 IWA IndexedDB 中按服务器 profile 管理。可用服务器为 `lastro-3x` 和 `lastro-2x`，`lastro-app` 保持不可用占位项。
+Phase A 支持本地构建、审计、unsigned Web Bundle 和被 Git 忽略的本地 disposable test key 签名。账号密码由用户在 IWA IndexedDB 中按服务器 profile 管理。可用服务器为 `lastro-3x`、`lastro-2x` 和 `lastro-app`。App服使用 `45.248.8.68:27569`，协议参数沿用 2转服，`lastroNid=6`。
+
+## 仓库边界
+
+`vendor/v2/` 是本项目固定管理的 V2 runtime、Worker、LastRO 模块和回归测试；`vendor/core/` 是本项目固定管理的 Lua/LUB、WASM、启动数据和 Source Han Sans CN 字体。`Online.js` 及其使用到的 `*.mjs` 都从这些目录进入构建。个人旧配置 `lastro-v2-config.js` 不属于本项目，也不会被复制。
+
+`.staging/` 不是源码目录，而是 `pnpm prepare:runtime` 生成的可删除构建中间目录，包含 patched runtime、Worker、核心资源和 executable manifest。删除它后重新运行 `pnpm prepare:runtime`、`pnpm test` 或 `pnpm build` 即可恢复。外部 `/run/media/.../ROWeb` 只属于历史来源，不是本项目的测试、构建或发布依赖。
 
 ## 本地命令
 
@@ -13,6 +19,7 @@ rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/nod
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm lint
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm typecheck
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm test
+rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm test:release
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm build
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm audit:iwa
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm bundle:iwa

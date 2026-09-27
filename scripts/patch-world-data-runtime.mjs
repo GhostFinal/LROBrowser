@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import process from 'node:process';
 
-const file = process.argv[2] ?? '.staging/v2/lastro-worldmap-details.mjs';
+const file = process.argv[2] ?? 'vendor/v2/lastro-worldmap-details.mjs';
 let source = await readFile(file, 'utf8');
 
 function replaceOnce(needle, replacement, label) {

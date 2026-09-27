@@ -2,7 +2,7 @@
 
 核查日期：2026-09-25。实施基点：`2ef74a2`。
 
-唯一迁移基线为用户指定的 `/run/media/parker/7A9F-F871/ROWeb/v2`，本轮对该目录及相关 `ro/src`、Lua/LUB 根目录只做读取。
+历史迁移基线来自用户指定的外部 `ROWeb` 项目；迁移完成后，本仓库只从已审核的 `vendor/v2` 和 `vendor/core` 读取。外部目录不参与开发、测试、构建或发布。
 
 已观察到的文件元数据：
 
@@ -15,17 +15,17 @@
 | `lastro-resource-path.js` | 5,367 bytes |
 | 主 bundle 引用的 `lastro-*.mjs` | 13 个 |
 
-`config/v2-allowlist.json` 固定 18 个生产文件及已核查基线的 SHA-256。生产导入排除旧 HTML 入口、`lastro-v2-config.js`、测试文件、截图和构建辅助工具。旧私人配置不读取、不复制、不加载，不因为它包含既知的个人账号而阻塞其余文件迁移。
+`vendor/v2` 固定管理 18 个生产文件及对应回归测试；生产导入排除旧 HTML 入口、`lastro-v2-config.js`、测试文件、截图和构建辅助工具。旧私人配置不读取、不复制、不加载。
 
 导入器通过 17 个合成夹具测试：禁止在待导入文件中携带凭据/私有 profile/私钥标记、未批准 origin、未知可执行文件、路径越界和符号链接；排除旧配置；拒绝 hash 漂移；记录旧传输标记；排序并计算 SHA-256；扫描失败不覆盖已有 staging。夹具的账号与地址均为人工测试值。
 
-清理器只处理 hash 与已核查基线一致的文件，通过 AST 定位旧快捷登录入口、私人服务器 UI、旧 HTTP 快捷键服务、远程字体和外部链接；来源目录始终只读。WASM 的旧远程默认值改为包内路径，实际资源由 Task 7 提供。原始与清理后 SHA-256、转换类别及次数记入 `.staging/v2-manifest.json`，不记录被删除的地址或账号值。
+`vendor/v2/Online.js` 在构建时由 `scripts/patch-v2-runtime.mjs` 生成到可删除的 `.staging/runtime/Online.js`；Worker 和 `vendor/core` 资源也只在构建阶段生成到 `.staging`。WASM 的运行时路径固定为包内路径，原始与清理后的 SHA-256、转换类别及次数只记录在本地生成清单中，不记录被删除的地址或账号值。
 
-真实基线导入已通过安全扫描：18 个文件，清理后合计 13,530,663 bytes，全部通过 JavaScript 语法检查。只有原始 `Online.js` 允许暂存旧传输实现计数，Task 6 必须移除后才能成为生产 runtime。
+仓库内的 V2 源码和回归测试通过 ownership/inventory 门禁；生产 runtime 只由 `vendor/v2` 生成，旧传输实现必须在进入 `.staging/runtime` 前移除。
 
 唯一不属于网络地址的 URI 例外是 SVG/XHTML/XLink 的三个 W3C XML 命名空间标识，用于创建本地 SVG 和截图。这些标识不是资源请求，不扩大允许的远程资源源。所有实际远程资源 origin 仍只允许官方与备用两个 HTTPS origin。
 
-本机测试许可状态见 [许可证核查记录](third-party-licenses.md)。第三方内容仅保存在被忽略的 staging，不随本项目代码提交。
+本机测试许可状态见 [许可证核查记录](third-party-licenses.md)。`.staging`、`dist` 和 `release` 都是被忽略的生成目录；可复现的源文件、模块、回归测试、字体和核心资源均在仓库内管理。
 
 ## 当前执行状态
 

@@ -29,8 +29,10 @@ function deferred<T>() {
 interface HarnessOptions {
   response?: Uint8Array[];
   holdResponse?: boolean;
+  closeResponse?: boolean;
   openTimeoutMs?: number;
   readTimeoutMs?: number;
+  nativeFetch?: typeof globalThis.fetch;
 }
 
 function harness(options: HarnessOptions = {}) {
@@ -45,7 +47,7 @@ function harness(options: HarnessOptions = {}) {
       requests.push(chunk.slice());
       if (!options.holdResponse) {
         for (const responseChunk of options.response ?? []) controller.enqueue(responseChunk);
-        controller.close();
+        if (options.closeResponse !== false) controller.close();
       }
     },
   });
@@ -60,6 +62,7 @@ function harness(options: HarnessOptions = {}) {
     TCPSocket: Native,
     ...(options.openTimeoutMs === undefined ? {} : { openTimeoutMs: options.openTimeoutMs }),
     ...(options.readTimeoutMs === undefined ? {} : { readTimeoutMs: options.readTimeoutMs }),
+    ...(options.nativeFetch === undefined ? {} : { nativeFetch: options.nativeFetch }),
   });
   return { fetch, requests, constructorArgs, close, controller, opened, readable, writable };
 }
@@ -81,12 +84,48 @@ describe('Direct HTTP resource transport', () => {
     expect(result.status).toBe(200);
     expect(result.headers.get('etag')).toBe('"fixture"');
     expect(new Uint8Array(await result.arrayBuffer())).toEqual(body);
-    expect(h.constructorArgs).toEqual([['game.lastro.cn', 80, { noDelay: true, keepAlive: true }]]);
+    expect(h.constructorArgs).toEqual([['game.lastro.cn', 80, { noDelay: true, keepAliveDelay: 60_000 }]]);
     const request = new TextDecoder().decode(h.requests[0]);
     expect(request).toContain('GET /ro/client_re/data/test.gat HTTP/1.1\r\n');
     expect(request).toContain('Host: game.lastro.cn\r\n');
     expect(request).toContain('Accept-Encoding: identity\r\n');
     expect(request).toContain('Connection: close\r\n');
+  });
+
+  it('returns a content-length response without waiting for TCP EOF', async () => {
+    const body = new Uint8Array([0, 255, 1, 2]);
+    const response = responseBytes('HTTP/1.1 200 OK', [
+      'Content-Type: font/otf',
+      'Content-Length: 4',
+    ], body);
+    const h = harness({ response: [response], closeResponse: false, readTimeoutMs: 50 });
+    h.opened.resolve({ readable: h.readable, writable: h.writable });
+
+    const result = await h.fetch('https://game.lastro.cn/ro/client_re/System/Font/Source%20Han%20Sans%20CN4.otf');
+
+    expect(result.status).toBe(200);
+    expect(new Uint8Array(await result.arrayBuffer())).toEqual(body);
+    expect(h.close).toHaveBeenCalledOnce();
+  });
+
+  it('uses Chrome fetch for the HTTPS backup source instead of opening plaintext TCP', async () => {
+    const body = new Uint8Array([9, 8, 7]).buffer;
+    const nativeFetch = vi.fn<typeof globalThis.fetch>(async (...args) => {
+      void args;
+      return new Response(body, {
+        status: 200,
+        headers: { 'content-type': 'application/octet-stream' },
+      });
+    });
+    const h = harness({ nativeFetch });
+
+    const result = await h.fetch('https://rodata.ltsd.ro/ro/client_re/data/fallback.gat');
+
+    expect(result.status).toBe(200);
+    expect(new Uint8Array(await result.arrayBuffer())).toEqual(new Uint8Array(body));
+    expect(nativeFetch).toHaveBeenCalledOnce();
+    expect(String(nativeFetch.mock.calls[0]?.[0])).toBe('https://rodata.ltsd.ro/ro/client_re/data/fallback.gat');
+    expect(h.constructorArgs).toEqual([]);
   });
 
   it('decodes chunked binary bodies and preserves non-success statuses', async () => {

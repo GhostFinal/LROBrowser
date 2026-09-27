@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
-import { MemoryResourceCache } from '../src/resources/resource-cache';
+import { IDBFactory } from 'fake-indexeddb';
+import { describe, expect, it, vi } from 'vitest';
+import { IndexedDbResourceCache, MemoryResourceCache } from '../src/resources/resource-cache';
 import { buildResourcePathCandidates, DEFAULT_RESOURCE_ROOTS, ResourceResolutionError, resolvePassiveResource } from '../src/resources/resource-resolver';
 
 function response(status: number, bytes = new Uint8Array([1, 2]).buffer, contentType = 'application/octet-stream'): Response {
@@ -31,6 +32,30 @@ describe('passive resource resolver', () => {
     await cache.put('data/map/prt.gat', new Uint8Array([7]).buffer, { sourceUrl: 'cache://test' });
     const fetch = async () => { throw new Error('fetch should not run'); };
     await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch })).resolves.toEqual(new Uint8Array([7]).buffer);
+  });
+
+  it('expires cached resources after the 30-day retention period', async () => {
+    const cache = new MemoryResourceCache();
+    const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+    await cache.put('data/map/prt.gat', new Uint8Array([7]).buffer, {
+      sourceUrl: 'cache://expired',
+      savedAt: Date.now() - thirtyDays - 1,
+    });
+    const fetch = async () => response(200, new Uint8Array([8]).buffer);
+
+    await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch })).resolves.toEqual(new Uint8Array([8]).buffer);
+    await expect(cache.match('data/map/prt.gat')).resolves.toMatchObject({ sourceUrl: DEFAULT_RESOURCE_ROOTS[0] + 'data/map/prt.gat' });
+  });
+
+  it('does not trust a cache entry with an invalid timestamp', async () => {
+    const cache = new MemoryResourceCache();
+    await cache.put('data/map/prt.gat', new Uint8Array([7]).buffer, {
+      sourceUrl: 'cache://invalid-time',
+      savedAt: Number.NaN,
+    });
+    const fetch = async () => response(200, new Uint8Array([8]).buffer);
+
+    await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch })).resolves.toEqual(new Uint8Array([8]).buffer);
   });
 
   it('keeps original logical paths for existing caches and packaged executables', async () => {
@@ -68,6 +93,41 @@ describe('passive resource resolver', () => {
     await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch: fetch as typeof globalThis.fetch })).resolves.toEqual(new Uint8Array([9]).buffer);
     expect(calls).toBe(2);
     await expect(cache.match('data/map/prt.gat')).resolves.toMatchObject({ sourceUrl: `${DEFAULT_RESOURCE_ROOTS[1]}data/map/prt.gat`, size: 1 });
+  });
+
+  it.each([
+    ['http-503', () => response(503)],
+    ['abort-error', () => { throw new DOMException('The operation was aborted', 'AbortError'); }],
+    ['network-error', () => { throw new Error('fetch failed'); }],
+  ])('enters the backup root after an official %s failure', async (_name, officialFailure) => {
+    const urls: string[] = [];
+    const input = 'data/sprite/normal_검광.spr';
+    const fetch = async (url: string) => {
+      urls.push(url);
+      if (url.startsWith(DEFAULT_RESOURCE_ROOTS[0])) return officialFailure();
+      return response(200, new Uint8Array([9]).buffer);
+    };
+
+    await expect(resolvePassiveResource(input, {
+      cache: new MemoryResourceCache(),
+      fetch: fetch as typeof globalThis.fetch,
+    })).resolves.toEqual(new Uint8Array([9]).buffer);
+    expect(urls[0]).toBe(`${DEFAULT_RESOURCE_ROOTS[0]}data/sprite/normal_%E5%85%AB%E5%A0%A1.spr`);
+    expect(urls[1]).toBe(`${DEFAULT_RESOURCE_ROOTS[1]}data/sprite/normal_%E5%85%AB%E5%A0%A1.spr`);
+  });
+
+  it('persists successful resources in IndexedDB so a new cache instance can reuse them', async () => {
+    vi.stubGlobal('indexedDB', new IDBFactory());
+    const databaseName = `lastro-resource-cache-${Date.now()}-${Math.random()}`;
+    const firstCache = new IndexedDbResourceCache(databaseName);
+    await firstCache.put('data/map/prt.gat', new Uint8Array([4, 5]).buffer, { sourceUrl: DEFAULT_RESOURCE_ROOTS[1] + 'data/map/prt.gat' });
+
+    const secondCache = new IndexedDbResourceCache(databaseName);
+    await expect(secondCache.match('data/map/prt.gat')).resolves.toMatchObject({
+      sourceUrl: DEFAULT_RESOURCE_ROOTS[1] + 'data/map/prt.gat',
+      size: 2,
+    });
+    vi.unstubAllGlobals();
   });
 
   it('rejects HTML and reports structured failures after both roots fail', async () => {

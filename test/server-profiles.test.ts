@@ -1,24 +1,36 @@
 import { describe, expect, it } from 'vitest';
-import { LASTRO_SERVER_PROFILES, getServerProfile, getAvailableServerProfile, ServerUnavailableError } from '../src/servers/server-profiles';
+import { LASTRO_SERVER_PROFILES, getServerProfile, getAvailableServerProfile } from '../src/servers/server-profiles';
 
 describe('immutable LastRO profiles', () => {
-  it('contains exactly the two known servers and the disabled placeholder', () => {
+  it('contains the three verified server profiles', () => {
     expect(LASTRO_SERVER_PROFILES.map(p => p.id)).toEqual(['lastro-3x', 'lastro-2x', 'lastro-app']);
-    for (const [id, port, langtype, key, ver] of [
-      ['lastro-3x', 28569, 3, 453061308, 3], ['lastro-2x', 26569, 4, 453065404, 5],
+    for (const [id, port, langtype, packetKeys, ver] of [
+      ['lastro-3x', 28569, 3, [1205481659, 453061308, 592073252], 3],
+      ['lastro-2x', 26569, 4, [1205481642, 453065386, 592073252], 5],
+      ['lastro-app', 27569, 4, [1473917115, 721500860, 860508708], 6],
     ] as const) {
       expect(getAvailableServerProfile(id)).toEqual({
-        id, displayName: id === 'lastro-3x' ? '3转服' : '2转服', availability: 'available',
+        id, displayName: id === 'lastro-3x' ? '3转服' : id === 'lastro-2x' ? '2转服' : 'App服', availability: 'available',
         loginAddress: '45.248.8.68', loginPort: port, version: 45, langtype, packetver: 20211103,
-        packetKeys: [1205481659, key, 592073252], clientHash: '83ba069fd7c9e7683c435cecd507b18d',
-        clientVer: ver, lastroNid: ver, resourceProfileId: 'lastro-public',
+        packetKeys, clientHash: id === 'lastro-app' ? '23ba069fd7c9e5683c435cecd507b11d' : '83ba069fd7c9e7683c435cecd507b18d',
+        clientVer: id === 'lastro-app' ? 5 : ver, lastroNid: ver, resourceProfileId: 'lastro-public',
       });
     }
-    expect(getServerProfile('lastro-app')).toEqual({
-      id: 'lastro-app', displayName: 'App服', availability: 'unavailable',
-      unavailableReason: 'App服协议参数尚未完成验证', resourceProfileId: 'lastro-public',
+    expect(getAvailableServerProfile("lastro-app")).toEqual({
+      id: "lastro-app",
+      displayName: "App服",
+      availability: "available",
+      loginAddress: "45.248.8.68",
+      loginPort: 27569,
+      version: 45,
+      langtype: 4,
+      packetver: 20211103,
+      packetKeys: [1473917115, 721500860, 860508708],
+      clientHash: "23ba069fd7c9e5683c435cecd507b11d",
+      clientVer: 5,
+      lastroNid: 6,
+      resourceProfileId: "lastro-public",
     });
-    expect(() => getAvailableServerProfile('lastro-app')).toThrow(ServerUnavailableError);
     expect(() => getServerProfile('untrusted-server')).toThrow();
   });
 

@@ -36,7 +36,7 @@
 
 原版 input 和 button 是透明样式，图形由 `ui-image` / data-background 加载。`createWinLogin → GUIComponent._prepare → installLastROLogin` 将账号面板作为原版 `#WinLogin` 内的子节点，定位在 `left: calc(100% + 12px)`。它随原版 host 挂载/移除，不替代登录框。恢复旧版皮肤时，旧版 `#WinLogin input` 的绝对定位会影响面板输入框；局部覆盖恢复正常排布。选择账号继续填充 `.user/.pass`，不会主动触发 `.connect`。
 
-`Configs.get` 优先级为当前 server → 全局 ROConfig → 调用方默认值，不读取 localStorage 或 IndexedDB 的 renewal 值。原先两层都缺少 renewal，`LoginEngine` 使用默认 false，输出 PRE-RENEWAL；`PacketStructure` 更早在模块初始化时快照 `Configs.get("renewal") || false`。修复在导入前设置全局和当前 server 的 `renewal: true`，按本次明确的复兴后目标生效。`packetver=20211103`、资源根 `client_re` 和复兴开关是不同配置，未推断或变更封包参数。App服继续禁用；真实服务器握手兼容性尚未验证。
+`Configs.get` 优先级为当前 server → 全局 ROConfig → 调用方默认值，不读取 localStorage 或 IndexedDB 的 renewal 值。原先两层都缺少 renewal，`LoginEngine` 使用默认 false，输出 PRE-RENEWAL；`PacketStructure` 更早在模块初始化时快照 `Configs.get("renewal") || false`。修复在导入前设置全局和当前 server 的 `renewal: true`，按本次明确的复兴后目标生效。`packetver=20211103`、资源根 `client_re` 和复兴开关是不同配置，未推断或变更封包参数。App服现按用户提供的参数开放；真实服务器握手兼容性尚未验证。
 
 日志中的 `client:802` 与本地 Vite `dist/client/client.mjs` 的 WebSocket 构造代码位置一致，URL 携带 Vite HMR token，并使用 isolated-app 主机名拼接 ws 地址。这是开发 HMR 注入，不是游戏网络。日志后续仍进入原版登录，所以它不是上述资源失败的原因。工作区在本次开始前已有关闭 HMR、移除 client 注入以及改用 link 样式表的修改，本次保留并验证，没有放宽 CSP。
 

@@ -26,9 +26,9 @@
 | `https://game.lastro.cn/ro/client_re/data/mapnametable.txt` | 200 | `DB.init()` 读取地图名称 |
 | `https://game.lastro.cn/ro/client_re/data/msgstringtable.txt` | 200 | `DB.init()` 读取界面字符串 |
 | `https://game.lastro.cn/ro/client_re/data/texture/%EC%9C%A0%EC%A0%80%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4/bgi_temp.bmp` | 404 | `Background.setImage("bgi_temp.bmp")`；失败回调允许继续启动 |
-| `https://rodata.ltsd.ro/ro/client_re/data/mp3nametable.txt` | DNS `ENOTFOUND` | 官方源失败后的备用源 |
+| `https://rodata.ltsd.ro/ro/client_re/data/mp3nametable.txt` | HTTPS 200，`Access-Control-Allow-Origin: *` | 官方源失败后的备用源，由 Chrome 原生 `fetch` 读取 |
 
-官方缺少 CORS 许可与备用源未解析是外部限制。客户端不再依赖浏览器 Fetch 读取官方源，而是通过受限 Direct TCP HTTP/1.1 transport 读取 port 80；未修改远端服务，未增加代理、任意 origin 或远程 executable fallback。启动代码不需要目录索引，也没有猜测索引 URL。
+官方缺少 CORS 许可，因此客户端通过受限 Direct TCP HTTP/1.1 transport 读取 `game.lastro.cn:80`；备用 `rodata.ltsd.ro` 则由 Chrome 原生 HTTPS `fetch` 读取，因为该源提供 CORS。未修改远端服务，未增加代理、任意 origin 或远程 executable fallback。启动代码不需要目录索引，也没有猜测索引 URL。
 
 ## Chrome 手工验证
 
@@ -36,9 +36,9 @@
 2. Dev Mode Proxy 已指向当前 5173 时无需删除或重新安装。若安装指向其他端口，先让 Vite 使用原端口，或在 Chrome 的 IWA 开发安装界面使用正确地址重新安装。不要把普通 localhost 标签页作为游戏入口。
 3. signed bundle 使用本仓库 `release/lastro-v2.swbn` 重新手动安装；当前版本未增加且无自动更新，旧包不会自行变成新包。Chrome 若拒绝替换同版本，再移除旧测试安装并重新安装；卸载可能清除该 IWA 保存的账号和缓存，先自行保留所需信息。
 4. 从 Chrome 应用入口启动 LastRO IWA。Console 检查 `location.origin` 应为 `isolated-app://...`、`typeof TCPSocket` 应为 `function`，并检查 `!!document.createElement('canvas').getContext('webgl2')`。若仍为 false，检查真实 Chrome 的图形加速设置及 `chrome://gpu`，客户端无法绕过 WebGL2 要求。
-5. 应跳过 “Drop GRF / data files here” 和 “START NOW”，进入原生资源加载流程；在资源可读取的前提下出现带账号管理、2转/3转切换及 App服禁用项的原生登录界面。
+5. 应跳过 “Drop GRF / data files here” 和 “START NOW”，进入原生资源加载流程；在资源可读取的前提下出现带账号管理、2转/3转/App服切换的原生登录界面。
 6. Console 的三个阶段标记依次为 `waiting for resource worker`、`resource worker ready; initializing renderer`、`initializing remote client resources`。只有第一条时检查 Worker 错误；到第二条但没有第三条时检查 Renderer/WebGL；到第三条时检查资源请求。
-7. Network/DevTools 检查 `LastROThreadEventHandler.js`、`ThreadEventHandler.js`、`lastro-resource-loader.js`、`core/executable-assets.json` 的状态与 MIME。被动资源只应由 Direct TCP 连接到上述两个源的 port 80，包内 Lua/WASM 请求不应发往远程。开启 Preserve log，检查 Direct Sockets 权限、DNS、连接超时、HTTP 404、CSP 及 `Unable to resolve passive resource` 错误。
+7. Network/DevTools 检查 `LastROThreadEventHandler.js`、`ThreadEventHandler.js`、`lastro-resource-loader.js`、`core/executable-assets.json` 的状态与 MIME。官方被动资源应由 Direct TCP 连接 `game.lastro.cn:80`，备用被动资源应由原生 HTTPS `fetch` 访问 `rodata.ltsd.ro`，包内 Lua/WASM 请求不应发往远程。开启 Preserve log，检查 Direct Sockets 权限、DNS、连接超时、HTTP 404、CORS、CSP 及 `Unable to resolve passive resource` 错误。
 
 真实 Chrome IWA 的登录、选角和进图尚未验收；备用源行为由确定性测试覆盖，未声称其公网已可用。
 

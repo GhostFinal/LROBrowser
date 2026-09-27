@@ -16,6 +16,8 @@ export interface V2ClientConfig {
   readonly clientHash: string;
   readonly clientVer: number;
   readonly lastroNid: number;
+  readonly lastroLoginCheck: boolean;
+  readonly lastroLoginCheckin: boolean;
   readonly packetver: number;
   readonly renewal: true;
   readonly forceLegacyLoginSkin: true;
@@ -77,6 +79,8 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
     clientHash: available.clientHash,
     clientVer: available.clientVer,
     lastroNid: available.lastroNid,
+    lastroLoginCheck: false,
+    lastroLoginCheckin: true,
     packetver: available.packetver,
     // PacketStructure reads the global mode before LoginEngine selects a server.
     renewal: true,

@@ -11,7 +11,7 @@ export function mountAppShell(root: HTMLElement, onLogin?: LoginHandler): void {
   icon.width = 40;
   icon.height = 40;
   const title = document.createElement('h1');
-  title.textContent = 'LastRO V2';
+  title.textContent = 'LRO进阶客户端(Powered by LTSD.Ro)';
   const status = document.createElement('p');
   status.id = 'environment-status';
   status.setAttribute('role', 'status');

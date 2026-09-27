@@ -43,12 +43,19 @@ describe('local plaintext accounts', () => {
     expect(await store.get(first.id)).toMatchObject({ password: draft.password, lastUsedAt: 1000 });
   });
 
-  it('rejects unavailable and unknown profiles before opening storage', async () => {
+  it('rejects unknown profiles before opening storage', async () => {
     const { store } = setup();
-    for (const serverProfileId of ['lastro-app', 'untrusted']) {
+    for (const serverProfileId of ['untrusted']) {
       await expect(store.save({ ...draft, serverProfileId } as never)).rejects.toThrow();
     }
     expect(await store.list()).toEqual([]);
+  });
+
+  it('accepts App服 accounts with the verified profile', async () => {
+    const { store } = setup();
+    const saved = await store.save({ ...draft, serverProfileId: 'lastro-app' });
+    expect(saved.serverProfileId).toBe('lastro-app');
+    expect((await store.list('lastro-app')).map(account => account.id)).toEqual([saved.id]);
   });
 
   it('does not recreate a deleted account when an old edit or login completes', async () => {
