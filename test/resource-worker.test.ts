@@ -11,7 +11,7 @@ async function loadWorker(responses: Array<Response | Error>, manifest: string[]
   const saved: ArrayBuffer[] = [];
   const context: Record<string, unknown> = {
     ArrayBuffer, Promise, URL, TextDecoder, TextEncoder, Uint8Array, Response, Headers, encodeURIComponent,
-    indexedDB: new IDBFactory(), AbortController, setTimeout, clearTimeout,
+    indexedDB: new IDBFactory(), AbortController, DOMException, Error, AggregateError, setTimeout, clearTimeout,
     importScripts: () => {},
     ne: { saveFile: (_path: string, bytes: ArrayBuffer) => saved.push(bytes) },
     se: {
@@ -118,7 +118,7 @@ describe('LastRO resource worker', () => {
     expect(patched).not.toContain('importScripts("lastro-resource-loader.js", "ThreadEventHandler.js")');
   });
 
-  it('tries official then backup for passive resources', async () => {
+  it('races official and backup origins for map resources', async () => {
     const worker = await loadWorker([response(404), response(200, new Uint8Array([9]).buffer)]);
     const result = await worker.load('data/map/prt.gat');
     expect(result.error).toBeUndefined();
@@ -158,11 +158,12 @@ describe('LastRO resource worker', () => {
 
   it('serves a second request from IndexedDB without fetching again', async () => {
     const worker = await loadWorker([response(200), response(503), response(503)]);
-    await worker.load('data/map/prt.gat');
+    const first = await worker.load('data/map/prt.gat');
+    expect(first.error).toBeUndefined();
+    const initialCounts = [worker.urls.length, worker.tcpRequests.length];
     const second = await worker.load('data/map/prt.gat');
     expect(second.error).toBeUndefined();
-    expect(worker.urls).toHaveLength(0);
-    expect(worker.tcpRequests).toHaveLength(1);
+    expect([worker.urls.length, worker.tcpRequests.length]).toEqual(initialCounts);
   });
 
   it('falls back after empty and disguised HTML responses without hanging', async () => {

@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { patchGuildEmblemRequestCallbacks, patchLegacyScriptSinks, patchTrustedTypesDomWrites, patchV2Runtime, patchWebAudioPlayback } from '../scripts/patch-v2-runtime.mjs';
 import { buildClientConfig } from '../src/runtime/client-config';
@@ -135,6 +136,11 @@ describe('V2 runtime patch', () => {
       '\t}',
     ].join('\n');
     const patched = patchV2Runtime(fixture);
+    const transpiled = ts.transpileModule(patched, {
+      compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ESNext },
+      reportDiagnostics: true,
+    });
+    expect(transpiled.diagnostics ?? []).toEqual([]);
     expect(patched).toContain('globalThis.LastRODirectSocketFactory(host, port)');
     expect(patched).toContain("font-family: 'Source Han Sans CN', sans-serif");
     expect(patched).toContain('font-size: 13px');

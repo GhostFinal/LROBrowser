@@ -22,6 +22,19 @@ function replaceOnce(source, needle, replacement) {
   return source.replace(needle, replacement);
 }
 
+/**
+ * Try candidate anchor/replacement pairs, longest anchor first, and apply the
+ * first pair whose anchor matches exactly once.  This lets the patcher support
+ * both the tab-indented upstream bundle and the space-indented formatted copy.
+ */
+function replaceOnceAny(source, pairs) {
+  const sorted = [...pairs].sort((a, b) => b[0].length - a[0].length);
+  for (const [anchor, replacement] of sorted) {
+    if (count(source, anchor) === 1) return source.replace(anchor, replacement);
+  }
+  fail(`anchor:${pairs[0][0]}`);
+}
+
 function removeRegion(source, names) {
   const pattern = new RegExp(`//#region src/Network/SocketHelpers/(?:${names.join('|')})\\.js\\r?\\n[\\s\\S]*?//#endregion`, 'g');
   const matches = [...source.matchAll(pattern)];
@@ -55,13 +68,19 @@ function patchLoginRegistrationHook(source) {
   if (matches.length !== 1) fail('function:onConnectionRequest');
   const node = matches[0];
   let body = source.slice(node.body.getStart(file), node.body.end);
-  const hook = '\n\t\t\t\tif (typeof globalThis.LastROLoginAfterPassword === "function") globalThis.LastROLoginAfterPassword(username, password);';
-  const hanMarker = '\t\t\t\tNetwork.sendPacket(pkt);\n\t\t\t} else {';
-  const normalMarker = '\t\t\t\tNetwork.sendPacket(pkt);\n\t\t\t}\n\t\t}\n\t});\n}';
-  if (count(body, hanMarker) !== 1) fail('anchor:login-han-send');
+  const variants = [
+    { send: '\t\t\t\tNetwork.sendPacket(pkt);', close3: '\t\t\t}', close2: '\t\t}', close1: '\t});', indent: '\t\t\t\t' },
+    { send: '        Network.sendPacket(pkt);', close3: '      }', close2: '    }', close1: '  });', indent: '        ' },
+  ];
+  const matched = variants.filter((v) => count(body, `${v.send}\n${v.close3} else {`) === 1);
+  if (matched.length !== 1) fail('anchor:login-han-send');
+  const variant = matched[0];
+  const hook = `\n${variant.indent}if (typeof globalThis.LastROLoginAfterPassword === "function") globalThis.LastROLoginAfterPassword(username, password);`;
+  const hanMarker = `${variant.send}\n${variant.close3} else {`;
+  const normalMarker = `${variant.send}\n${variant.close3}\n${variant.close2}\n${variant.close1}\n}`;
   if (count(body, normalMarker) !== 1) fail('anchor:login-send');
-  body = body.replace(hanMarker, `\t\t\t\tNetwork.sendPacket(pkt);${hook}\n\t\t\t} else {`);
-  body = body.replace(normalMarker, `\t\t\t\tNetwork.sendPacket(pkt);${hook}\n\t\t\t}\n\t\t}\n\t});\n}`);
+  body = body.replace(hanMarker, `${variant.send}${hook}\n${variant.close3} else {`);
+  body = body.replace(normalMarker, `${variant.send}${hook}\n${variant.close3}\n${variant.close2}\n${variant.close1}\n}`);
   return source.slice(0, node.body.getStart(file)) + body + source.slice(node.body.end);
 }
 
@@ -88,25 +107,40 @@ function patchRuntimeTypography(source) {
     + 'body, .title, .ui-btn {\r\n'
     + '\tfont-size: 13px;\r\n'
     + '}\r\n';
+  const escapedFont = "\\'Source Han Sans CN\\'";
   return source.replace(match[0], `${match[1]}${JSON.stringify(commonCss)}`)
     .replaceAll('SCDream', 'Source Han Sans CN')
+    // CSS literals in the bundle use single-quoted JS strings, so their CSS
+    // font quotes must remain escaped. Ordinary double-quoted JS strings do
+    // not need that extra escaping.
+    .replaceAll("\\', Arial", `\\', ${escapedFont}`)
+    .replaceAll('font-family: Arial', `font-family: ${escapedFont}`)
+    .replaceAll('font: 13px Arial', `font: 13px ${escapedFont}`)
     .replaceAll('Arial', "'Source Han Sans CN'");
 }
 
 function replaceWorkerCreation(source) {
   const pattern = /if \(!_source\) _source = new Worker\(new URL\(\s*\/\* @vite-ignore \*\/\s*"" \+ new URL\("LastROThreadEventHandler\.js", import\.meta\.url\)\.href,\s*"" \+ import\.meta\.url\s*\), \{ type: "classic" \}\);/g;
   const matches = [...source.matchAll(pattern)];
-  if (matches.length !== 1) fail('anchor:trusted-worker-url');
-  const replacement = [
-    'if (!_source) _source = new Worker(createLastROWorkerScriptUrl("LastROThreadEventHandler.js"), { type: "classic" });',
-  ].join('\n');
-  return source.replace(pattern, replacement);
+  if (matches.length === 1) {
+    const replacement = [
+      'if (!_source) _source = new Worker(createLastROWorkerScriptUrl("LastROThreadEventHandler.js"), { type: "classic" });',
+    ].join('\n');
+    return source.replace(pattern, replacement);
+  }
+  return replaceOnceAny(source, [
+    ['      if (!_source)\n        _source = new Worker(\n          new URL(\n            /* @vite-ignore */\n            "" +\n              new URL(\n                "LastROThreadEventHandler.js",\n                import.meta.url,\n              ).href,\n            "" + import.meta.url,\n          ),\n          { type: "classic" },\n        );',
+      '      if (!_source) _source = new Worker(createLastROWorkerScriptUrl("LastROThreadEventHandler.js"), { type: "classic" });'],
+  ]);
 }
 
 function replacePathFindingWorkerCreation(source) {
-  return replaceOnce(source,
-    'const workerUrl = new URL("PathFindingWorker.js", import.meta.url).href;',
-    'const workerUrl = createLastROWorkerScriptUrl("PathFindingWorker.js");');
+  return replaceOnceAny(source, [
+    ['const workerUrl = new URL("PathFindingWorker.js", import.meta.url).href;',
+      'const workerUrl = createLastROWorkerScriptUrl("PathFindingWorker.js");'],
+    ['    const workerUrl = new URL(\n      "PathFindingWorker.js",\n      import.meta.url,\n    ).href;',
+      '    const workerUrl = createLastROWorkerScriptUrl("PathFindingWorker.js");'],
+  ]);
 }
 
 const webAudioRuntime = String.raw`
@@ -521,10 +555,18 @@ function LastROAudioRegisterContext(context) {
 installLastROAudioUnlock();
 ${normalizedSource}`;
   output = output.replace(/\?build=[A-Za-z0-9._-]+/g, '');
-  output = replaceOnce(output, '\troInitSpinner.add();\n\tPlugins.init();\n\tGameEngine.init();',
-    '\troInitSpinner.add();\n\ttry {\n\t\tPlugins.init();\n\t\tGameEngine.init();\n\t} catch (error) {\n\t\troInitSpinner.remove();\n\t\tthrow error;\n\t}');
-  output = replaceOnce(output, 'if (_source instanceof Worker) _source.addEventListener("message", Thread.receive, false);',
-    'if (_source instanceof Worker) {\n\t\t\t\tconsole.info("[LastRO IWA] waiting for resource worker");\n\t\t\t\t_source.addEventListener("error", (event) => console.error("[LastRO IWA] resource worker failed", event.message));\n\t\t\t\t_source.addEventListener("message", Thread.receive, false);\n\t\t\t}');
+  output = replaceOnceAny(output, [
+    ['\troInitSpinner.add();\n\tPlugins.init();\n\tGameEngine.init();',
+      '\troInitSpinner.add();\n\ttry {\n\t\tPlugins.init();\n\t\tGameEngine.init();\n\t} catch (error) {\n\t\troInitSpinner.remove();\n\t\tthrow error;\n\t}'],
+    ['  roInitSpinner.add();\n  Plugins.init();\n  GameEngine.init();',
+      '  roInitSpinner.add();\n  try {\n    Plugins.init();\n    GameEngine.init();\n  } catch (error) {\n    roInitSpinner.remove();\n    throw error;\n  }'],
+  ]);
+  output = replaceOnceAny(output, [
+    ['if (_source instanceof Worker) _source.addEventListener("message", Thread.receive, false);',
+      'if (_source instanceof Worker) {\n\t\t\t\tconsole.info("[LastRO IWA] waiting for resource worker");\n\t\t\t\t_source.addEventListener("error", (event) => console.error("[LastRO IWA] resource worker failed", event.message));\n\t\t\t\t_source.addEventListener("message", Thread.receive, false);\n\t\t\t}'],
+    ['      if (_source instanceof Worker)\n        _source.addEventListener("message", Thread.receive, false);',
+      '      if (_source instanceof Worker) {\n        console.info("[LastRO IWA] waiting for resource worker");\n        _source.addEventListener("error", (event) => console.error("[LastRO IWA] resource worker failed", event.message));\n        _source.addEventListener("message", Thread.receive, false);\n      }'],
+  ]);
   output = replaceOnce(output, '_thread_ready = true;', '_thread_ready = true;\n\t\t\t\t\t\tconsole.info("[LastRO IWA] resource worker ready; initializing renderer");');
   output = replaceOnce(output, 'savingFiles(files);', 'console.info("[LastRO IWA] initializing remote client resources");\n\t\t\tThread.send("CLIENT_INIT", { files: [], save: false }, (...args) => Client.onFilesLoaded(...args));');
   output = replaceFunctionBody(output, 'defaultSocketFactory', '{\n\tif (typeof globalThis.LastRODirectSocketFactory !== "function") throw new Error("Direct TCP factory unavailable");\n\treturn globalThis.LastRODirectSocketFactory(host, port);\n}');
@@ -569,7 +611,10 @@ ${normalizedSource}`;
     '}',
   ].join('\n\t\t\t'));
 
-  output = replaceOnce(output, 'if (!Configs.get("remoteClient") && !count && !window.electronAPI?.isElectron) {', 'if (!Configs.get("remoteClient") && !count) {');
+  output = replaceOnceAny(output, [
+    ['if (!Configs.get("remoteClient") && !count && !window.electronAPI?.isElectron) {', 'if (!Configs.get("remoteClient") && !count) {'],
+    ['      if (\n        !Configs.get("remoteClient") &&\n        !count &&\n        !window.electronAPI?.isElectron\n      ) {', '      if (!Configs.get("remoteClient") && !count) {'],
+  ]);
   output = replaceOnce(output, 'el.innerHTML = PRELOADER_INNER_HTML;', [
     'const spinner = document.createElement("div");',
     'spinner.className = "pre-spinner";',
@@ -583,24 +628,48 @@ ${normalizedSource}`;
     '}',
     'el.append(spinner, text);',
   ].join('\n\t\t\t\t'));
-  for (const anchor of ['if (remoteClient) Thread.send("SET_HOST", remoteClient);', '\t\t\t\tThread.send("SET_HOST", remoteClient);']) {
-    output = replaceOnce(output, anchor, anchor + '\n\t\t\tThread.send("SET_EXECUTABLE_MANIFEST", globalThis.LastROExecutableManifest);');
+  for (const pairs of [
+    [
+      ['      if (remoteClient) Thread.send("SET_HOST", remoteClient);', '      if (remoteClient) Thread.send("SET_HOST", remoteClient);\n      Thread.send("SET_EXECUTABLE_MANIFEST", globalThis.LastROExecutableManifest);'],
+      ['if (remoteClient) Thread.send("SET_HOST", remoteClient);', 'if (remoteClient) Thread.send("SET_HOST", remoteClient);\n\t\t\tThread.send("SET_EXECUTABLE_MANIFEST", globalThis.LastROExecutableManifest);'],
+    ],
+    [
+      ['        Thread.send("SET_HOST", remoteClient);', '        Thread.send("SET_HOST", remoteClient);\n      Thread.send("SET_EXECUTABLE_MANIFEST", globalThis.LastROExecutableManifest);'],
+      ['\t\t\t\tThread.send("SET_HOST", remoteClient);', '\t\t\t\tThread.send("SET_HOST", remoteClient);\n\t\t\tThread.send("SET_EXECUTABLE_MANIFEST", globalThis.LastROExecutableManifest);'],
+    ],
+  ]) {
+    output = replaceOnceAny(output, pairs);
   }
   output = replaceOnce(output, 'var root = freeGlobal || freeSelf || Function("return this")();', 'var root = freeGlobal || freeSelf || globalThis;');
-  output = replaceOnce(output, 'return Function(importsKeys, sourceURL + "return " + source).apply(undefined, importsValues);',
-    'throw new Error("Dynamic templates are disabled in the IWA runtime");');
+  output = replaceOnceAny(output, [
+    ['return Function(importsKeys, sourceURL + "return " + source).apply(undefined, importsValues);',
+      'throw new Error("Dynamic templates are disabled in the IWA runtime");'],
+    ['          return Function(importsKeys, sourceURL + "return " + source).apply(\n            undefined,\n            importsValues,\n          );',
+      '          throw new Error("Dynamic templates are disabled in the IWA runtime");'],
+  ]);
   output = removeRegion(output, ['legacy transport', 'WebSocket']);
   output = removeRegion(output, ['NodeSocket']);
   output = output.replace(/\/\*\*(?:(?!\*\/)[\s\S])*?Default socket factory(?:(?!\*\/)[\s\S])*?\*\/\r?\nfunction defaultSocketFactory/, 'function defaultSocketFactory');
-  output = replaceOnce(output, 'new GUIComponent(name, enhanceWinLoginStyles(name, cssText))',
-    'new GUIComponent(name, decorateLastROLoginStyles(name, enhanceWinLoginStyles(name, cssText)))');
+  output = replaceOnceAny(output, [
+    ['new GUIComponent(\n    name,\n    enhanceWinLoginStyles(name, cssText),\n  )',
+      'new GUIComponent(\n    name,\n    decorateLastROLoginStyles(name, enhanceWinLoginStyles(name, cssText)),\n  )'],
+    ['new GUIComponent(name, enhanceWinLoginStyles(name, cssText))',
+      'new GUIComponent(name, decorateLastROLoginStyles(name, enhanceWinLoginStyles(name, cssText)))'],
+  ]);
   output = replaceOnce(output, 'const renderedHtmlText = enhanceWinLoginTemplate(name, htmlText);',
     'const renderedHtmlText = decorateLastROLoginTemplate(name, enhanceWinLoginTemplate(name, htmlText));');
-  output = replaceOnce(output,
-    '\t\tvoid 0;\n\t\tpopulateLoginServerButtons(root, Configs.get("loginServerProfiles", []), Configs.getServer?.().id || "lastro", (profile) => Component.onServerSelect(profile));',
-    '\t\tinstallLastROLogin({ root, component: Component, configs: Configs });');
-  output = replaceOnce(output, '\t\tconst pass = _inputPassword.value;\n\t\tapplyDebugLoginFields();',
-    '\t\tconst pass = _inputPassword.value;\n\t\tconst beforeConnect = globalThis.LastROLoginBeforeConnect;\n\t\tif (typeof beforeConnect === "function" && beforeConnect(user, pass) === false) return false;\n\t\tapplyDebugLoginFields();');
+  output = replaceOnceAny(output, [
+    ['    void 0;\n    populateLoginServerButtons(\n      root,\n      Configs.get("loginServerProfiles", []),\n      Configs.getServer?.().id || "lastro",\n      (profile) => Component.onServerSelect(profile),\n    );',
+      '    installLastROLogin({ root, component: Component, configs: Configs });'],
+    ['\t\tvoid 0;\n\t\tpopulateLoginServerButtons(root, Configs.get("loginServerProfiles", []), Configs.getServer?.().id || "lastro", (profile) => Component.onServerSelect(profile));',
+      '\t\tinstallLastROLogin({ root, component: Component, configs: Configs });'],
+  ]);
+  output = replaceOnceAny(output, [
+    ['    const pass = _inputPassword.value;\n    applyDebugLoginFields();',
+      '    const pass = _inputPassword.value;\n    const beforeConnect = globalThis.LastROLoginBeforeConnect;\n    if (typeof beforeConnect === "function" && beforeConnect(user, pass) === false) return false;\n    applyDebugLoginFields();'],
+    ['\t\tconst pass = _inputPassword.value;\n\t\tapplyDebugLoginFields();',
+      '\t\tconst pass = _inputPassword.value;\n\t\tconst beforeConnect = globalThis.LastROLoginBeforeConnect;\n\t\tif (typeof beforeConnect === "function" && beforeConnect(user, pass) === false) return false;\n\t\tapplyDebugLoginFields();'],
+  ]);
   output = patchRuntimeTypography(output);
   if (/new WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i.test(output)) fail('legacy-transport');
   return patchTrustedTypesDomWrites(output);

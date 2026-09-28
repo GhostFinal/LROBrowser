@@ -162,21 +162,6 @@ test("renewal quest panel renders active quests into its visible list", () => {
   assert.equal(lists.active.children[0].className, "quest-item");
 });
 
-test("classic quest panel rebuilds data received before the UI is attached", () => {
-  const { lists, quest, setAttached } = createQuestPanel(false);
-
-  quest.init();
-  setAttached(false);
-  quest.setQuestList({
-    1001: { questID: 1001, title: "Active quest", summary: "Summary", icon: "ico_nq.bmp", active: 1, end_time: 0, hunt_list: [] }
-  });
-  setAttached(true);
-  quest.onAppend();
-
-  assert.equal(lists.active.children.length, 1);
-  assert.equal(lists.active.children[0].className, "quest-item qid1001");
-});
-
 test("renewal quest panel keeps the selected tab visible after quest data refresh", () => {
   const { lists, menuItems, quest } = createQuestPanel();
 

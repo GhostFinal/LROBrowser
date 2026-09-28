@@ -182,59 +182,52 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
   const candidates = buildResourcePathCandidates(normalizedPath, options.primaryCharset, options.fallbackCharset);
   const roots = (options.resourceRoots ?? DEFAULT_RESOURCE_ROOTS).map(normalizeRoot);
   if (roots.join('|') !== DEFAULT_RESOURCE_ROOTS.join('|')) throw new Error('Resource root order is fixed');
-  const isMapResource = /\.(?:gat|gnd|rsw|rsm|str)$/i.test(normalizedPath);
-  for (const root of roots) {
+  const controller = new AbortController();
+  const loadRoot = async (root: string) => {
+    const failures: ResourceAttempt[] = [];
     for (const candidate of candidates) {
-      if (isMapResource && roots.length > 1) {
-        const raceController = new AbortController();
-        const raceAttempts = roots.map(async (raceRoot) => {
-          const url = raceRoot + candidate;
-          try {
-            const result = await fetchResource(url, options, raceController.signal);
-            return { url, result };
-          } catch (error) {
-            const reason = error instanceof Error ? error.message : 'fetch-failed';
-            throw { url, reason };
-          }
-        });
-        try {
-          const winner = await Promise.any(raceAttempts);
-          raceController.abort();
-          const metadata = {
-            sourceUrl: winner.url,
-            ...(header(winner.result.response, 'etag') ? { etag: header(winner.result.response, 'etag') } : {}),
-            ...(header(winner.result.response, 'last-modified') ? { lastModified: header(winner.result.response, 'last-modified') } : {})
-          };
-          await cache.put(normalizedPath, winner.result.bytes, metadata).catch(() => {});
-          return winner.result.bytes;
-        } catch (error) {
-          const failures = error instanceof AggregateError ? error.errors : [error];
-          for (const failure of failures) {
-            const detail = failure as { url?: string; reason?: string };
-            attempts.push({ url: detail.url ?? `${roots[0]}${candidate}`, reason: detail.reason ?? 'fetch-failed' });
-          }
-          const reasons = failures.map((failure) => (failure as { reason?: string }).reason ?? 'fetch-failed');
-          if (reasons.some((reason) => reason !== 'http-404' && reason !== 'html-response')) break;
-          continue;
-        }
-      }
       const url = root + candidate;
       try {
-        const result = await fetchResource(url, options);
-        const metadata = {
-          sourceUrl: url,
-          ...(header(result.response, 'etag') ? { etag: header(result.response, 'etag') } : {}),
-          ...(header(result.response, 'last-modified') ? { lastModified: header(result.response, 'last-modified') } : {})
-        };
-        await cache.put(normalizedPath, result.bytes, metadata).catch(() => {});
-        return result.bytes;
+        const result = await fetchResource(url, options, controller.signal);
+        return { url, ...result };
       } catch (error) {
+        if (controller.signal.aborted) throw error;
         const reason = error instanceof Error ? error.message : 'fetch-failed';
-        attempts.push({ url, reason });
+        failures.push({ url, reason });
         if (reason !== 'http-404' && reason !== 'html-response') break;
       }
     }
-    if (isMapResource) break;
+    throw new ResourceResolutionError(normalizedPath, failures);
+  };
+  const save = async (result: Awaited<ReturnType<typeof loadRoot>>) => {
+    const metadata = {
+      sourceUrl: result.url,
+      ...(header(result.response, 'etag') ? { etag: header(result.response, 'etag') } : {}),
+      ...(header(result.response, 'last-modified') ? { lastModified: header(result.response, 'last-modified') } : {})
+    };
+    await cache.put(normalizedPath, result.bytes, metadata).catch(() => {});
+    return result.bytes;
+  };
+  if (/\.(?:gat|gnd|rsw|rsm|str)$/i.test(normalizedPath)) {
+    // Each origin advances through its own path candidates independently.
+    // A failed origin must not prevent the other from finding a valid variant.
+    try {
+      const result = await Promise.any(roots.map(loadRoot));
+      controller.abort();
+      return await save(result);
+    } catch (error) {
+      if (!(error instanceof AggregateError)) throw error;
+      for (const failure of error.errors as ResourceResolutionError[]) attempts.push(...failure.attempts);
+    }
+  } else {
+    for (const root of roots) {
+      try {
+        return await save(await loadRoot(root));
+      } catch (error) {
+        if (!(error instanceof ResourceResolutionError)) throw error;
+        attempts.push(...error.attempts);
+      }
+    }
   }
   throw new ResourceResolutionError(normalizedPath, attempts);
 }

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildAutoBattleFieldUpdate, buildAutoBattleFieldUpdates, getAvailableInventoryItems, getVendingShopTitle } from "./lastro-v1-migration.mjs";
+import { buildAutoBattleFieldUpdate, buildAutoBattleFieldUpdates, getAvailableInventoryItems, getVendingShopTitle, mapOnlyTargetPacket } from "./lastro-v1-migration.mjs";
 
 test("keeps every positive-count inventory item, including Yellow Potion", () => {
   const items = getAvailableInventoryItems([
@@ -54,17 +54,9 @@ test("does not require a local shop name when restoring a vending list", () => {
   assert.equal(getVendingShopTitle(undefined), "");
 });
 
-test("maps server target updates without reversing the checked state", async () => {
-  const { mapOnlyTargetState, applyOnlyTargetState } = await import("./lastro-v1-migration.mjs");
-  assert.deepEqual(mapOnlyTargetState({ id: 123, value: 1 }), { mobId: 123, enabled: true });
-  assert.deepEqual(mapOnlyTargetState({ id: 123, value: 0 }), { mobId: 123, enabled: false });
-  assert.deepEqual(applyOnlyTargetState([123, 456], { id: 123, value: 0 }), [456]);
-  assert.deepEqual(applyOnlyTargetState([456], { id: 123, value: 1 }), [456, 123]);
-});
 
-test("maps auto toggle reload packets to server-authoritative states", async () => {
-  const { mapAutoToggleState } = await import("./lastro-v1-migration.mjs");
-  assert.deepEqual(mapAutoToggleState({ id: 34, value: 0 }), { option: "autoAttack", enabled: false });
-  assert.deepEqual(mapAutoToggleState({ id: 35, value: 7 }), { option: "autoLoot", enabled: true });
-  assert.equal(mapAutoToggleState({ id: 99, value: 1 }), null);
+test("maps server target packets using mobid and value", () => {
+  assert.deepEqual(mapOnlyTargetPacket({ mobid: 123, value: 1 }), { mobId: 123, enabled: true });
+  assert.deepEqual(mapOnlyTargetPacket({ mobid: 456, value: 0 }), { mobId: 456, enabled: false });
+  assert.equal(mapOnlyTargetPacket({ id: 123, value: 1 }), null);
 });

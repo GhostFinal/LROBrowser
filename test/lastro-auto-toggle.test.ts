@@ -17,7 +17,9 @@ describe("auto toggle packet selection", () => {
 
   it("uses scalar update ids for 2x and App", () => {
     expect(buildAutoToggleRequest({ nid: 5, option: "autoAttack", enabled: true })).toEqual({ kind: "update", id: 34, value: 1 });
-    expect(buildAutoToggleRequest({ nid: 6, option: "autoLoot", enabled: false })).toEqual({ kind: "update", id: 35, value: 0 });
+    expect(buildAutoToggleRequest({ nid: 6, option: "autoLoot", enabled: false })).toEqual({ kind: "update", id: 35, value: 1 });
+    expect(buildAutoToggleRequest({ nid: 6, option: "autoLoot", enabled: true })).toEqual({ kind: "update", id: 35, value: 1 });
+    expect(buildAutoToggleRequest({ nid: 6, option: "autoPots", enabled: false })).toEqual({ kind: "update", id: 36, value: 1 });
     expect(buildAutoToggleRequest({ nid: 6, option: "autoFollow", enabled: true })).toEqual({ kind: "update", id: 37, value: 1 });
   });
 });

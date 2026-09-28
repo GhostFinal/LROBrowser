@@ -96,6 +96,42 @@ describe('passive resource resolver', () => {
     ]);
   });
 
+  it.each([0, 1])('uses origin %s when its body finishes first and cancels the pending body', async (winner) => {
+    const cache = new MemoryResourceCache();
+    let cancelled = false;
+    const fetch = async (url: string, init?: RequestInit) => {
+      if (url.startsWith(DEFAULT_RESOURCE_ROOTS[winner]!)) return response(200, new Uint8Array([9]).buffer);
+      return {
+        ...response(200),
+        arrayBuffer: () => new Promise<ArrayBuffer>((_resolve, reject) => {
+          init!.signal!.addEventListener('abort', () => {
+            cancelled = true;
+            reject(new DOMException('Aborted', 'AbortError'));
+          }, { once: true });
+        }),
+      } as Response;
+    };
+    const bytes = await resolvePassiveResource('data/prt.gnd', { cache, fetch: fetch as typeof globalThis.fetch });
+    expect(bytes).toEqual(new Uint8Array([9]).buffer);
+    expect(cancelled).toBe(true);
+    expect((await cache.match('data/prt.gnd'))?.sourceUrl).toBe(DEFAULT_RESOURCE_ROOTS[winner] + 'data/prt.gnd');
+  });
+
+  it('keeps trying backup path variants after the official origin fails', async () => {
+    const fetch = async (url: string) => response(
+      url.startsWith(DEFAULT_RESOURCE_ROOTS[0]) ? 503 : url.endsWith('.GND') ? 404 : 200,
+    );
+    await expect(resolvePassiveResource('data/Map.GND', { fetch: fetch as typeof globalThis.fetch }))
+      .resolves.toEqual(new Uint8Array([1, 2]).buffer);
+  });
+
+  it.each([0, 1])('falls back from invalid body on origin %s', async (invalidOrigin) => {
+    const fetch = async (url: string) => response(200, url.startsWith(DEFAULT_RESOURCE_ROOTS[invalidOrigin]!)
+      ? new TextEncoder().encode('<html>error</html>').buffer : new Uint8Array([9]).buffer);
+    await expect(resolvePassiveResource('data/prt.gnd', { fetch: fetch as typeof globalThis.fetch }))
+      .resolves.toEqual(new Uint8Array([9]).buffer);
+  });
+
   it('tries official candidates before the backup source', async () => {
     const urls: string[] = [];
     const candidateCount = buildResourcePathCandidates('data/texture/Map.BMP').length;

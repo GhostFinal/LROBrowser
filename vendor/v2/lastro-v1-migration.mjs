@@ -157,7 +157,7 @@ export function buildAutoToggleRequest({ nid, option, enabled = false } = {}) {
   const receiver = AUTO_TOGGLE_WHISPER_RECEIVERS[option];
   if (!receiver) return null;
   if (Number(nid) === 3) return { kind: "whisper", receiver, msg: "0" };
-  return { kind: "update", id: AUTO_BATTLE_SCALAR_IDS[{ autoAttack: "startAutoAtk", autoLoot: "startAutoLoot", autoPots: "startAutopots", autoFollow: "startAutofollow" }[option]], value: enabled ? 1 : 0 };
+  return { kind: "update", id: AUTO_BATTLE_SCALAR_IDS[{ autoAttack: "startAutoAtk", autoLoot: "startAutoLoot", autoPots: "startAutopots", autoFollow: "startAutofollow" }[option]], value: 1 };
 }
 
 export function buildAutoBattleFieldUpdate(field, rawValue, inputType = "number") {
@@ -193,6 +193,12 @@ export function buildAssistSkillUpdates({ skillId = 0, level = 0, enabled = fals
     { id: AUTO_BATTLE_SCALAR_IDS.addiskilllv, value: Number(level) || 0 },
     { id: AUTO_BATTLE_SCALAR_IDS.addiskillop, value: enabled ? 1 : 0 }
   ];
+}
+
+export function mapOnlyTargetPacket({ mobid, value } = {}) {
+  const mobId = Number(mobid);
+  if (!Number.isInteger(mobId) || mobId < 0) return null;
+  return { mobId, enabled: Number(value) !== 0 };
 }
 
 export function mapOnlyTargetUpdate({ mobId, enabled } = {}) {
