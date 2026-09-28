@@ -8,18 +8,19 @@ import { createBundle } from '../scripts/bundle-iwa.mjs';
 import { signBundle } from '../scripts/sign-iwa.mjs';
 
 describe('IWA Web Bundle', () => {
-  it('packages every distribution file under one HTTPS origin with isolated headers', async () => {
+  it('packages distribution files as relative IWA exchanges with isolated headers', async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), 'lastro-iwa-bundle-'));
     try {
       await mkdir(path.join(root, '.well-known'), { recursive: true });
       await writeFile(path.join(root, '.well-known/manifest.webmanifest'), '{}');
-      const bytes = await createBundle(root, 'https://lastro-v2.local/');
+      await writeFile(path.join(root, 'index.html'), '<!doctype html>');
+      const bytes = await createBundle(root);
       const bundle = new Bundle(bytes);
       expect(bundle.version).toMatch(/^b/);
       expect(bundle.primaryURL).toBeNull();
-      const [url] = bundle.urls;
-      if (!url) throw new Error('bundle has no URLs');
-      const response = bundle.getResponse(url);
+      expect(bundle.urls).toEqual(expect.arrayContaining(['', '.well-known/manifest.webmanifest', 'index.html']));
+      expect(bundle.urls.every((url) => !url.includes('://'))).toBe(true);
+      const response = bundle.getResponse('');
       expect(response.status).toBe(200);
       expect(response.headers['content-security-policy']).toBe("script-src 'self' 'wasm-unsafe-eval'");
       expect(response.headers['cross-origin-opener-policy']).toBe('same-origin');
@@ -35,7 +36,7 @@ describe('IWA Web Bundle', () => {
       await writeFile(path.join(root, '.well-known/manifest.webmanifest'), '{}');
       const unsigned = path.join(root, 'client.wbn');
       const signed = path.join(root, 'client.swbn');
-      await writeFile(unsigned, await createBundle(root, 'https://lastro-v2.local/'));
+      await writeFile(unsigned, await createBundle(root));
       const { privateKey } = generateKeyPairSync('ed25519');
       const keyPath = path.join(root, 'disposable-test-key.pem');
       await writeFile(keyPath, privateKey.export({ type: 'pkcs8', format: 'pem' }));

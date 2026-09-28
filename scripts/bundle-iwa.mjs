@@ -27,29 +27,33 @@ async function walk(root) {
 }
 
 function parseArgs(args) {
-  const values = { dist: 'dist', out: undefined, baseUrl: 'https://lastro-v2.local/', skipAudit: false };
+  const values = { dist: 'dist', out: undefined, skipAudit: false };
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index];
     if (argument === '--') continue;
     if (argument === '--dist') values.dist = args[++index];
     else if (argument === '--out') values.out = args[++index];
-    else if (argument === '--base-url') values.baseUrl = args[++index];
     else if (argument === '--skip-audit') values.skipAudit = true;
     else throw new Error(`unknown argument: ${argument}`);
   }
   return values;
 }
 
-export async function createBundle(distDirectory, baseUrl) {
+export async function createBundle(distDirectory) {
   const dist = path.resolve(distDirectory);
-  const origin = new globalThis.URL(baseUrl);
-  if (origin.protocol !== 'https:' || !origin.pathname.endsWith('/')) throw new Error('base URL must be an HTTPS origin ending with /');
   const builder = new BundleBuilder();
   for (const file of await walk(dist)) {
     const relative = path.relative(dist, file).replaceAll(path.sep, '/');
-    const url = new globalThis.URL(relative, origin).href;
     const headers = { ...REQUIRED_HEADERS, 'Content-Type': MIME_TYPES[path.extname(relative).toLowerCase()] ?? 'application/octet-stream' };
-    builder.addExchange(url, 200, headers, await readFile(file));
+    const body = await readFile(file);
+    if (path.posix.basename(relative) === 'index.html') {
+      const directory = path.posix.dirname(relative);
+      const base = directory === '.' ? '' : `${directory}/`;
+      builder.addExchange(base, 200, headers, body);
+      builder.addExchange(`${base}index.html`, 301, { ...headers, Location: './' }, new Uint8Array());
+    } else {
+      builder.addExchange(relative, 200, headers, body);
+    }
   }
   return builder.createBundle();
 }
@@ -57,8 +61,8 @@ export async function createBundle(distDirectory, baseUrl) {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const options = parseArgs(process.argv.slice(2));
   if (!options.skipAudit) await auditDist(options.dist);
-  const bytes = await createBundle(options.dist, options.baseUrl);
+  const bytes = await createBundle(options.dist);
   const output = options.out ?? path.resolve('release/lastro-v2.wbn');
   await writeFile(output, bytes);
-  process.stdout.write(JSON.stringify({ output, bytes: bytes.byteLength, baseUrl: options.baseUrl }) + '\n');
+  process.stdout.write(JSON.stringify({ output, bytes: bytes.byteLength }) + '\n');
 }
