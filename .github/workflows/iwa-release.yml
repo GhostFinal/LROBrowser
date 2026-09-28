@@ -1,0 +1,96 @@
+name: IWA Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: iwa-production-release
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '24'
+  PNPM_VERSION: '12.4.2'
+  IWA_UPDATE_MANIFEST_URL: https://client.ltsd.ro/updates.json
+  IWA_BUNDLE_BASE_URL: https://client.ltsd.ro/
+
+jobs:
+  release:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-24.04
+    environment:
+      name: iwa-production
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - name: Minify production JavaScript
+        run: pnpm minify:release
+      - name: Inject production manifest metadata
+        env:
+          IWA_VERSION: 0.1.${{ github.run_number }}
+        run: node scripts/apply-release-manifest.mjs
+      - run: pnpm audit:iwa
+        env:
+          IWA_ALLOW_UPDATE_MANIFEST: 1
+      - run: pnpm bundle:iwa -- --out release/lastro-v2-${{ github.sha }}.wbn
+        env:
+          IWA_ALLOW_UPDATE_MANIFEST: 1
+      - name: Prepare production signing key
+        id: key
+        env:
+          IWA_SIGNING_KEY: ${{ secrets.IWA_SIGNING_KEY }}
+        run: |
+          key_path="${RUNNER_TEMP}/iwa-signing-key.pem"
+          umask 077
+          printf '%s' "$IWA_SIGNING_KEY" > "$key_path"
+          chmod 600 "$key_path"
+          echo "path=$key_path" >> "$GITHUB_OUTPUT"
+      - name: Verify production release inputs
+        env:
+          IWA_WEB_BUNDLE_ID: ${{ vars.IWA_WEB_BUNDLE_ID || secrets.IWA_WEB_BUNDLE_ID }}
+        run: node scripts/verify-release-inputs.mjs --key "${{ steps.key.outputs.path }}" --bundle-id "$IWA_WEB_BUNDLE_ID" --version "0.1.${{ github.run_number }}" --commit-sha "${{ github.sha }}"
+      - name: Sign production bundle
+        env:
+          WEB_BUNDLE_SIGNING_PASSPHRASE: ${{ secrets.WEB_BUNDLE_SIGNING_PASSPHRASE }}
+          IWA_WEB_BUNDLE_ID: ${{ vars.IWA_WEB_BUNDLE_ID || secrets.IWA_WEB_BUNDLE_ID }}
+        run: node scripts/sign-production-iwa.mjs --input release/lastro-v2-${{ github.sha }}.wbn --key "${{ steps.key.outputs.path }}" --out release/lastro-v2-${{ github.sha }}.swbn --bundle-id "$IWA_WEB_BUNDLE_ID" --commit-sha "${{ github.sha }}"
+      - name: Publish to Cloudflare R2
+        env:
+          R2_ACCOUNT_ID: ${{ vars.R2_ACCOUNT_ID || secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ vars.R2_BUCKET || secrets.R2_BUCKET }}
+          R2_ENDPOINT: ${{ vars.R2_ENDPOINT || secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: node scripts/publish-r2.mjs --release-dir release --bundle "lastro-v2-${{ github.sha }}.swbn"
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "iwa-${{ github.run_number }}" \
+            "release/lastro-v2-${{ github.sha }}.swbn" \
+            "release/lastro-v2-${{ github.sha }}.swbn.sha256" \
+            "release/release-manifest.json" \
+            "release/audit-report.json" \
+            --title "IWA ${{ github.run_number }}" \
+            --generate-notes
+      - name: Remove temporary signing material
+        if: always()
+        run: rm -f "${{ steps.key.outputs.path }}"

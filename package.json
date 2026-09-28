@@ -20,9 +20,14 @@
     "manifest:core": "node scripts/build-core-manifest.mjs",
     "audit:iwa": "node scripts/audit-iwa-dist.mjs",
     "bundle:iwa": "node scripts/bundle-iwa.mjs",
-    "sign:iwa": "node scripts/sign-iwa.mjs"
+    "sign:iwa": "node scripts/sign-iwa.mjs",
+    "release:metadata": "node scripts/build-release-metadata.mjs",
+    "release:update-manifest": "node scripts/build-update-manifest.mjs",
+    "release:verify": "node scripts/verify-release-inputs.mjs",
+    "minify:release": "node scripts/minify-release-js.mjs"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "3.879.0",
     "@eslint/js": "9.39.1",
     "@types/node": "24.10.1",
     "esbuild": "0.25.12",

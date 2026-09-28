@@ -46,14 +46,17 @@ function originReferences(source) {
   return [...origins].sort();
 }
 
-export async function auditDist(distDirectory, reportPath = path.resolve('release/audit-report.json')) {
+export async function auditDist(distDirectory, reportPath = path.resolve('release/audit-report.json'), options = {}) {
   const dist = path.resolve(distDirectory);
   const files = await walk(dist);
   const relativeFiles = files.map((file) => path.relative(dist, file).replaceAll(path.sep, '/'));
   const manifestPath = path.join(dist, '.well-known/manifest.webmanifest');
   if (!relativeFiles.includes('.well-known/manifest.webmanifest')) throw new Error('missing IWA manifest');
   const manifest = readManifestJson(await readFile(manifestPath, 'utf8'), 'IWA manifest');
-  if ('update_manifest_url' in manifest) throw new Error('Phase A manifest must omit update_manifest_url');
+  if ('update_manifest_url' in manifest) {
+    if (!options.allowUpdateManifest && process.env.IWA_ALLOW_UPDATE_MANIFEST !== '1') throw new Error('Phase A manifest must omit update_manifest_url');
+    try { const updateUrl = new globalThis.URL(manifest.update_manifest_url); if (updateUrl.protocol !== 'https:') throw new Error('update_manifest_url must use HTTPS'); } catch { throw new Error('invalid update_manifest_url'); }
+  }
   const coreManifestRelative = 'core/executable-assets.json';
   if (!relativeFiles.includes(coreManifestRelative)) throw new Error('missing executable asset manifest');
   const coreManifest = readManifestJson(await readFile(path.join(dist, coreManifestRelative), 'utf8'), 'core executable manifest');
@@ -77,7 +80,9 @@ export async function auditDist(distDirectory, reportPath = path.resolve('releas
     bytesByCategory[category] = (bytesByCategory[category] ?? 0) + bytes.byteLength;
     if (!/\.(?:js|mjs|cjs|html|json|css|webmanifest)$/i.test(relative)) continue;
     const source = bytes.toString('utf8');
-    for (const origin of originReferences(source)) originSet.add(origin);
+    if (relative !== '.well-known/manifest.webmanifest') {
+      for (const origin of originReferences(source)) originSet.add(origin);
+    }
     for (const [name, pattern] of PROHIBITED_TEXT) {
       if (pattern.test(source)) prohibitedResults.push({ file: relative, name });
     }

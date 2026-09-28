@@ -30,6 +30,7 @@ function parseArgs(args) {
   const values = { dist: 'dist', out: undefined, baseUrl: 'https://lastro-v2.local/', skipAudit: false };
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index];
+    if (argument === '--') continue;
     if (argument === '--dist') values.dist = args[++index];
     else if (argument === '--out') values.out = args[++index];
     else if (argument === '--base-url') values.baseUrl = args[++index];

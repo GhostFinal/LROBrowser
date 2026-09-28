@@ -1,0 +1,11 @@
+import process from 'node:process';
+import { writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { signBundle } from './sign-iwa.mjs';
+const args = process.argv.slice(2); const value = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
+const input = value('--input'); const key = value('--key'); const out = value('--out'); const bundleId = value('--bundle-id'); const commitSha = value('--commit-sha');
+if (!input || !key || !out || !bundleId || !commitSha) throw new Error('--input, --key, --out, --bundle-id and --commit-sha are required');
+const metadata = await signBundle(input, key, out, bundleId);
+metadata.testKey = false; metadata.commitSha = commitSha;
+await writeFile(path.join(path.dirname(out), 'release-manifest.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+process.stdout.write(`${JSON.stringify(metadata)}\n`);
