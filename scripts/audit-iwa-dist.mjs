@@ -38,6 +38,14 @@ function readManifestJson(contents, name) {
   try { return JSON.parse(contents); } catch (error) { throw new Error(`${name}: invalid JSON (${error.message})`); }
 }
 
+function validateProtocolHandlers(manifest) {
+  if (!('protocol_handlers' in manifest)) return;
+  if (!Array.isArray(manifest.protocol_handlers) || manifest.protocol_handlers.some((handler) => (
+    !handler || typeof handler.protocol !== 'string' || !/^web\+[a-z]+$/.test(handler.protocol)
+    || typeof handler.url !== 'string' || !handler.url.includes('%s')
+  ))) throw new Error('invalid protocol handler');
+}
+
 function originReferences(source) {
   const origins = new Set();
   for (const match of source.matchAll(/https?:\/\/[^\s"'`<>)]*/gi)) {
@@ -53,6 +61,7 @@ export async function auditDist(distDirectory, reportPath = path.resolve('releas
   const manifestPath = path.join(dist, '.well-known/manifest.webmanifest');
   if (!relativeFiles.includes('.well-known/manifest.webmanifest')) throw new Error('missing IWA manifest');
   const manifest = readManifestJson(await readFile(manifestPath, 'utf8'), 'IWA manifest');
+  validateProtocolHandlers(manifest);
   if ('update_manifest_url' in manifest) {
     if (!options.allowUpdateManifest && process.env.IWA_ALLOW_UPDATE_MANIFEST !== '1') throw new Error('Phase A manifest must omit update_manifest_url');
     try { const updateUrl = new globalThis.URL(manifest.update_manifest_url); if (updateUrl.protocol !== 'https:') throw new Error('update_manifest_url must use HTTPS'); } catch { throw new Error('invalid update_manifest_url'); }

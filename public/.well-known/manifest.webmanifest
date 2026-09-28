@@ -17,5 +17,8 @@
     "gamepad": ["self"],
     "cross-origin-isolated": ["self"],
     "autoplay": ["self"]
-  }
+  },
+  "protocol_handlers": [
+    { "protocol": "web+lastro", "url": "/?protocol=%s" }
+  ]
 }

@@ -45,4 +45,15 @@ describe('IWA distribution audit', () => {
       await expect(auditDist(root, path.join(root, 'report.json'))).rejects.toThrow('unapproved remote origins');
     } finally { await rm(root, { recursive: true, force: true }); }
   });
+
+  it('rejects protocol handlers that cannot receive the launched URL', async () => {
+    const root = await fixture();
+    try {
+      await writeFile(path.join(root, '.well-known/manifest.webmanifest'), JSON.stringify({
+        version: '0.1.0',
+        protocol_handlers: [{ protocol: 'web+lastro', url: '/' }],
+      }));
+      await expect(auditDist(root, path.join(root, 'report.json'))).rejects.toThrow('invalid protocol handler');
+    } finally { await rm(root, { recursive: true, force: true }); }
+  });
 });

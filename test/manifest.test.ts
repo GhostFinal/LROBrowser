@@ -15,6 +15,9 @@ describe('Phase A IWA', () => {
     expect(manifest.permissions_policy.gamepad).toEqual(['self']);
     expect(manifest.permissions_policy['cross-origin-isolated']).toEqual(['self']);
     expect(manifest.permissions_policy.autoplay).toEqual(['self']);
+    expect(manifest.protocol_handlers).toEqual([
+      { protocol: 'web+lastro', url: '/?protocol=%s' },
+    ]);
     expect(manifest.icons).toEqual([{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' }]);
     expect(manifest).not.toHaveProperty('update_manifest_url');
     expect(source).not.toMatch(/socketProxy|WebSocket|wss/i);
