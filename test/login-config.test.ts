@@ -44,7 +44,9 @@ describe('remote server handoff', () => {
     const config = buildClientConfig(getAvailableServerProfile('lastro-2x'), { username: '', password: '' });
     const region = runtime.split(engine + ' = class ' + engine + ' {')[1]!;
     const start = region.indexOf('static init(');
-    const end = region.indexOf('\n\t\t}', start) + '\n\t\t}'.length;
+    const indent = region.slice(0, start).match(/[ \t]*$/)![0]!;
+    const closing = `\n${indent}}`;
+    const end = region.indexOf(closing, start) + closing.length;
     const init = region.slice(start, end).replace('static init(', 'function init(');
     const connections: unknown[] = [];
     const stop = new Error('transport reached');
@@ -60,7 +62,7 @@ describe('remote server handoff', () => {
     vm.runInContext(configsRegion + '\ninit_Configs(); Configs.setServer(window.ROConfig.servers[0]);', context);
     vm.runInContext(init, context);
     const invocation = engine === 'CharEngine' ? 'init({ ip: 16777343, port: 26570 })' : 'init(16777343, 26571, "prontera")';
-    expect(() => vm.runInContext(invocation, context)).toThrow(stop);
+    expect(() => vm.runInContext(invocation, context)).toThrow(stop.message);
     expect(connections).toEqual([['45.248.8.68', engine === 'CharEngine' ? 26570 : 26571]]);
   });
 });

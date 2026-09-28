@@ -11,7 +11,9 @@ const ONLINE_PATH = join(HERE, 'Online.js');
 function loadHatTable() {
   const source = readFileSync(ONLINE_PATH, 'utf8');
   const start = source.indexOf('HatTable_default = {');
-  const end = source.indexOf('\n\t};', start) + 4;
+  const indent = source.slice(0, start).match(/[ \t]*$/)[0];
+  const closing = '\n' + indent + '};';
+  const end = source.indexOf(closing, start) + closing.length;
   const context = {};
   vm.runInNewContext('var ' + source.slice(start, end), context);
   return context.HatTable_default;

@@ -9,7 +9,7 @@ test("v2 decodes state icon descriptions with their GBK source charset", () => {
   assert.match(configSource, /statusDescriptionCharset: ['"]gbk['"]/);
   assert.match(
     onlineSource,
-    /const text = userStringDecoder\.decode\(desc, Configs\.get\("statusDescriptionCharset", userCharpage\)\);/
+    /const text = userStringDecoder\.decode\(\s*desc,\s*Configs\.get\("statusDescriptionCharset", userCharpage\),?\s*\);/
   );
 });
 

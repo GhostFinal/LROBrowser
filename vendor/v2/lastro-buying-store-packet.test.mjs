@@ -6,7 +6,7 @@ import test from "node:test";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ONLINE_PATH = join(HERE, "Online.js");
-const BUILD_MARKER = "PACKET.CZ.REQ_TRADE_BUYING_STORE.prototype.build = function()";
+const BUILD_MARKER = /PACKET\.CZ\.REQ_TRADE_BUYING_STORE\.prototype\.build\s*=\s*function\s*\(\s*\)/;
 
 class RecordingWriter {
   constructor(length) {
@@ -35,7 +35,7 @@ function readOnlineSource() {
 }
 
 function extractBuild(source, packetVersion) {
-  const markerIndex = source.indexOf(BUILD_MARKER);
+  const markerIndex = source.search(BUILD_MARKER);
   assert.notEqual(markerIndex, -1, "REQ_TRADE_BUYING_STORE build method was not found");
   const functionIndex = source.indexOf("function", markerIndex);
   const openBrace = source.indexOf("{", functionIndex);

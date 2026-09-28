@@ -5,7 +5,7 @@ import test from "node:test";
 const onlineSource = fs.readFileSync(new URL("./Online.js", import.meta.url), "utf8");
 
 function extractTopLevelFunction(name) {
-  const match = onlineSource.match(new RegExp(`function ${name}\\([^\\n]*\\) \\{[\\s\\S]*?\\n\\}`));
+  const match = onlineSource.match(new RegExp(`function ${name}\\([\\s\\S]*?\\) \\{[\\s\\S]*?\\n\\}`));
   assert.ok(match, `expected ${name} to exist in Online.js`);
   return match[0];
 }

@@ -29,8 +29,8 @@ class BinaryWriter {
 }
 
 function extractEnter2Build() {
-  const marker = "PACKET.CZ.ENTER2.prototype.build = function()";
-  const markerIndex = ONLINE_SOURCE.indexOf(marker);
+  const marker = /PACKET\.CZ\.ENTER2\.prototype\.build\s*=\s*function\s*\(\s*\)/;
+  const markerIndex = ONLINE_SOURCE.search(marker);
   assert.notEqual(markerIndex, -1, "CZ_ENTER2 build method was not found");
   const functionIndex = ONLINE_SOURCE.indexOf("function", markerIndex);
   const openBrace = ONLINE_SOURCE.indexOf("{", functionIndex);

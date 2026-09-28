@@ -4,8 +4,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 const runtime = readFileSync('generated/runtime/Online.js', 'utf8');
 const loader = runtime.slice(runtime.indexOf('function loadLuaValue('), runtime.indexOf('function loadMapTbl(')).split('/**')[0]!;
-const start = runtime.indexOf('loadLuaValue(DB.LUA_PATH + "navigation/');
-const navigation = runtime.slice(start, runtime.indexOf('\n\t\t\t\t}', start));
+const navPath = runtime.indexOf('DB.LUA_PATH + "navigation/"');
+const start = runtime.lastIndexOf('if (PacketVerManager_default.value >= 20111010)', navPath);
+const navigation = runtime.slice(start, runtime.indexOf('if (PacketVerManager_default.value >= 20150507)', navPath));
 const root = 'data/luafiles514/lua files/navigation/';
 const manifest = JSON.parse(readFileSync('generated/core/executable-assets.json', 'utf8'));
 
@@ -15,6 +16,7 @@ describe('navigation database loading', () => {
     const completed: string[] = [];
     const context = vm.createContext({
       DB: { LUA_PATH: 'data/luafiles514/lua files/' }, Configs: { get: () => true },
+      PacketVerManager_default: { value: 20211103 },
       NaviMapTable: {}, NaviMobTable: [], NaviNpcTable: {}, NaviLinkTable: {}, NaviLinkDistanceTable: {}, NaviNpcDistanceTable: {},
       onLoad: (name: string) => () => completed.push(name),
       loadLuaValue: (path: string, _variable: string, callback: (value: object) => void, done: () => void) => {
