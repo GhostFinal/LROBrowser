@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: iwa-production-release
+  group: production-release
   cancel-in-progress: false
 
 env:
@@ -23,7 +23,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     environment:
-      name: iwa-production
+      name: production
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -61,6 +61,22 @@ jobs:
           printf '%s' "$IWA_SIGNING_KEY" > "$key_path"
           chmod 600 "$key_path"
           echo "path=$key_path" >> "$GITHUB_OUTPUT"
+      - name: Check production release configuration
+        env:
+          IWA_WEB_BUNDLE_ID: ${{ secrets.IWA_WEB_BUNDLE_ID || vars.IWA_WEB_BUNDLE_ID }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID || vars.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET || vars.R2_BUCKET }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT || vars.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          test -n "$IWA_WEB_BUNDLE_ID" || { echo "Missing IWA_WEB_BUNDLE_ID in the production Environment (secret or variable)." >&2; exit 1; }
+          test -n "$R2_ACCOUNT_ID" || { echo "Missing R2_ACCOUNT_ID in the production Environment." >&2; exit 1; }
+          test -n "$R2_BUCKET" || { echo "Missing R2_BUCKET in the production Environment." >&2; exit 1; }
+          test -n "$R2_ENDPOINT" || { echo "Missing R2_ENDPOINT in the production Environment." >&2; exit 1; }
+          test -n "$R2_ACCESS_KEY_ID" || { echo "Missing R2_ACCESS_KEY_ID in the production Environment secrets." >&2; exit 1; }
+          test -n "$R2_SECRET_ACCESS_KEY" || { echo "Missing R2_SECRET_ACCESS_KEY in the production Environment secrets." >&2; exit 1; }
+          echo "Production release configuration is present."
       - name: Verify production release inputs
         env:
           IWA_WEB_BUNDLE_ID: ${{ vars.IWA_WEB_BUNDLE_ID || secrets.IWA_WEB_BUNDLE_ID }}

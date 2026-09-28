@@ -64,7 +64,7 @@ manifest.version = 0.1.<run_number>
 - `main` 的正式 push；
 - 显式 `workflow_dispatch`。
 
-release job 使用受保护的 GitHub Environment，例如 `iwa-production`。Environment 可设置 required reviewers。流程为：
+release job 使用受保护的 GitHub Environment，例如 `production`。Environment 可设置 required reviewers。流程为：
 
 1. 执行完整 CI 检查。
 2. 从 GitHub context 计算数字版本和完整 commit SHA。
@@ -131,7 +131,7 @@ R2 bucket 应通过 Cloudflare 公共自定义域名或受控公开 URL 读取�
 | `R2_ACCESS_KEY_ID` | Secret 字符串 | 仅目标 bucket 的对象读写权限 | R2 上传/删除 |
 | `R2_SECRET_ACCESS_KEY` | Secret 字符串 | 与 access key 对应；不能输出到日志 | R2 上传/删除 |
 
-`IWA_SIGNING_KEY` 和 `WEB_BUNDLE_SIGNING_PASSPHRASE` 必须是不同 secret。所有 secret 只存在于 `iwa-production` Environment，不放在 repository-wide 普通 secrets，除非仓库明确限制 Environment secrets。
+`IWA_SIGNING_KEY` 和 `WEB_BUNDLE_SIGNING_PASSPHRASE` 必须是不同 secret。所有 secret 只存在于 `production` Environment，不放在 repository-wide 普通 secrets，除非仓库明确限制 Environment secrets。
 
 R2 API Token 必须只授予目标 bucket 的 Object Read & Write 权限，不授予账户管理、DNS、Workers、Zone 编辑等权限。
 

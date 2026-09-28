@@ -7,7 +7,7 @@
 在仓库 Settings → Environments 创建环境：
 
 ```text
-iwa-production
+production
 ```
 
 建议为该环境启用 required reviewers。正式发布只在 `main` push 或手动 `workflow_dispatch` 时运行。
@@ -43,8 +43,8 @@ iwa-production
 在安全的离线机器生成：
 
 ```bash
-openssl genpkey -algorithm Ed25519 -out iwa-production-key.pem
-openssl pkcs8 -in iwa-production-key.pem -topk8 -out iwa-production-key-encrypted.pem
+openssl genpkey -algorithm Ed25519 -out production-key.pem
+openssl pkcs8 -in production-key.pem -topk8 -out production-key-encrypted.pem
 ```
 
 只把加密后的 PEM 内容复制到 `IWA_SIGNING_KEY`。不要把私钥提交到 GitHub，也不要把它放在 workflow artifact。生产 Web Bundle ID 必须从这把公钥派生并填入 `IWA_WEB_BUNDLE_ID`。

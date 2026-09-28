@@ -7,7 +7,7 @@ describe('GitHub workflow policy', () => {
     expect(ci).not.toContain('secrets.IWA_SIGNING_KEY');
     expect(ci).toContain('contents: read');
     expect(release).toContain('environment:');
-    expect(release).toContain('name: iwa-production');
+    expect(release).toContain('name: production');
     expect(release).toContain('if: always()');
     expect(release).toContain('rm -f');
     expect(release).toContain('concurrency:');

@@ -105,7 +105,7 @@
 
 **Interfaces:**
 - CI workflow runs on pull requests and non-release pushes without protected secrets.
-- Release workflow runs on `main` push and manual dispatch, uses `environment: iwa-production`, has concurrency protection, and requires minimum permissions.
+- Release workflow runs on `main` push and manual dispatch, uses `environment: production`, has concurrency protection, and requires minimum permissions.
 - Release workflow creates temporary `IWA_SIGNING_KEY` PEM with mode `0600`, sets `WEB_BUNDLE_SIGNING_PASSPHRASE` only in the signing step, removes temporary files in an `always()` cleanup step, and uploads only final artifacts.
 
 - [ ] **Step 1: Write failing workflow policy tests** that parse YAML and assert event conditions, environment binding, secret isolation, permissions, concurrency, pinned setup actions, and cleanup.
@@ -125,7 +125,7 @@
 
 **Interfaces:**
 - Documentation lists every secret/environment variable, value type, format, creation procedure, scope, rotation behavior, and validation command.
-- Documentation explains how to create the R2 bucket and public read URL, configure the GitHub `iwa-production` Environment, run manual release, inspect artifacts, and recover from failed publication.
+- Documentation explains how to create the R2 bucket and public read URL, configure the GitHub `production` Environment, run manual release, inspect artifacts, and recover from failed publication.
 - Documentation explicitly states that minification/signing protect integrity and provenance; browser-delivered code remains inspectable.
 
 - [ ] **Step 1: Document Cloudflare R2 setup** and least-privilege token creation.
