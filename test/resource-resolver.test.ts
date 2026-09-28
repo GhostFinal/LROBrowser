@@ -71,14 +71,39 @@ describe('passive resource resolver', () => {
     } })).resolves.toEqual(new Uint8Array([8]).buffer);
   });
 
+  it('races both origins for map resources and uses the first successful response', async () => {
+    const urls: string[] = [];
+    let releaseBackup!: () => void;
+    const backupReady = new Promise<void>((resolve) => { releaseBackup = resolve; });
+    const fetch = async (url: string) => {
+      urls.push(url);
+      if (url.startsWith(DEFAULT_RESOURCE_ROOTS[0])) {
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        return response(200, new Uint8Array([1]).buffer);
+      }
+      await backupReady;
+      return response(200, new Uint8Array([2]).buffer);
+    };
+    const result = await resolvePassiveResource('data/map/prt.gnd', {
+      cache: new MemoryResourceCache(),
+      fetch: fetch as typeof globalThis.fetch,
+    });
+    releaseBackup();
+    expect(result).toEqual(new Uint8Array([1]).buffer);
+    expect(urls).toEqual([
+      DEFAULT_RESOURCE_ROOTS[0] + 'data/map/prt.gnd',
+      DEFAULT_RESOURCE_ROOTS[1] + 'data/map/prt.gnd',
+    ]);
+  });
+
   it('tries official candidates before the backup source', async () => {
     const urls: string[] = [];
-    const candidateCount = buildResourcePathCandidates('data/map/Map.GAT').length;
+    const candidateCount = buildResourcePathCandidates('data/texture/Map.BMP').length;
     const fetch = async (url: string) => {
       urls.push(url);
       return response(url.startsWith(DEFAULT_RESOURCE_ROOTS[0]) && urls.length < candidateCount + 1 ? 404 : 200);
     };
-    await resolvePassiveResource('data/map/Map.GAT', { cache: new MemoryResourceCache(), fetch: fetch as typeof globalThis.fetch });
+    await resolvePassiveResource('data/texture/Map.BMP', { cache: new MemoryResourceCache(), fetch: fetch as typeof globalThis.fetch });
     expect(urls.slice(0, candidateCount).every((url) => url.startsWith(DEFAULT_RESOURCE_ROOTS[0]))).toBe(true);
     expect(urls.at(-1)).toMatch(new RegExp(`^${DEFAULT_RESOURCE_ROOTS[1]}`));
   });

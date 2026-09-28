@@ -1,6 +1,6 @@
 import { installNavigationDebug } from "./lastro-navigation-debug.mjs?build=20260924-v2-navigation-log-2";
 import { calculateLastROPinCode, parseLastROFrameHeader, getLastROPacketLengthOverrides } from "./lastro-packet-framing.mjs?build=20260923-v2-receive-assets-1";
-import { buildPrivateAirshipRequest, mapLoadInfoPayload, mapReloadInfoPacket, mapScalarUpdate, buildAutoBattleFieldUpdate, buildAutoBattleFieldUpdates, buildAssistSkillUpdates, mapOnlyTargetUpdate, canSelectOnlyTarget, AUTO_BATTLE_SCALAR_IDS, getAvailableInventoryItems, getVendingShopTitle, normalizeRouteEntry } from "./lastro-v1-migration.mjs?build=20260902-v2-auto-potion-slot-fix-1";
+import { buildPrivateAirshipRequest, mapLoadInfoPayload, mapReloadInfoPacket, mapScalarUpdate, buildAutoToggleRequest, buildAutoBattleFieldUpdate, buildAutoBattleFieldUpdates, buildAssistSkillUpdates, mapOnlyTargetUpdate, canSelectOnlyTarget, AUTO_BATTLE_SCALAR_IDS, getAvailableInventoryItems, getVendingShopTitle, normalizeRouteEntry } from "./lastro-v1-migration.mjs?build=20260902-v2-auto-potion-slot-fix-1";
 import { getMapMonsterDetails, getMapTargetOptions, getPrimaryMapMonsters, getWorldMapFloorOptions, loadWorldMapData, loadWorldMapNameData, resolveWorldMapDisplayName as resolveLocalWorldMapDisplayName } from "./lastro-worldmap-details.mjs?build=20260915-v2-worldmap-localization-1";
 import { isPvpEnabled, isPvpMapProperty } from "./lastro-map-state.mjs?build=20260915-v2-map-state-1";
 import { PARADISE_GROUP_QUICK_ROUTE, QUICK_TELEPORT_CAVE_ROUTES } from "./lastro-quick-teleport-catalog.mjs?build=20260906-v2-quick-teleport-catalog-1";
@@ -83754,7 +83754,7 @@ var init_VerticalFlip = __esmMin((() => {
 		}
 		/** @param {boolean} bool - Enables/disables the effect */
 		static setActive(bool) {
-			_active$3 = bool;
+			_active$3 = false;
 		}
 	};
 }));
@@ -221220,9 +221220,10 @@ function getPreviewSpriteId$1(item, it) {
 	else if (it && it.ClassNum) spriteId = it.ClassNum;
 	const location = getItemLocation(item);
 	const headLocations = EquipmentLocation_default.HEAD_BOTTOM | EquipmentLocation_default.HEAD_MID | EquipmentLocation_default.HEAD_TOP | EquipmentLocation_default.COSTUME_HEAD_BOTTOM | EquipmentLocation_default.COSTUME_HEAD_MID | EquipmentLocation_default.COSTUME_HEAD_TOP;
-	if (spriteId > 0 && location & headLocations && typeof HatTable_default === "object" && !(spriteId in HatTable_default)) {
-		const resourceName = typeof it?.identifiedResourceName === "string" ? it.identifiedResourceName.trim() : "";
-		if (resourceName && !/[\\\\/]/.test(resourceName)) HatTable_default[spriteId] = resourceName.startsWith("_") ? resourceName : "_" + resourceName;
+	const resourceName = typeof it?.identifiedResourceName === "string" ? it.identifiedResourceName.trim() : "";
+	if (resourceName && !/[\\\\/]/.test(resourceName)) {
+		if (spriteId > 0 && location & headLocations && typeof HatTable_default === "object" && !(spriteId in HatTable_default)) HatTable_default[spriteId] = resourceName.startsWith("_") ? resourceName : "_" + resourceName;
+		if (spriteId > 0 && location & EquipmentLocation_default.COSTUME_ROBE && typeof RobeTable_default === "object") RobeTable_default[spriteId] = resourceName;
 	}
 	return spriteId;
 }
@@ -233123,6 +233124,7 @@ function createQuest(config) {
 	* @var {string} _active_menu active click menu
 	*/
 	let _active_menu = "active";
+	let _menuBackgroundRequest = 0;
 	/**
 	* @var {Preferences} structure
 	*/
@@ -233273,6 +233275,7 @@ function createQuest(config) {
 		_questList = quests;
 		Quest.ClearQuestList();
 		for (const questID in quests) Quest.addQuestToUI(quests[questID]);
+		applyActiveMenu();
 		if (questWindow) {
 			questWindow.ClearQuestList();
 			questWindow.setQuestList(_questList, _questNotShowList);
@@ -233476,61 +233479,28 @@ function createQuest(config) {
 		const allList = root.querySelector("#all-quest-list");
 		if (allList) allList.appendChild(liAll);
 	};
-	function onClickMenu(e) {
+	function applyActiveMenu() {
 		const root = Quest.getRoot();
-		const menuId = e.currentTarget.id;
-		if (_active_menu === menuId) return;
-		_active_menu = menuId;
-		if (renewLayout) {
-			let background_image = "";
-			root.querySelector("#active-quest-list").style.display = "none";
-			root.querySelector("#inactive-quest-list").style.display = "none";
-			root.querySelector("#feature-quest-list").style.display = "none";
-			root.querySelector("#cooldown-quest-list").style.display = "none";
-			switch (_active_menu) {
-				case "feature":
-					background_image = "bg_quest2";
-					root.querySelector("#feature-quest-list").style.display = "block";
-					break;
-				case "inactive":
-					background_image = "bg_quest3";
-					root.querySelector("#inactive-quest-list").style.display = "block";
-					break;
-				case "cooldown":
-					background_image = "bg_quest4";
-					root.querySelector("#cooldown-quest-list").style.display = "block";
-					break;
-				default:
-					background_image = "bg_quest1";
-					root.querySelector("#active-quest-list").style.display = "block";
-			}
-			Client.loadFile(`${DB.INTERFACE_PATH}renew_questui/${background_image}.bmp`, (data) => {
-				const titlebar = root.querySelector(".titlebar");
-				if (titlebar) titlebar.style.backgroundImage = `url(${data})`;
-			});
-		} else {
-			let background_image = "";
-			root.querySelector("#active-quest-list").style.display = "none";
-			root.querySelector("#inactive-quest-list").style.display = "none";
-			root.querySelector("#all-quest-list").style.display = "none";
-			switch (_active_menu) {
-				case "inactive":
-					background_image = "tab_que_02";
-					root.querySelector("#inactive-quest-list").style.display = "block";
-					break;
-				case "all":
-					background_image = "tab_que_03";
-					root.querySelector("#all-quest-list").style.display = "block";
-					break;
-				default:
-					background_image = "tab_que_01";
-					root.querySelector("#active-quest-list").style.display = "block";
-			}
-			Client.loadFile(`${DB.INTERFACE_PATH}basic_interface/${background_image}.bmp`, (data) => {
-				const el = root.querySelector(".quest-menu");
-				if (el) el.style.backgroundImage = `url(${data})`;
-			});
+		if (!root) return;
+		const ids = renewLayout ? ["active", "inactive", "feature", "cooldown"] : ["active", "inactive", "all"];
+		for (const id of ids) {
+			const list = root.querySelector("#" + id + "-quest-list");
+			if (list) list.style.display = id === _active_menu ? "block" : "none";
 		}
+		const images = renewLayout ? { active: "bg_quest1", feature: "bg_quest2", inactive: "bg_quest3", cooldown: "bg_quest4" } : { active: "tab_que_01", inactive: "tab_que_02", all: "tab_que_03" };
+		const image = images[_active_menu] || images.active;
+		const request = ++_menuBackgroundRequest;
+		const path = renewLayout ? "renew_questui/" + image + ".bmp" : "basic_interface/" + image + ".bmp";
+		Client.loadFile(DB.INTERFACE_PATH + path, (data) => {
+			if (request !== _menuBackgroundRequest) return;
+			const target = root.querySelector(renewLayout ? ".titlebar" : ".quest-menu");
+			if (target) target.style.backgroundImage = "url(" + data + ")";
+		});
+	}
+	function onClickMenu(e) {
+		const menuId = e.currentTarget.id;
+		_active_menu = menuId;
+		applyActiveMenu();
 		questHelper.clearQuestDesc();
 	}
 	function onClickQuest(e) {
@@ -303036,7 +303006,7 @@ function usesCostumePalettePath(job) {
 }
 function buildBodyPalettePath(job, pal, sex, costumePath = usesCostumePalettePath(job)) {
 	if (job === 0 || !(job in PalNameTable)) return null;
-	return "data/palette/赂枚/" + (costumePath ? "costume_1/" : "")
+	return "data/palette/¸ö/" + (costumePath ? "costume_1/" : "")
 		+ PalNameTable[job] + "_" + SexTable[sex] + "_" + pal + (costumePath ? "_1" : "") + ".pal";
 }
 function shouldSkipBodyPalette(job) {
@@ -319534,9 +319504,15 @@ var init_LastROTools = __esmMin((() => {
 	LastROTools.setAutomationOption = function setAutomationOption(option, enabled) {
 		if (!(option in OPTION_TO_PACKET_ID)) return;
 		this._settingState[option] = Boolean(enabled);
-		if (PACKET.CZ.NOTIFY_UPDATEINFO) {
+		const request = buildAutoToggleRequest({ nid: Configs.get("lastroNid", 0), option, enabled });
+		if (request?.kind === "whisper" && PACKET.CZ.WHISPER) {
+			const pkt = new PACKET.CZ.WHISPER();
+			pkt.receiver = request.receiver;
+			pkt.msg = request.msg;
+			Network.sendPacket(pkt);
+		} else if (request?.kind === "update" && PACKET.CZ.NOTIFY_UPDATEINFO) {
 			const pkt = new PACKET.CZ.NOTIFY_UPDATEINFO();
-			Object.assign(pkt, mapScalarUpdate({ id: OPTION_TO_PACKET_ID[option], value: enabled ? 1 : 0 }));
+			Object.assign(pkt, mapScalarUpdate(request));
 			Network.sendPacket(pkt);
 		}
 		this.setStatus(`${this.getOptionLabel(option)}：${enabled ? "开启" : "关闭"}`);
@@ -325275,7 +325251,7 @@ function onEquipementTakeOff(pkt) {
 		if (pkt.wearLocation & EquipmentLocation_default.COSTUME_HEAD_TOP) SessionStorage_default.Entity.accessory2 = EquipmentController.getUI().checkEquipLoc(EquipmentLocation_default.HEAD_TOP);
 		if (pkt.wearLocation & EquipmentLocation_default.COSTUME_HEAD_MID) SessionStorage_default.Entity.accessory3 = EquipmentController.getUI().checkEquipLoc(EquipmentLocation_default.HEAD_MID);
 		if (pkt.wearLocation & EquipmentLocation_default.COSTUME_HEAD_BOTTOM) SessionStorage_default.Entity.accessory = EquipmentController.getUI().checkEquipLoc(EquipmentLocation_default.HEAD_BOTTOM);
-		if (pkt.wearLocation & EquipmentLocation_default.COSTUME_ROBE) SessionStorage_default.Entity.robe = EquipmentController.getUI().checkEquipLoc(EquipmentLocation_default.GARMENT);
+		if (pkt.wearLocation & EquipmentLocation_default.COSTUME_ROBE) SessionStorage_default.Entity.robe = EquipmentController.getUI().checkEquipLoc(EquipmentLocation_default.COSTUME_ROBE);
 		if (PacketVerManager_default.value >= 20170208) {
 			if (!InventoryController.getUI().isInEquipSwitchList(pkt.wearLocation)) SwitchEquip_default.unEquip(pkt.index, pkt.wearLocation);
 		}
@@ -325289,6 +325265,11 @@ function onEquipementTakeOff(pkt) {
 function onItemEquip(pkt) {
 	if (pkt.result == 1) {
 		const item = InventoryController.getUI().removeItem(pkt.index, 1);
+		const itemInfo = DB.getItemInfo(item?.ITID);
+		if (pkt.wearLocation & EquipmentLocation_default.COSTUME_ROBE && itemInfo?.identifiedResourceName && typeof RobeTable_default === "object") {
+			const resourceName = itemInfo.identifiedResourceName.trim();
+			if (resourceName && !/[\\\\/]/.test(resourceName)) RobeTable_default[pkt.viewid] = resourceName;
+		}
 		EquipmentController.getUI().equip(item, pkt.wearLocation);
 		ChatBox_default.addText(DB.getItemName(item) + " " + DB.getMessage(170), ChatBox_default.TYPE.BLUE, ChatBox_default.FILTER.ITEM);
 		const CostumeCheckTop = EquipmentController.getUI().checkEquipLoc(EquipmentLocation_default.COSTUME_HEAD_TOP);

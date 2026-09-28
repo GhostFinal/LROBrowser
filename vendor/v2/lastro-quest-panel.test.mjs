@@ -49,7 +49,8 @@ function createNode(id = "") {
   };
 }
 
-function createQuestPanel() {
+function createQuestPanel(renewLayout = true) {
+  let attached = true;
   const lists = {
     active: createNode(),
     feature: createNode(),
@@ -65,9 +66,13 @@ function createQuestPanel() {
     ["#feature-quest-list", lists.feature],
     ["#inactive-quest-list", lists.inactive],
     ["#cooldown-quest-list", lists.cooldown],
+    ["#all-quest-list", createNode()],
     [".titlebar", titlebar],
     [".close-quest-container-btn", closeButton],
-    [".toggle-quest-list", toggleButton]
+    [".toggle-quest-list", toggleButton],
+    [".view", createNode()],
+    [".close", createNode()],
+    [".btn-right", createNode()]
   ]);
   const root = {
     querySelector(selector) {
@@ -92,7 +97,7 @@ function createQuestPanel() {
     }
 
     getRoot() {
-      return root;
+      return attached ? root : null;
     }
 
     draggable() {}
@@ -130,10 +135,10 @@ function createQuestPanel() {
     cssText: "",
     questHelper: { prepare() {}, clearQuestDesc() {} },
     questWindow: { prepare() {}, append() {}, ClearQuestList() {}, setQuestList() {} },
-    renewLayout: true
+    renewLayout
   });
 
-  return { lists, menuItems, quest };
+  return { lists, menuItems, quest, setAttached(value) { attached = value; } };
 }
 
 test("renewal quest panel renders active quests into its visible list", () => {
@@ -155,6 +160,35 @@ test("renewal quest panel renders active quests into its visible list", () => {
   assert.equal(lists.active.style.display, "block");
   assert.equal(lists.active.children.length, 1);
   assert.equal(lists.active.children[0].className, "quest-item");
+});
+
+test("classic quest panel rebuilds data received before the UI is attached", () => {
+  const { lists, quest, setAttached } = createQuestPanel(false);
+
+  quest.init();
+  setAttached(false);
+  quest.setQuestList({
+    1001: { questID: 1001, title: "Active quest", summary: "Summary", icon: "ico_nq.bmp", active: 1, end_time: 0, hunt_list: [] }
+  });
+  setAttached(true);
+  quest.onAppend();
+
+  assert.equal(lists.active.children.length, 1);
+  assert.equal(lists.active.children[0].className, "quest-item qid1001");
+});
+
+test("renewal quest panel keeps the selected tab visible after quest data refresh", () => {
+  const { lists, menuItems, quest } = createQuestPanel();
+
+  quest.init();
+  menuItems.find((item) => item.id === "inactive").dispatch("click");
+  quest.setQuestList({
+    1001: { questID: 1001, title: "Inactive quest", summary: "Summary", icon: "ico_nq.bmp", active: 0, end_time: 0, hunt_list: [] }
+  });
+
+  assert.equal(lists.inactive.style.display, "block");
+  assert.equal(lists.active.style.display, "none");
+  assert.equal(lists.inactive.children.length, 1);
 });
 
 test("renewal quest panel explicitly shows every selected tab", () => {

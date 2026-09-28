@@ -5,8 +5,8 @@ import test from "node:test";
 const configSource = readFileSync(new URL("../../src/runtime/client-config.ts", import.meta.url), "utf8");
 const onlineSource = readFileSync(new URL("./Online.js", import.meta.url), "utf8");
 
-test("v2 decodes state icon descriptions with their Big5 source charset", () => {
-  assert.match(configSource, /statusDescriptionCharset: ['"]big5['"]/);
+test("v2 decodes state icon descriptions with their GBK source charset", () => {
+  assert.match(configSource, /statusDescriptionCharset: ['"]gbk['"]/);
   assert.match(
     onlineSource,
     /const text = userStringDecoder\.decode\(desc, Configs\.get\("statusDescriptionCharset", userCharpage\)\);/

@@ -8,7 +8,7 @@
   },
   "packageManager": "pnpm@12.4.2",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
+    "dev": "pnpm prepare:runtime && vite --host 127.0.0.1",
     "prepare:runtime": "node scripts/prepare-runtime.mjs",
     "build": "pnpm prepare:runtime && vite build",
     "test": "pnpm prepare:runtime && vitest run --exclude test/release-smoke.test.ts",

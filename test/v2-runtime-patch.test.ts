@@ -193,6 +193,12 @@ describe('V2 runtime patch', () => {
     await expect(readFile('vendor/v2/Online.js', 'utf8')).resolves.toContain('defaultSocketFactory');
   });
 
+  it('keeps the built-in vertical flip disabled for the ILLUSION status', async () => {
+    const runtime = await readFile('vendor/v2/Online.js', 'utf8');
+    expect(runtime).toMatch(/static setActive\(bool\)\s*\{\s*_active\$3 = false;\s*\}/);
+    expect(runtime).toContain('if (efstConst == StatusConst_default.ILLUSION) VerticalFlip.setActive(true);');
+  });
+
   it('applies bundled Chinese typography to the generated runtime', async () => {
     const runtime = await readFile('generated/runtime/Online.js', 'utf8');
     expect(runtime).toContain("font-family: 'Source Han Sans CN'");

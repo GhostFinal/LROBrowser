@@ -88,7 +88,7 @@ test("v1 costume body palette jobs use the costume folder and suffix", () => {
   for (const job of costumeJobs) {
     assert.match(
       paletteHelpers.buildBodyPalettePath(job, 2, 0),
-      /^data\/palette\/赂枚\/costume_1\/[^/]+_male_2_1\.pal$/u
+      /^data\/palette\/¸ö\/costume_1\/[^/]+_male_2_1\.pal$/u
     );
   }
 });
@@ -96,11 +96,11 @@ test("v1 costume body palette jobs use the costume folder and suffix", () => {
 test("body palette paths avoid duplicating the costume folder", () => {
   assert.equal(
     paletteHelpers.buildBodyPalettePath(4332, 1, 0, true),
-    "data/palette/赂枚/costume_1/rune_knight_male_1_1.pal"
+    "data/palette/¸ö/costume_1/rune_knight_male_1_1.pal"
   );
   assert.equal(
     paletteHelpers.buildBodyPalettePath(100, 2, 0),
-    "data/palette/赂枚/regular_job_male_2.pal"
+    "data/palette/¸ö/regular_job_male_2.pal"
   );
 });
 

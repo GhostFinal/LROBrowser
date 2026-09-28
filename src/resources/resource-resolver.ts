@@ -139,11 +139,13 @@ function header(response: Response, name: string): string | undefined {
   return value || undefined;
 }
 
-async function fetchResource(url: string, options: ResolvePassiveResourceOptions): Promise<{ bytes: ArrayBuffer; response: Response }> {
+async function fetchResource(url: string, options: ResolvePassiveResourceOptions, signal?: AbortSignal): Promise<{ bytes: ArrayBuffer; response: Response }> {
   const fetchImpl = options.fetch ?? globalThis.fetch;
   if (!fetchImpl) throw new Error('fetch-unavailable');
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), Math.max(1, options.timeoutMs ?? 8000));
+  const abort = () => controller.abort();
+  signal?.addEventListener('abort', abort, { once: true });
+  const timeout = setTimeout(abort, Math.max(1, options.timeoutMs ?? 8000));
   try {
     const response = await fetchImpl(url, { signal: controller.signal, redirect: 'error', credentials: 'omit' });
     if (!response.ok) throw new Error(`http-${response.status}`);
@@ -156,6 +158,7 @@ async function fetchResource(url: string, options: ResolvePassiveResourceOptions
     return { bytes, response };
   } finally {
     clearTimeout(timeout);
+    signal?.removeEventListener('abort', abort);
   }
 }
 
@@ -179,8 +182,42 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
   const candidates = buildResourcePathCandidates(normalizedPath, options.primaryCharset, options.fallbackCharset);
   const roots = (options.resourceRoots ?? DEFAULT_RESOURCE_ROOTS).map(normalizeRoot);
   if (roots.join('|') !== DEFAULT_RESOURCE_ROOTS.join('|')) throw new Error('Resource root order is fixed');
+  const isMapResource = /\.(?:gat|gnd|rsw|rsm|str)$/i.test(normalizedPath);
   for (const root of roots) {
     for (const candidate of candidates) {
+      if (isMapResource && roots.length > 1) {
+        const raceController = new AbortController();
+        const raceAttempts = roots.map(async (raceRoot) => {
+          const url = raceRoot + candidate;
+          try {
+            const result = await fetchResource(url, options, raceController.signal);
+            return { url, result };
+          } catch (error) {
+            const reason = error instanceof Error ? error.message : 'fetch-failed';
+            throw { url, reason };
+          }
+        });
+        try {
+          const winner = await Promise.any(raceAttempts);
+          raceController.abort();
+          const metadata = {
+            sourceUrl: winner.url,
+            ...(header(winner.result.response, 'etag') ? { etag: header(winner.result.response, 'etag') } : {}),
+            ...(header(winner.result.response, 'last-modified') ? { lastModified: header(winner.result.response, 'last-modified') } : {})
+          };
+          await cache.put(normalizedPath, winner.result.bytes, metadata).catch(() => {});
+          return winner.result.bytes;
+        } catch (error) {
+          const failures = error instanceof AggregateError ? error.errors : [error];
+          for (const failure of failures) {
+            const detail = failure as { url?: string; reason?: string };
+            attempts.push({ url: detail.url ?? `${roots[0]}${candidate}`, reason: detail.reason ?? 'fetch-failed' });
+          }
+          const reasons = failures.map((failure) => (failure as { reason?: string }).reason ?? 'fetch-failed');
+          if (reasons.some((reason) => reason !== 'http-404' && reason !== 'html-response')) break;
+          continue;
+        }
+      }
       const url = root + candidate;
       try {
         const result = await fetchResource(url, options);
@@ -197,6 +234,7 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
         if (reason !== 'http-404' && reason !== 'html-response') break;
       }
     }
+    if (isMapResource) break;
   }
   throw new ResourceResolutionError(normalizedPath, attempts);
 }

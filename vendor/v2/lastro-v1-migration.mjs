@@ -76,6 +76,13 @@ export const AUTO_BATTLE_ITEM_SLOT_FIELDS = Object.freeze({
   AutoUseItem_sp_3: 6
 });
 
+const AUTO_TOGGLE_WHISPER_RECEIVERS = Object.freeze({
+  autoAttack: "NPC:setautoattack",
+  autoLoot: "NPC:setautopick",
+  autoPots: "NPC:setautoeat",
+  autoFollow: "NPC:setfollow"
+});
+
 const BOOLEAN_FIELDS = new Set([
   "usehpConversion", "AutoSeeBoss", "usealheal", "useBoarding", "AutoUseSit",
   "AutoUseItem_jsys", "AutoUseItem_Elemental", "AutoUseItem_Panacea", "useSiegfried",
@@ -144,6 +151,13 @@ export function mapReloadInfoPacket({ id, value } = {}) {
 
 export function mapScalarUpdate({ id, value } = {}) {
   return { id: Number(id), value: Number(value) || 0 };
+}
+
+export function buildAutoToggleRequest({ nid, option, enabled = false } = {}) {
+  const receiver = AUTO_TOGGLE_WHISPER_RECEIVERS[option];
+  if (!receiver) return null;
+  if (Number(nid) === 3) return { kind: "whisper", receiver, msg: "0" };
+  return { kind: "update", id: AUTO_BATTLE_SCALAR_IDS[{ autoAttack: "startAutoAtk", autoLoot: "startAutoLoot", autoPots: "startAutopots", autoFollow: "startAutofollow" }[option]], value: enabled ? 1 : 0 };
 }
 
 export function buildAutoBattleFieldUpdate(field, rawValue, inputType = "number") {

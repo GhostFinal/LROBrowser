@@ -53,3 +53,18 @@ test("maps HP and SP potion selections to the v1 slot-then-item packet sequence"
 test("does not require a local shop name when restoring a vending list", () => {
   assert.equal(getVendingShopTitle(undefined), "");
 });
+
+test("maps server target updates without reversing the checked state", async () => {
+  const { mapOnlyTargetState, applyOnlyTargetState } = await import("./lastro-v1-migration.mjs");
+  assert.deepEqual(mapOnlyTargetState({ id: 123, value: 1 }), { mobId: 123, enabled: true });
+  assert.deepEqual(mapOnlyTargetState({ id: 123, value: 0 }), { mobId: 123, enabled: false });
+  assert.deepEqual(applyOnlyTargetState([123, 456], { id: 123, value: 0 }), [456]);
+  assert.deepEqual(applyOnlyTargetState([456], { id: 123, value: 1 }), [456, 123]);
+});
+
+test("maps auto toggle reload packets to server-authoritative states", async () => {
+  const { mapAutoToggleState } = await import("./lastro-v1-migration.mjs");
+  assert.deepEqual(mapAutoToggleState({ id: 34, value: 0 }), { option: "autoAttack", enabled: false });
+  assert.deepEqual(mapAutoToggleState({ id: 35, value: 7 }), { option: "autoLoot", enabled: true });
+  assert.equal(mapAutoToggleState({ id: 99, value: 1 }), null);
+});
