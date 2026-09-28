@@ -175,6 +175,40 @@ test("Navigation quick teleport sends the exact /navi destination", () => {
   throw new Error("Navigation quick teleport helper has unbalanced braces");
 });
 
+test("Activity map links send the server-provided map and coordinates", () => {
+  const source = readFileSync(ONLINE_PATH, "utf8");
+  const marker = "function requestChatMapTeleport(";
+  const markerIndex = source.indexOf(marker);
+  assert.notEqual(markerIndex, -1, "Chat map teleport helper was not found");
+  const functionIndex = source.lastIndexOf("function", markerIndex);
+  const openBrace = source.indexOf("{", functionIndex);
+  let depth = 0;
+  for (let index = openBrace; index < source.length; ++index) {
+    if (source[index] === "{") ++depth;
+    if (source[index] === "}" && --depth === 0) {
+      class PrivateAirshipRequest {
+        constructor() { this.mapname = ""; this.x = 0; this.y = 0; this.type = 0; }
+      }
+      const sentPackets = [];
+      const request = new Function(
+        "normalizeMapName", "PACKET", "buildPrivateAirshipRequest", "Network",
+        `return (${source.slice(functionIndex, index + 1)});`
+      )(
+        (map) => String(map || "").replace(/\.gat$/i, "").toLowerCase(),
+        { CZ: { PRIVATE_AIRSHIP_REQUEST: PrivateAirshipRequest } },
+        (data) => ({ ...data, itemid: 14527 }),
+        { sendPacket: (packet) => sentPackets.push(packet) }
+      );
+      assert.equal(request({ dataset: { map: "force_map3", x: "100", y: "184" }, getAttribute: () => null }), true);
+      assert.deepEqual({ ...sentPackets[0] }, { mapname: "force_map3", x: 100, y: 184, type: 0, itemid: 14527 });
+      assert.equal(request({ dataset: { map: "force_map3", x: "100" }, getAttribute: () => null }), false);
+      assert.equal(sentPackets.length, 1);
+      return;
+    }
+  }
+  throw new Error("Chat map teleport helper has unbalanced braces");
+});
+
 test("The /navi command uses the shared navigation target handler", () => {
   const source = readFileSync(ONLINE_PATH, "utf8");
   const commandIndex = source.indexOf("navi: {");
@@ -321,4 +355,3 @@ test("LastRO entity walking keeps grid pathfinding enabled", () => {
   assert.doesNotMatch(walkSource, /lastroProtocol/);
   assert.doesNotMatch(walkSource, /path\[2\]\s*=\s*to_x/);
 });
-

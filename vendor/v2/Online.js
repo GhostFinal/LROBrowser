@@ -181022,6 +181022,21 @@ function extractChatMessage$1(inputEl) {
   result = result.replace(/\u00A0/g, " ");
   return result;
 }
+function requestChatMapTeleport(link) {
+  if (!link || !PACKET?.CZ?.PRIVATE_AIRSHIP_REQUEST) return false;
+  const mapname = normalizeMapName(link.dataset.map || link.getAttribute("data-map"));
+  const xValue = link.dataset.x ?? link.getAttribute("data-x");
+  const yValue = link.dataset.y ?? link.getAttribute("data-y");
+  const x = Number(xValue);
+  const y = Number(yValue);
+  if (!/^[a-z0-9_]+$/i.test(mapname) || xValue == null || yValue == null
+    || !Number.isInteger(x) || !Number.isInteger(y)
+    || x < 0 || y < 0 || x > 65535 || y > 65535) return false;
+  const packet = new PACKET.CZ.PRIVATE_AIRSHIP_REQUEST();
+  Object.assign(packet, buildPrivateAirshipRequest({ mapname, x, y, type: 0 }));
+  Network.sendPacket(packet);
+  return true;
+}
 /**
  * Process all messages in the buffer at once
  */
@@ -181321,6 +181336,7 @@ var init_ChatBox = __esmMin(() => {
     },
     1,
   );
+  ChatBox_default$1 += "\r\n#chatbox .content .mapname { color: #ffd76b; text-decoration: underline; cursor: pointer; }\r\n";
   ChatBox = new GUIComponent("ChatBox", ChatBox_default$1);
   /**
    * Render HTML
@@ -181756,6 +181772,14 @@ var init_ChatBox = __esmMin(() => {
       });
     if (chatboxEl)
       chatboxEl.addEventListener("click", (event) => {
+        const mapLink = event.target.closest(".content .mapname");
+        if (mapLink) {
+          if (requestChatMapTeleport(mapLink)) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+          return;
+        }
         const tab = event.target.closest("table.header tr td.tab");
         if (tab) {
           event.stopImmediatePropagation();
@@ -182286,6 +182310,8 @@ var init_ChatBox = __esmMin(() => {
       },
     );
     if (!override && /<span\s+class="nickname-link"/.test(text))
+      override = true;
+    if (!override && /<span\b(?=[^>]*\bclass=['"][^'"]*\bmapname\b[^'"]*['"])(?=[^>]*\bdata-map=['"][^'"]+['"])(?=[^>]*\bdata-x=['"]-?\d+['"])(?=[^>]*\bdata-y=['"]-?\d+['"])[^>]*>/i.test(text))
       override = true;
     if (isNaN(filterType)) filterType = ChatBox.FILTER.PUBLIC_LOG;
     _messageBuffer.push({
@@ -184977,10 +185003,10 @@ var init_WorldMap$1 = __esmMin(() => {
   WorldMap_default$1 +=
     "\r\n#WorldMap .worldmap.show-lvls .section:not(.is-dungeon):not(.is-dungeon-stacked) .worldmap-monster-label { display: -webkit-box; position: absolute; inset: 2px 2px 13px; width: auto; height: auto; transform: none; overflow: hidden; padding: 1px; color: #fff; font-size: 10px; line-height: 11px; font-weight: bold; text-align: center; white-space: normal; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; pointer-events: none; }\r\n#WorldMap .worldmap-boss-marker { position: absolute; top: 1px; right: 1px; z-index: 2; max-width: calc(100% - 2px); overflow: hidden; padding: 1px 2px; background: rgba(112, 16, 16, 0.9); color: #ffd76b; font-size: 8px; line-height: 9px; white-space: nowrap; text-overflow: ellipsis; pointer-events: none; }\r\n#WorldMap .worldmap-boss-marker[hidden] { display: none; }\r\n";
   WorldMap_default$1 +=
-    "\r\n/* ---- WorldMap 信息层重设计：分层标签 / 碰撞隐藏 / 搜索 / 拖拽缩放 / 详情抽屉 ---- */\r\n#WorldMap .worldmap { display: block; overflow: hidden; position: relative; cursor: grab; touch-action: none; }\r\n#WorldMap .worldmap.dragging { cursor: grabbing; }\r\n#WorldMap .worldmap.dragging .section { pointer-events: none; }\r\n#WorldMap .worldmap .map-view { transform-origin: 0 0; }\r\n#WorldMap .worldmap .section .mapname { display: none !important; }\r\n#WorldMap .worldmap .section:hover { border: none; background-color: rgba(74, 144, 217, 0.32); box-shadow: inset 0 0 0 1px rgba(74, 144, 217, 0.85); }\r\n#WorldMap .worldmap .section.selected { background-color: rgba(74, 144, 217, 0.22); box-shadow: inset 0 0 0 1.5px #4a90d9; }\r\n#WorldMap .worldmap .section.is-dungeon { background-color: rgba(224, 82, 82, 0.1) !important; border: none !important; box-shadow: inset 0 0 0 1px rgba(224, 82, 82, 0.65); }\r\n#WorldMap .worldmap .section.is-dungeon:hover { background-color: rgba(224, 82, 82, 0.22) !important; }\r\n#WorldMap .worldmap .section.is-entrance { background-color: rgba(224, 82, 82, 0.9) !important; border: none !important; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45); }\r\n#WorldMap .worldmap .section.is-entrance:hover { background-color: #ff6b6b !important; }\r\n#WorldMap .worldmap .section.is-dungeon-stacked { display: none !important; }\r\n#WorldMap .worldmap .section .displayname { position: absolute; top: 1px; left: 50%; transform: translateX(-50%); height: auto; font-size: 11px; font-weight: 600; line-height: 1.25; text-align: center; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85), 0 0 4px rgba(0, 0, 0, 0.55); white-space: nowrap; pointer-events: none; z-index: 2; }\r\n#WorldMap .worldmap .section.is-entrance .displayname { top: auto; bottom: calc(100% + 1px); }\r\n#WorldMap .worldmap .section.is-field .displayname { display: none; }\r\n#WorldMap .worldmap .map-view.wm-zoom-mid .section.is-field .displayname,\r\n#WorldMap .worldmap .map-view.show-fields .section.is-field .displayname,\r\n#WorldMap .worldmap .section.is-field:hover .displayname,\r\n#WorldMap .worldmap .section.is-field.selected .displayname,\r\n#WorldMap .worldmap .section.is-field.currentmap .displayname { display: block; }\r\n#WorldMap .worldmap .section .level-range-text { display: block; top: auto; bottom: 1px; left: 50%; transform: translateX(-50%); width: auto; padding: 0 5px; font-size: 9px; font-weight: 500; line-height: 1.5; color: rgba(255, 255, 255, 0.8); background: rgba(10, 14, 20, 0.62); border-radius: 999px; white-space: nowrap; text-shadow: none; pointer-events: none; opacity: 0; transition: opacity 0.15s; }\r\n#WorldMap .worldmap .section:hover .level-range-text,\r\n#WorldMap .worldmap .section.selected .level-range-text,\r\n#WorldMap .worldmap .map-view.wm-zoom-high .section .level-range-text { opacity: 1; }\r\n#WorldMap .worldmap .worldmap-boss-marker { top: -3px; right: -3px; padding: 1px 4px 1px 3px; font-weight: bold; letter-spacing: 0.04em; border-radius: 3px; }\r\n#WorldMap .worldmap .connector-line { height: 1.5px; background: linear-gradient(90deg, rgba(224, 82, 82, 0), rgba(224, 82, 82, 0.8), rgba(224, 82, 82, 0)); }\r\n#WorldMap .worldmap .section.clash .displayname { display: none !important; }\r\n#WorldMap .worldmap .section.clash:hover .displayname { display: block !important; }\r\n@keyframes wmSearchPulse { 0%, 100% { box-shadow: inset 0 0 0 1.5px rgba(255, 215, 107, 0.9), 0 0 6px 1px rgba(255, 215, 107, 0.35); background-color: rgba(255, 215, 107, 0.16); } 50% { box-shadow: inset 0 0 0 2.5px rgba(255, 215, 107, 1), 0 0 16px 4px rgba(255, 215, 107, 0.55); background-color: rgba(255, 215, 107, 0.34); } }\r\n#WorldMap .worldmap .section.search-hit { animation: wmSearchPulse 1.1s ease-in-out infinite; z-index: 3; }\r\n#WorldMap .worldmap .section.search-hit .displayname { display: block !important; color: #ffd76b; }\r\n#WorldMap .worldmap.searching .section:not(.search-hit) { opacity: 0.45; }\r\n.worldmap-search { position: absolute; top: 30px; right: 8px; z-index: 60; width: 208px; display: flex; flex-direction: column; gap: 4px; }\r\n.worldmap-search-box { display: flex; align-items: center; height: 28px; padding: 0 9px; background: rgba(13, 18, 24, 0.88); border: 1px solid #3a4550; border-radius: 7px; }\r\n.worldmap-search-box:focus-within { border-color: #4a90d9; box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25); }\r\n.worldmap-search-input { flex: 1; min-width: 0; background: none; border: none; outline: none; color: #fff; font-size: 12px; }\r\n.worldmap-search-input::placeholder { color: rgba(255, 255, 255, 0.35); }\r\n.worldmap-search-count { align-self: flex-end; padding: 2px 9px; font-size: 10px; color: #ffd76b; background: rgba(13, 18, 24, 0.85); border: 1px solid rgba(255, 215, 107, 0.35); border-radius: 999px; }\r\n.worldmap-search-count[hidden] { display: none; }\r\n#WorldMap .titlebar .wm-fieldtoggle { height: 14px; margin: 1px 4px 0 0; padding: 0 6px; border: 1px solid #9aa6b0; border-radius: 2px; background: #fff; font-size: 10px; line-height: 12px; color: #444; cursor: pointer; vertical-align: middle; }\r\n#WorldMap .titlebar .wm-fieldtoggle.on { background: #dcebfa; border-color: #4a90d9; color: #123; }\r\n#WorldMap #map-tooltip .tooltip-meta { margin-top: 4px; font-size: 11px; color: rgba(255, 255, 255, 0.8); }\r\n#WorldMap #map-tooltip .tooltip-row { display: flex; gap: 6px; margin-top: 3px; }\r\n#WorldMap #map-tooltip .tooltip-row .k { flex: none; font-size: 10px; color: rgba(255, 255, 255, 0.45); }\r\n#WorldMap #map-tooltip .tooltip-boss { color: #ffd76b; }\r\n#WorldMap #map-tooltip .tooltip-hint { margin-top: 6px; padding-top: 5px; border-top: 1px dashed rgba(255, 255, 255, 0.12); font-size: 10px; color: rgba(255, 255, 255, 0.4); }\r\n.worldmap-details-overlay { position: absolute; inset: 0; display: block; padding: 0; background: transparent; pointer-events: none; z-index: 40; }\r\n.worldmap-details-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 320px; max-width: 92%; max-height: none; overflow: auto; pointer-events: auto; background: #1d232b; border: none; border-left: 1px solid #3a4550; box-shadow: -12px 0 32px rgba(0, 0, 0, 0.45); transform: translateX(102%); transition: transform 0.22s cubic-bezier(0.32, 0.72, 0.24, 1); }\r\n.worldmap-details-overlay:not([hidden]) .worldmap-details-panel { transform: translateX(0); }\r\n@media (max-width: 720px) { .worldmap-details-panel { top: auto; left: 0; right: 0; bottom: 0; width: auto; max-width: none; height: 46%; border-left: none; border-top: 1px solid #3a4550; transform: translateY(102%); } .worldmap-details-overlay:not([hidden]) .worldmap-details-panel { transform: translateY(0); } }\r\n";
+    "\r\n/* ---- WorldMap 信息层重设计：分层标签 / 碰撞隐藏 / 搜索 / 拖拽缩放 / 详情抽屉 ---- */\r\n#WorldMap .worldmap { display: block; overflow: hidden; position: relative; cursor: grab; touch-action: none; }\r\n#WorldMap .worldmap.dragging { cursor: grabbing; }\r\n#WorldMap .worldmap.dragging .section { pointer-events: none; }\r\n#WorldMap .worldmap .map-view { transform-origin: 0 0; }\r\n#WorldMap .worldmap .section .mapname { display: none !important; }\r\n#WorldMap .worldmap .section:hover { border: none; background-color: rgba(74, 144, 217, 0.32); box-shadow: inset 0 0 0 1px rgba(74, 144, 217, 0.85); }\r\n#WorldMap .worldmap .section.selected { background-color: rgba(74, 144, 217, 0.22); box-shadow: inset 0 0 0 1.5px #4a90d9; }\r\n#WorldMap .worldmap .section.is-dungeon { background-color: rgba(224, 82, 82, 0.1) !important; border: none !important; box-shadow: inset 0 0 0 1px rgba(224, 82, 82, 0.65); }\r\n#WorldMap .worldmap .section.is-dungeon:hover { background-color: rgba(224, 82, 82, 0.22) !important; }\r\n#WorldMap .worldmap .section.is-entrance { background-color: rgba(224, 82, 82, 0.9) !important; border: none !important; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45); }\r\n#WorldMap .worldmap .section.is-entrance:hover { background-color: #ff6b6b !important; }\r\n#WorldMap .worldmap .section.is-dungeon-stacked { display: none !important; }\r\n#WorldMap .worldmap .section .displayname { position: absolute; top: 1px; left: 50%; transform: translateX(-50%); height: auto; font-size: 8px; font-weight: 600; line-height: 1.25; text-align: center; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85), 0 0 4px rgba(0, 0, 0, 0.55); white-space: nowrap; pointer-events: none; z-index: 2; }\r\n#WorldMap .worldmap .section.is-entrance .displayname { top: auto; bottom: calc(100% + 1px); }\r\n#WorldMap .worldmap .section.is-field .displayname { display: none; }\r\n#WorldMap .worldmap .map-view.wm-zoom-mid .section.is-field .displayname,\r\n#WorldMap .worldmap .map-view.show-fields .section.is-field .displayname,\r\n#WorldMap .worldmap .section.is-field:hover .displayname,\r\n#WorldMap .worldmap .section.is-field.selected .displayname,\r\n#WorldMap .worldmap .section.is-field.currentmap .displayname { display: block; }\r\n#WorldMap .worldmap .section .level-range-text { display: block; top: auto; bottom: 1px; left: 50%; transform: translateX(-50%); width: auto; padding: 0 5px; font-size: 7px; font-weight: 500; line-height: 1.5; color: rgba(255, 255, 255, 0.8); background: rgba(10, 14, 20, 0.62); border-radius: 999px; white-space: nowrap; text-shadow: none; pointer-events: none; opacity: 0; transition: opacity 0.15s; }\r\n#WorldMap .worldmap .section:hover .level-range-text,\r\n#WorldMap .worldmap .section.selected .level-range-text,\r\n#WorldMap .worldmap .section.search-hit .level-range-text,\r\n#WorldMap .worldmap .map-view.wm-zoom-high .section .level-range-text { opacity: 1; }\r\n#WorldMap .worldmap .worldmap-boss-marker { top: -3px; right: -3px; padding: 1px 4px 1px 3px; font-weight: bold; letter-spacing: 0.04em; border-radius: 3px; }\r\n#WorldMap .worldmap .connector-line { height: 1.5px; background: linear-gradient(90deg, rgba(224, 82, 82, 0), rgba(224, 82, 82, 0.8), rgba(224, 82, 82, 0)); }\r\n#WorldMap .worldmap .section.clash .displayname { display: none !important; }\r\n#WorldMap .worldmap .section.clash:hover .displayname { display: block !important; }\r\n@keyframes wmSearchPulse { 0%, 100% { box-shadow: inset 0 0 0 1.5px rgba(255, 215, 107, 0.9), 0 0 6px 1px rgba(255, 215, 107, 0.35); background-color: rgba(255, 215, 107, 0.16); } 50% { box-shadow: inset 0 0 0 2.5px rgba(255, 215, 107, 1), 0 0 16px 4px rgba(255, 215, 107, 0.55); background-color: rgba(255, 215, 107, 0.34); } }\r\n#WorldMap .worldmap .section.search-hit { animation: wmSearchPulse 1.1s ease-in-out infinite; z-index: 3; }\r\n#WorldMap .worldmap .section.search-hit .displayname { display: block !important; color: #ffd76b; }\r\n#WorldMap .worldmap.searching .section:not(.search-hit) { opacity: 0.45; }\r\n.worldmap-search { position: absolute; top: 30px; right: 8px; z-index: 60; width: 208px; display: flex; flex-direction: column; gap: 4px; }\r\n.worldmap-search-box { display: flex; align-items: center; height: 28px; padding: 0 9px; background: rgba(13, 18, 24, 0.88); border: 1px solid #3a4550; border-radius: 7px; }\r\n.worldmap-search-box:focus-within { border-color: #4a90d9; box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25); }\r\n.worldmap-search-input { flex: 1; min-width: 0; background: none; border: none; outline: none; color: #fff; font-size: 12px; }\r\n.worldmap-search-input::placeholder { color: rgba(255, 255, 255, 0.35); }\r\n.worldmap-search-count { align-self: flex-end; padding: 2px 9px; font-size: 10px; color: #ffd76b; background: rgba(13, 18, 24, 0.85); border: 1px solid rgba(255, 215, 107, 0.35); border-radius: 999px; }\r\n.worldmap-search-count[hidden] { display: none; }\r\n#WorldMap .titlebar .wm-fieldtoggle { height: 14px; margin: 1px 4px 0 0; padding: 0 6px; border: 1px solid #9aa6b0; border-radius: 2px; background: #fff; font-size: 10px; line-height: 12px; color: #444; cursor: pointer; vertical-align: middle; }\r\n#WorldMap .titlebar .wm-fieldtoggle.on { background: #dcebfa; border-color: #4a90d9; color: #123; }\r\n#WorldMap #map-tooltip .tooltip-meta { margin-top: 4px; font-size: 11px; color: rgba(255, 255, 255, 0.8); }\r\n#WorldMap #map-tooltip .tooltip-row { display: flex; gap: 6px; margin-top: 3px; }\r\n#WorldMap #map-tooltip .tooltip-row .k { flex: none; font-size: 10px; color: rgba(255, 255, 255, 0.45); }\r\n#WorldMap #map-tooltip .tooltip-boss { color: #ffd76b; }\r\n#WorldMap #map-tooltip .tooltip-hint { margin-top: 6px; padding-top: 5px; border-top: 1px dashed rgba(255, 255, 255, 0.12); font-size: 10px; color: rgba(255, 255, 255, 0.4); }\r\n.worldmap-details-overlay { position: absolute; inset: 0; display: block; padding: 0; background: transparent; pointer-events: none; z-index: 40; }\r\n.worldmap-details-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 320px; max-width: 92%; max-height: none; overflow: auto; pointer-events: auto; background: #1d232b; border: none; border-left: 1px solid #3a4550; box-shadow: -12px 0 32px rgba(0, 0, 0, 0.45); transform: translateX(102%); transition: transform 0.22s cubic-bezier(0.32, 0.72, 0.24, 1); }\r\n.worldmap-details-overlay:not([hidden]) .worldmap-details-panel { transform: translateX(0); }\r\n@media (max-width: 720px) { .worldmap-details-panel { top: auto; left: 0; right: 0; bottom: 0; width: auto; max-width: none; height: 46%; border-left: none; border-top: 1px solid #3a4550; transform: translateY(102%); } .worldmap-details-overlay:not([hidden]) .worldmap-details-panel { transform: translateY(0); } }\r\n";
   WorldMap_default$1 = WorldMap_default$1.replace(
     /:host \{[\s\S]*?\}/,
-    ":host {\r\n\tposition: fixed !important;\r\n\twidth: 70vw;\r\n\theight: 70vh;\r\n\ttop: 15vh !important;\r\n\tleft: 15vw !important;\r\n}",
+    ":host {\r\n\tposition: fixed !important;\r\n\twidth: 90vw;\r\n\theight: 90vh;\r\n\ttop: 5vh !important;\r\n\tleft: 5vw !important;\r\n}",
   ).replace(
     /#WorldMap \{[\s\S]*?\}/,
     "#WorldMap {\r\n\tposition: relative;\r\n\ttop: auto;\r\n\tleft: auto;\r\n\tbackground: black;\r\n\theight: 100%;\r\n\twidth: 100%;\r\n}",
@@ -187170,8 +187196,7 @@ function attachWorldMapPanZoom(worldmap) {
   };
   worldmap.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
-    _wmDrag = { x: e.clientX, y: e.clientY, moved: false };
-    worldmap.setPointerCapture(e.pointerId);
+    _wmDrag = { x: e.clientX, y: e.clientY, moved: false, pointerId: e.pointerId };
   });
   worldmap.addEventListener("pointermove", (e) => {
     if (!_wmDrag) return;
@@ -187180,6 +187205,9 @@ function attachWorldMapPanZoom(worldmap) {
     if (!_wmDrag.moved && Math.hypot(dx, dy) < 4) return;
     if (!_wmDrag.moved) {
       _wmDrag.moved = true;
+      try {
+        worldmap.setPointerCapture(_wmDrag.pointerId);
+      } catch (err) {}
       worldmap.classList.add("dragging");
       hideTooltip();
     }
@@ -298616,7 +298644,10 @@ var init_LastROTools = __esmMin(() => {
     this.applyState({
       ...mapLoadInfoPayload(pkt),
       autoAttack: Boolean(pkt.startAutoAtk),
-      autoLoot: Boolean(pkt.startAutoLoot),
+      // nid 5/6 report auto-loot with the opposite polarity to the UI.
+      autoLoot: [5, 6].includes(Number(Configs.get("lastroNid", 0)))
+        ? !Boolean(pkt.startAutoLoot)
+        : Boolean(pkt.startAutoLoot),
       autoPots: Boolean(pkt.startAutopots),
       autoFollow: Boolean(pkt.startAutofollow),
     });
@@ -298632,7 +298663,9 @@ var init_LastROTools = __esmMin(() => {
     const field = SCALAR_FIELD_BY_ID[update.id];
     if (option)
       this.applyState({
-        [option]: Boolean(update.value),
+        [option]: option === "autoLoot" && [5, 6].includes(Number(Configs.get("lastroNid", 0)))
+          ? !Boolean(update.value)
+          : Boolean(update.value),
         ...(field ? { [field]: update.value } : {}),
       });
     else if (field) this.applyState({ [field]: update.value });

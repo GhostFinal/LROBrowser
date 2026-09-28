@@ -8,6 +8,19 @@ export const DEFAULT_RESOURCE_ROOTS = Object.freeze([
   'https://rodata.ltsd.ro/ro/client_re/'
 ] as const);
 
+/**
+ * World-map backdrop artwork (referenced by worldviewdata_list.lub `BgImage`).
+ * game.lastro.cn ships a localized variant with labels baked into the pixels
+ * while rodata.ltsd.ro ships the clean artwork; DOM labels are rendered on top,
+ * so the baked-in variant must never be used or labels double up.
+ */
+const WORLDMAP_BACKDROP_PATTERN = /(?:^|\/)(?:worldmap[^/]*|midgard_north|pasta|crack_of_dimension\d*|worldmap_isgard)\.(?:jpg|bmp)$/i;
+const CLEAN_BACKDROP_ROOT = 'https://rodata.ltsd.ro/';
+
+function isWorldMapBackdrop(path: string): boolean {
+  return path.startsWith('data/texture/') && WORLDMAP_BACKDROP_PATTERN.test(path);
+}
+
 export class ResourceResolutionError extends Error {
   readonly path: string;
   readonly attempts: readonly ResourceAttempt[];
@@ -173,15 +186,19 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
   }
   if (classification === 'packaged-executable') throw new ResourceResolutionError(normalizedPath, [{ url: normalizedPath, reason: 'package-only-resource' }]);
   const cache = options.cache ?? createResourceCache();
+  const backdropOnly = isWorldMapBackdrop(normalizedPath);
   const cached = await cache.match(normalizedPath).catch(() => null);
   if (cached?.bytes.byteLength) {
     const age = Date.now() - cached.savedAt;
-    if (Number.isFinite(age) && age >= 0 && age <= RESOURCE_CACHE_MAX_AGE_MS) return cached.bytes.slice(0);
+    // Drop cached backdrops that came from the localized origin once.
+    const staleBackdrop = backdropOnly && !cached.sourceUrl.startsWith(CLEAN_BACKDROP_ROOT);
+    if (Number.isFinite(age) && age >= 0 && age <= RESOURCE_CACHE_MAX_AGE_MS && !staleBackdrop) return cached.bytes.slice(0);
     await cache.delete(normalizedPath).catch(() => {});
   }
   const candidates = buildResourcePathCandidates(normalizedPath, options.primaryCharset, options.fallbackCharset);
-  const roots = (options.resourceRoots ?? DEFAULT_RESOURCE_ROOTS).map(normalizeRoot);
-  if (roots.join('|') !== DEFAULT_RESOURCE_ROOTS.join('|')) throw new Error('Resource root order is fixed');
+  const allRoots = (options.resourceRoots ?? DEFAULT_RESOURCE_ROOTS).map(normalizeRoot);
+  if (allRoots.join('|') !== DEFAULT_RESOURCE_ROOTS.join('|')) throw new Error('Resource root order is fixed');
+  const roots = backdropOnly ? allRoots.filter((root) => root.startsWith(CLEAN_BACKDROP_ROOT)) : allRoots;
   const controller = new AbortController();
   const loadRoot = async (root: string) => {
     const failures: ResourceAttempt[] = [];
