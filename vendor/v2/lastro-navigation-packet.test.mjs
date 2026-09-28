@@ -213,9 +213,12 @@ test("The /navi command uses the shared navigation target handler", () => {
   const source = readFileSync(ONLINE_PATH, "utf8");
   const commandIndex = source.indexOf("navi: {");
   assert.notEqual(commandIndex, -1, "/navi command was not found");
-  const callbackIndex = source.indexOf("callback: function(text)", commandIndex);
-  assert.notEqual(callbackIndex, -1, "/navi callback was not found");
-  const functionIndex = source.indexOf("function(text)", callbackIndex);
+  const callbackMatch = /callback:\s*function\s*\(text\)/.exec(
+    source.slice(commandIndex),
+  );
+  assert.ok(callbackMatch, "/navi callback was not found");
+  const callbackIndex = commandIndex + callbackMatch.index;
+  const functionIndex = callbackIndex + callbackMatch[0].indexOf("function");
   const openBrace = source.indexOf("{", functionIndex);
   let depth = 0;
   for (let index = openBrace; index < source.length; ++index) {

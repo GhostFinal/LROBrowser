@@ -136,6 +136,16 @@ describe('LastRO resource worker', () => {
     expect(new Uint8Array(result.data!)).toEqual(new Uint8Array([35]));
   });
 
+  it('loads the mp3 name table from the local package before opening a TCP socket', async () => {
+    const tableBytes = new TextEncoder().encode('mp3 names').buffer;
+    const worker = await loadWorker([response(200, tableBytes)], ['data/mp3nametable.txt']);
+    const result = await worker.load('data/mp3nametable.txt');
+    expect(result.error).toBeUndefined();
+    expect(new Uint8Array(result.data!)).toEqual(new Uint8Array(tableBytes));
+    expect(worker.urls).toEqual(['https://iwa.invalid/core/data/mp3nametable.txt']);
+    expect(worker.tcpRequests).toEqual([]);
+  });
+
   it('loads startup fonts from the package manifest before opening a TCP socket', async () => {
     const fontBytes = new Uint8Array([79, 84, 84, 79]).buffer;
     const worker = await loadWorker([response(200, fontBytes)], ['System/Font/Source Han Sans CN4.otf']);

@@ -17,6 +17,7 @@
     "lint": "eslint .",
     "import:v2": "node scripts/import-v2-snapshot.mjs",
     "import:core": "node scripts/import-core-assets.mjs",
+    "import:passive": "node scripts/import-passive-assets.mjs",
     "manifest:core": "node scripts/build-core-manifest.mjs",
     "audit:iwa": "node scripts/audit-iwa-dist.mjs",
     "bundle:iwa": "node scripts/bundle-iwa.mjs",
