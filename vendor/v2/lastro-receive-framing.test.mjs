@@ -187,22 +187,23 @@ test('unregistered packet with a known packet-table length still discards the re
   assert.equal(harness.getCloseCount(), 0);
 });
 
-test('registered packet with no length definition still stops as desynchronized', () => {
+test('registered packet with no length definition is ignored without closing the connection', () => {
   const decoded = [];
   const harness = loadReceiveHarness(decoded);
   harness.receive(new Uint8Array([0xaa, 0xaa]).buffer);
   assert.deepEqual(decoded, []);
   assert.equal(harness.getSavedBytes(), null);
-  assert.equal(harness.getCloseCount(), 1);
-  assert.match(harness.getErrors()[0], /Stream desynchronized at packet 0xaaaa/);
+  assert.equal(harness.getCloseCount(), 0);
+  assert.match(harness.getErrors()[0], /Discarding receive chunk at packet 0xaaaa/);
 });
 
-test('invalid variable packet length stops decoding before payload-like UI bytes', () => {
+test('invalid variable packet length is ignored without closing the connection', () => {
   const decoded = [];
   const harness = loadReceiveHarness(decoded);
   harness.receive(new Uint8Array([0xff, 0x09, 0x03, 0, 0xf2, 0, 0, 0, 0, 0]).buffer);
   assert.deepEqual(decoded, []);
-  assert.equal(harness.getCloseCount(), 1);
+  assert.equal(harness.getCloseCount(), 0);
+  assert.match(harness.getErrors()[0], /Discarding receive chunk at packet 0x9ff/);
 });
 
 test('valid fixed packets survive every WebSocket split position', () => {

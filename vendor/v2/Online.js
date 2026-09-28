@@ -166601,15 +166601,14 @@ function receive(buf) {
         `[Network] Incomplete frame 0x${id?.toString(16) || "?"}: buffered=${fp.length - start}, expected=${expectedLength}, missing=${expectedLength - (fp.length - start)}.`,
       );
   };
-  const stopDesynchronizedStream = (reason) => {
+  const discardDesynchronizedChunk = (reason) => {
     console.error(
-      `[Network] Stream desynchronized at packet 0x${id.toString(16)} (offset=${offset}, remaining=${fp.length - offset}): ${reason}. Closing connection; reconnect required.`,
+      `[Network] Discarding receive chunk at packet 0x${id.toString(16)} (offset=${offset}, remaining=${fp.length - offset}): ${reason}.`,
     );
-    // A legacy transport message is a TCP chunk, not a packet boundary. Neither its
-    // payload nor a later message can be decoded safely after losing framing.
+    // A legacy transport message is a TCP chunk, not a packet boundary. Do not
+    // decode its remaining bytes after losing framing, but keep the socket open.
     if (state) clearReceiveState(ownerSocket);
     else _save_buffer = null;
-    if (ownerSocket) ownerSocket.close();
   };
   const scheduleReceiveContinuation = () => {
     if (fp.tell() >= fp.length) return false;
@@ -166716,7 +166715,7 @@ function receive(buf) {
       : PacketLength_default.getPacketLength(id);
     if (!packet_len) {
       if (Configs.get("lastroCustomPackets", false)) {
-        stopDesynchronizedStream("registered packet has unknown length");
+        discardDesynchronizedChunk("registered packet has unknown length");
         return;
       }
       length = fp.length - offset;
@@ -166729,7 +166728,7 @@ function receive(buf) {
       length = fp.readUShort();
       if (length < 4) {
         if (Configs.get("lastroCustomPackets", false)) {
-          stopDesynchronizedStream(`invalid declared length ${length}`);
+          discardDesynchronizedChunk(`invalid declared length ${length}`);
           return;
         }
         malformedPacket = true;
