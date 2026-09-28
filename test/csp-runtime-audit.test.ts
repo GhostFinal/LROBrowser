@@ -20,6 +20,11 @@ describe('isolated app CSP audit', () => {
     expect(auditRuntimeSource('// Function("return this")\nconst text = "eval(code) /core/a.lua";', 'fixture.js')).toEqual([]);
   });
 
+  it('audits deeply nested expressions without exhausting the call stack', () => {
+    const source = `const value = ${Array(8_000).fill('1').join('+')};`;
+    expect(auditRuntimeSource(source, 'deep-expression.js')).toEqual([]);
+  });
+
   it('removes Electron-only require fallbacks from vendored workers', () => {
     const source = 'var fs=null;if("undefined"!=typeof process&&process.versions?.electron)try{fs=Function("return require")()("fs")}catch{}';
     const patched = patchElectronRequireFallbacks(source);

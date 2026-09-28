@@ -7,7 +7,9 @@ export function auditRuntimeSource(source, file = 'runtime.js') {
   const parsed = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
   const violations = [];
   const executableElements = new Set();
-  function visit(node) {
+  const pending = [parsed];
+  while (pending.length) {
+    const node = pending.pop();
     if (ts.isVariableDeclaration(node) && node.initializer
       && ts.isCallExpression(node.initializer)
       && ts.isPropertyAccessExpression(node.initializer.expression)
@@ -45,9 +47,10 @@ export function auditRuntimeSource(source, file = 'runtime.js') {
       }
     }
     if (ts.isNewExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 'Function') violations.push({ file, code: 'new-Function' });
-    ts.forEachChild(node, visit);
+    const children = [];
+    ts.forEachChild(node, child => { children.push(child); });
+    for (let index = children.length - 1; index >= 0; index -= 1) pending.push(children[index]);
   }
-  visit(parsed);
   if (/createElement\(\s*["']script["']\s*\)[\s\S]{0,300}https?:\/\//i.test(source)) violations.push({ file, code: 'remote-script' });
   if (violations.length) throw new Error(JSON.stringify(violations));
   return violations;
