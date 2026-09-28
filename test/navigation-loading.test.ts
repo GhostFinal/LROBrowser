@@ -2,12 +2,12 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { describe, expect, it, vi } from 'vitest';
 
-const runtime = readFileSync('.staging/runtime/Online.js', 'utf8');
+const runtime = readFileSync('generated/runtime/Online.js', 'utf8');
 const loader = runtime.slice(runtime.indexOf('function loadLuaValue('), runtime.indexOf('function loadMapTbl(')).split('/**')[0]!;
 const start = runtime.indexOf('loadLuaValue(DB.LUA_PATH + "navigation/');
 const navigation = runtime.slice(start, runtime.indexOf('\n\t\t\t\t}', start));
 const root = 'data/luafiles514/lua files/navigation/';
-const manifest = JSON.parse(readFileSync('.staging/core/executable-assets.json', 'utf8'));
+const manifest = JSON.parse(readFileSync('generated/core/executable-assets.json', 'utf8'));
 
 describe('navigation database loading', () => {
   it('loads all six LastRO tables from executable assets present in the package', () => {
@@ -20,7 +20,7 @@ describe('navigation database loading', () => {
       loadLuaValue: (path: string, _variable: string, callback: (value: object) => void, done: () => void) => {
         requests.push(path);
         expect(manifest.files.some((file: { path: string }) => file.path === path), path).toBe(true);
-        expect(readFileSync('.staging/core/' + path).byteLength).toBeGreaterThan(0);
+        expect(readFileSync('generated/core/' + path).byteLength).toBeGreaterThan(0);
         callback({}); done();
       },
     });

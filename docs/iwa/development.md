@@ -2,7 +2,7 @@
 
 Phase A 只支持本机手动安装和测试。生产 manifest 不包含 `update_manifest_url`，仓库不跟踪签名私钥，也不配置自动更新服务。
 
-源码和运行资源边界：`vendor/v2/` 管理 `Online.js`、Worker、LastRO `*.mjs` 模块及其回归测试；`vendor/core/` 管理 Lua/LUB、WASM、启动数据和字体。`.staging/` 仅由 `pnpm prepare:runtime` 生成 patched runtime、Worker 和资源清单，属于可删除的构建中间目录，不是源代码来源。外部 `ROWeb` 目录不参与默认命令。
+源码和运行资源边界：`vendor/v2/` 管理 `Online.js`、Worker、LastRO `*.mjs` 模块及其回归测试；`vendor/core/` 管理 Lua/LUB、WASM、启动数据和字体。`generated/` 仅由 `pnpm prepare:runtime` 生成 patched runtime、Worker 和资源清单，属于可删除的构建中间目录，不是源代码来源。外部 `ROWeb` 目录不参与默认命令。
 
 在 Linux 上运行：
 

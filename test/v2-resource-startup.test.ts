@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { buildClientConfig } from '../src/runtime/client-config';
 import { getAvailableServerProfile } from '../src/servers/server-profiles';
 
-const source = readFileSync('.staging/runtime/Online.js', 'utf8');
+const source = readFileSync('generated/runtime/Online.js', 'utf8');
 const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const pieces = new Map<string, string>();
 function visit(node: ts.Node) {
@@ -69,10 +69,10 @@ function harness() {
   worker.importScripts = (...paths: string[]) => {
     for (const path of paths) {
       const filename = String(path).split('/').pop()!.split('?')[0];
-      vm.runInContext(readFileSync(`.staging/core/runtime/${filename}`, 'utf8'), worker);
+      vm.runInContext(readFileSync(`generated/core/runtime/${filename}`, 'utf8'), worker);
     }
   };
-  vm.runInContext(readFileSync('.staging/runtime/LastROThreadEventHandler.js', 'utf8'), worker);
+  vm.runInContext(readFileSync('generated/runtime/LastROThreadEventHandler.js', 'utf8'), worker);
   const send = (type: string, data: unknown, callback?: (data: unknown, error: unknown, input: unknown) => void) => {
     const id = callback ? ++uid : 0;
     if (callback) callbacks.set(id, callback);

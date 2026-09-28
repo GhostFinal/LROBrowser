@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { patchTrustedTypesDomWrites } from '../scripts/patch-v2-runtime.mjs';
 import * as trustedDom from '../src/runtime/lastro-trusted-dom.mjs';
 
-const source = readFileSync('.staging/runtime/Online.js', 'utf8');
+const source = readFileSync('generated/runtime/Online.js', 'utf8');
 const loader = source.slice(source.indexOf('function loadXMLFile('), source.indexOf('function loadBSONFile(')).split('/**')[0]!;
 const xml = '<?xml version="1.0"?><monster_talk_table><message>你好 &amp; welcome</message></monster_talk_table>';
 const { JSDOM } = createRequire(import.meta.url)('jsdom');

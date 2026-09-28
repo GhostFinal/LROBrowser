@@ -11,11 +11,11 @@ function packageRuntime(): Plugin {
     server.middlewares.use((request, response, next) => {
       const pathname = decodeURIComponent((request.url ?? '').split('?')[0] ?? '');
       let source: string | undefined;
-      if (pathname === '/runtime/Online.js') source = path.resolve('.staging/runtime/Online.js');
-      else if (pathname === '/runtime/LastROThreadEventHandler.js') source = path.resolve('.staging/runtime/LastROThreadEventHandler.js');
+      if (pathname === '/runtime/Online.js') source = path.resolve('generated/runtime/Online.js');
+      else if (pathname === '/runtime/LastROThreadEventHandler.js') source = path.resolve('generated/runtime/LastROThreadEventHandler.js');
       else if (pathname === '/runtime/lastro-account-login.mjs') source = path.resolve('src/runtime/lastro-account-login.mjs');
-      else if (pathname.startsWith('/runtime/')) source = path.resolve('.staging/core/runtime', pathname.slice('/runtime/'.length));
-      else if (pathname.startsWith('/core/')) source = path.resolve('.staging/core', pathname.slice('/core/'.length));
+      else if (pathname.startsWith('/runtime/')) source = path.resolve('generated/core/runtime', pathname.slice('/runtime/'.length));
+      else if (pathname.startsWith('/core/')) source = path.resolve('generated/core', pathname.slice('/core/'.length));
       if (!source || !existsSync(source)) { next(); return; }
       const extension = path.extname(source).toLowerCase();
       const contentType = extension === '.json' ? 'application/json' : extension === '.wasm' ? 'application/wasm' : 'text/javascript; charset=utf-8';
@@ -36,13 +36,13 @@ function packageRuntime(): Plugin {
       handler: stripViteClientInjection,
     },
     generateBundle() {
-      const runtime = path.resolve('.staging/runtime/Online.js');
+      const runtime = path.resolve('generated/runtime/Online.js');
       if (existsSync(runtime)) this.emitFile({ type: 'asset', fileName: 'runtime/Online.js', source: readFileSync(runtime) });
-      const manifestPath = path.resolve('.staging/core/executable-assets.json');
+      const manifestPath = path.resolve('generated/core/executable-assets.json');
       if (!existsSync(manifestPath)) return;
       const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as { files: Array<{ path: string; kind: string }> };
       for (const file of manifest.files) {
-        const source = path.resolve('.staging/core', file.path);
+        const source = path.resolve('generated/core', file.path);
         if (!existsSync(source)) throw new Error(`Missing core asset: ${file.path}`);
         this.emitFile({ type: 'asset', fileName: `core/${file.path}`, source: readFileSync(source) });
         if (file.kind === 'runtime' && file.path !== 'runtime/Online.js') {

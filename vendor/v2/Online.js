@@ -319534,18 +319534,10 @@ var init_LastROTools = __esmMin((() => {
 	LastROTools.setAutomationOption = function setAutomationOption(option, enabled) {
 		if (!(option in OPTION_TO_PACKET_ID)) return;
 		this._settingState[option] = Boolean(enabled);
-		if ((Number(Configs.get("lastroNid", 5)) === 5 || Number(Configs.get("lastroNid", 5)) === 6) && PACKET.CZ.NOTIFY_UPDATEINFO) {
+		if (PACKET.CZ.NOTIFY_UPDATEINFO) {
 			const pkt = new PACKET.CZ.NOTIFY_UPDATEINFO();
 			Object.assign(pkt, mapScalarUpdate({ id: OPTION_TO_PACKET_ID[option], value: enabled ? 1 : 0 }));
 			Network.sendPacket(pkt);
-		} else {
-			const legacyCommand = {
-				autoAttack: "NPC:setautoattack",
-				autoLoot: "NPC:setautopick",
-				autoPots: "NPC:setautoeat",
-				autoFollow: "NPC:setfollow"
-			}[option];
-			this.sendWhisper(legacyCommand);
 		}
 		this.setStatus(`${this.getOptionLabel(option)}：${enabled ? "开启" : "关闭"}`);
 		this.renderCompactStatus?.();
@@ -319561,12 +319553,10 @@ var init_LastROTools = __esmMin((() => {
 		}
 		const updates = buildAssistSkillUpdates({ skillId, level, enabled });
 		for (const update of updates) {
-			if ((Number(Configs.get("lastroNid", 5)) === 5 || Number(Configs.get("lastroNid", 5)) === 6) && PACKET.CZ.NOTIFY_UPDATEINFO) {
+			if (PACKET.CZ.NOTIFY_UPDATEINFO) {
 				const pkt = new PACKET.CZ.NOTIFY_UPDATEINFO();
 				Object.assign(pkt, mapScalarUpdate(update));
 				Network.sendPacket(pkt);
-			} else {
-				this.sendWhisper(`NPC:updateinfo:${update.id}:${update.value}`);
 			}
 		}
 		this._assistSkills = [...(this._assistSkills || []).filter((entry) => entry.skillId !== skillId), { skillId, level, enabled }];
@@ -319592,11 +319582,11 @@ var init_LastROTools = __esmMin((() => {
 		this._settingState[field] = input.type === "checkbox" ? Boolean(input.checked) : input.value;
 		for (const update of updates) {
 			const { id, value } = update;
-			if ((Number(Configs.get("lastroNid", 5)) === 5 || Number(Configs.get("lastroNid", 5)) === 6) && PACKET.CZ.NOTIFY_UPDATEINFO) {
+			if (PACKET.CZ.NOTIFY_UPDATEINFO) {
 				const pkt = new PACKET.CZ.NOTIFY_UPDATEINFO();
 				Object.assign(pkt, mapScalarUpdate({ id, value }));
 				Network.sendPacket(pkt);
-			} else this.sendWhisper(`NPC:updateinfo:${id}:${value}`);
+			}
 		}
 		this.renderCompactStatus?.();
 	};
@@ -319609,7 +319599,7 @@ var init_LastROTools = __esmMin((() => {
 		}
 		const id = Number(mobId);
 		this._onlyTargets = enabled ? Array.from(new Set([...current, id])) : current.filter((target) => target !== id);
-		if (PACKET.CZ.NOTIFY_ONLYTARGET && Number(Configs.get("lastroNid", 5)) === 5) {
+		if (PACKET.CZ.NOTIFY_ONLYTARGET) {
 			const pkt = new PACKET.CZ.NOTIFY_ONLYTARGET();
 			Object.assign(pkt, mapOnlyTargetUpdate({ mobId: id, enabled }));
 			Network.sendPacket(pkt);
@@ -319681,12 +319671,6 @@ var init_LastROTools = __esmMin((() => {
 			autoPots: "自动补给",
 			autoFollow: "跟随战斗"
 		}[option] || option;
-	};
-	LastROTools.sendWhisper = function sendWhisper(receiver) {
-		const pkt = new PACKET.CZ.WHISPER();
-		pkt.receiver = receiver;
-		pkt.msg = "0";
-		Network.sendPacket(pkt);
 	};
 	LastROTools.loadQuickRoutes = function loadQuickRoutes() {
 		if (this._quickLoaded) return;

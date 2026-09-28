@@ -1,12 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import { patchV2Runtime } from '../scripts/patch-v2-runtime.mjs';
 
 let inputSource: string;
 let loopSource: string;
 beforeAll(async () => {
-  const patched = patchV2Runtime(await readFile('vendor/v2/Online.js', 'utf8'));
+  // pnpm test prepares the patched runtime before Vitest starts.
+  const patched = await readFile('generated/runtime/Online.js', 'utf8');
   const region = (name: string) => patched.split('//#region src/UI/Components/JoystickUI/' + name + '.js')[1]!.split('//#endregion')[0]!;
   inputSource = region('JoystickInputService');
   loopSource = region('JoystickPollingLoop');

@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
-import { patchGuildEmblemRequestCallbacks, patchLegacyScriptSinks, patchTrustedTypesDomWrites, patchV2Runtime } from '../scripts/patch-v2-runtime.mjs';
+import { patchGuildEmblemRequestCallbacks, patchLegacyScriptSinks, patchTrustedTypesDomWrites, patchV2Runtime, patchWebAudioPlayback } from '../scripts/patch-v2-runtime.mjs';
 import { buildClientConfig } from '../src/runtime/client-config';
 import { LASTRO_SERVER_PROFILES } from '../src/servers/server-profiles';
 
@@ -8,6 +8,29 @@ const profile = LASTRO_SERVER_PROFILES[0];
 if (!profile || profile.availability !== 'available') throw new Error('missing fixture profile');
 
 describe('V2 runtime patch', () => {
+  it('routes BGM and sound effects through decoded Web Audio buffers', () => {
+    const source = [
+      'var BGM = class BGM {',
+      '  static audio = document.createElement("audio");',
+      '  static load(url) { BGM.audio.src = url; BGM.audio.play(); }',
+      '  static stop() { BGM.audio.pause(); }',
+      '};',
+      'var SoundManager = class SoundManager {',
+      '  static play(filename, vol) { const audio = document.createElement("audio"); audio.src = filename; audio.play(); }',
+      '  static stop(filename) { return filename; }',
+      '};',
+      'function createRainAudio() { this.audioCtx = new AudioContext(); }',
+    ].join('\n');
+    const patched = patchWebAudioPlayback(source);
+    expect(patched).toContain('LastROWebAudio.playBgm');
+    expect(patched).toContain('LastROWebAudio.playSound');
+    expect(patched).not.toContain('document.createElement("audio")');
+    expect(patched).not.toContain('BGM.audio.play()');
+    expect(patched).not.toContain('audio.play().catch');
+    expect(patched).toContain('decodeAudioData');
+    expect(patched).toContain('source.loop = true');
+  });
+
   it('keeps guild emblem callback arguments image-first', () => {
     const source = 'this.onSuccess(entry.guildId, entry.version, entry.image, entry.gif);';
     expect(patchGuildEmblemRequestCallbacks(source)).toBe('this.onSuccess(entry.guildId, entry.image, entry.gif);');
@@ -62,18 +85,8 @@ describe('V2 runtime patch', () => {
       'var root = freeGlobal || freeSelf || Function("return this")();',
       'var Common_default$1 = "body {\\r\\n\\tfont-size: 12px;\\r\\n\\tfont-family: \'SCDream\', Arial, sans-serif;\\r\\n\\tfont-size-adjust: 0.5186;\\r\\n}\\r\\n:host {\\r\\n\\ttouch-action: manipulation;\\r\\n}";',
       'function drawLabel(ctx) { ctx.font = "10px Arial"; }',
-      'function playBgm(BGM) {',
-      '\tBGM.audio.play();',
-      '\tconst playPromise = BGM.audio.play();',
-      '\treturn playPromise;',
-      '}',
-      'function playSound(sound) {',
-      '\tconst playPromise = sound.play();',
-      '\treturn playPromise;',
-      '}',
-      'function playFreshAudio(audio) {',
-      '\taudio.play().catch((err) => {});',
-      '}',
+      'var BGM = class BGM { static audio = document.createElement("audio"); static load(url) { BGM.audio.src = url; BGM.audio.play(); } };',
+      'var SoundManager = class SoundManager { static play() { const audio = document.createElement("audio"); audio.play(); } };',
       'function createRainAudio() {',
       '\tconst AudioContext = window.AudioContext || window.webkitAudioContext;',
       '\tthis.audioCtx = new AudioContext();',
@@ -130,9 +143,11 @@ describe('V2 runtime patch', () => {
     expect(patched).not.toContain('Arial');
     expect(patched).toContain('function installLastROAudioUnlock()');
     expect(patched).toContain('installLastROAudioUnlock();\nimport { existing }');
-    expect(patched).toContain('LastROAudioPlay(BGM.audio, true)');
-    expect(patched).toContain('const playPromise = LastROAudioPlay(sound);');
-    expect(patched).toContain('LastROAudioPlay(audio).catch((err) => {});');
+    expect(patched).toContain('LastROWebAudio.playBgm');
+    expect(patched).toContain('LastROWebAudio.playSound');
+    expect(patched).not.toContain('document.createElement("audio")');
+    expect(patched).not.toContain('BGM.audio.play()');
+    expect(patched).not.toContain('audio.play().catch');
     expect(patched).toContain('this.audioCtx = LastROAudioRegisterContext(new AudioContext());');
     expect(patched).toContain('const resumeAudioContexts = () => {');
     expect(patched).toContain('lastro-account-login.mjs');
@@ -179,7 +194,7 @@ describe('V2 runtime patch', () => {
   });
 
   it('applies bundled Chinese typography to the generated runtime', async () => {
-    const runtime = await readFile('.staging/runtime/Online.js', 'utf8');
+    const runtime = await readFile('generated/runtime/Online.js', 'utf8');
     expect(runtime).toContain("font-family: 'Source Han Sans CN'");
     expect(runtime).toContain('font-size: 13px');
     expect(runtime).not.toContain('SCDream');
@@ -187,7 +202,7 @@ describe('V2 runtime patch', () => {
   });
 
   it('registers Web Audio contexts in the generated runtime for activation resume', async () => {
-    const runtime = await readFile('.staging/runtime/Online.js', 'utf8');
+    const runtime = await readFile('generated/runtime/Online.js', 'utf8');
     expect(runtime).toContain('this.audioCtx = LastROAudioRegisterContext(new AudioContext());');
     expect(runtime).toContain('const resumeAudioContexts = () => {');
   });

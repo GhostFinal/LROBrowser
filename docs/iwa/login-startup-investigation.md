@@ -51,7 +51,7 @@
 - `test/login-config.test.ts`：运行实际 Configs/登录皮肤选择源码，验证模块初始化前和 server 选择后的模式、皮肤及封包版本。
 - `test/lastro-account-login.test.ts`：运行实际旧版模板和 CSS，验证面板样式、隔离 IndexedDB 账号填充、无自动登录及随 host 移除。
 
-其余既有未提交修改保留。重新生成了本仓库 `.staging` 的 Worker、账号模块和 501 项包内清单，以及 `dist`；未修改外部基线、未提交生成物、未生产签名或部署。
+其余既有未提交修改保留。重新生成了本仓库 `generated` 的 Worker、账号模块和 501 项包内清单，以及 `dist`；未修改外部基线、未提交生成物、未生产签名或部署。
 
 ## 验证和限制
 
@@ -65,7 +65,7 @@
 
 ## 本地启动与打包
 
-本次已更新 `.staging` 和 `dist`。Dev Mode Proxy 使用同一安装端口重新启动 Vite，然后重新打开 IWA；不能把普通 localhost 页面当作 IWA：
+本次已更新 `generated` 和 `dist`。Dev Mode Proxy 使用同一安装端口重新启动 Vite，然后重新打开 IWA；不能把普通 localhost 页面当作 IWA：
 
 ```bash
 cd /home/parker/Development/RO/RoBrowserV2
@@ -79,10 +79,10 @@ rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/nod
 ```bash
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH node scripts/patch-resource-worker.mjs
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH node scripts/import-core-assets.mjs \
-  --client-root /home/parker/Development/RO/RoBrowserV2/.staging/core \
-  --ro-source-root /home/parker/Development/RO/RoBrowserV2/.staging/core \
-  --runtime /home/parker/Development/RO/RoBrowserV2/.staging/runtime/Online.js \
-  --output /home/parker/Development/RO/RoBrowserV2/.staging/core
+  --client-root /home/parker/Development/RO/RoBrowserV2/generated/core \
+  --ro-source-root /home/parker/Development/RO/RoBrowserV2/generated/core \
+  --runtime /home/parker/Development/RO/RoBrowserV2/generated/runtime/Online.js \
+  --output /home/parker/Development/RO/RoBrowserV2/generated/core
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm build
 rtk proxy env PATH=/home/parker/.nvm/versions/node/v24.11.0/bin:$PATH .tools/node_modules/.bin/pnpm audit:iwa
 ```

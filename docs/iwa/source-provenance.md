@@ -19,13 +19,13 @@
 
 导入器通过 17 个合成夹具测试：禁止在待导入文件中携带凭据/私有 profile/私钥标记、未批准 origin、未知可执行文件、路径越界和符号链接；排除旧配置；拒绝 hash 漂移；记录旧传输标记；排序并计算 SHA-256；扫描失败不覆盖已有 staging。夹具的账号与地址均为人工测试值。
 
-`vendor/v2/Online.js` 在构建时由 `scripts/patch-v2-runtime.mjs` 生成到可删除的 `.staging/runtime/Online.js`；Worker 和 `vendor/core` 资源也只在构建阶段生成到 `.staging`。WASM 的运行时路径固定为包内路径，原始与清理后的 SHA-256、转换类别及次数只记录在本地生成清单中，不记录被删除的地址或账号值。
+`vendor/v2/Online.js` 在构建时由 `scripts/patch-v2-runtime.mjs` 生成到可删除的 `generated/runtime/Online.js`；Worker 和 `vendor/core` 资源也只在构建阶段生成到 `generated/`。WASM 的运行时路径固定为包内路径，原始与清理后的 SHA-256、转换类别及次数只记录在本地生成清单中，不记录被删除的地址或账号值。
 
-仓库内的 V2 源码和回归测试通过 ownership/inventory 门禁；生产 runtime 只由 `vendor/v2` 生成，旧传输实现必须在进入 `.staging/runtime` 前移除。
+仓库内的 V2 源码和回归测试通过 ownership/inventory 门禁；生产 runtime 只由 `vendor/v2` 生成，旧传输实现必须在进入 `generated/runtime` 前移除。
 
 唯一不属于网络地址的 URI 例外是 SVG/XHTML/XLink 的三个 W3C XML 命名空间标识，用于创建本地 SVG 和截图。这些标识不是资源请求，不扩大允许的远程资源源。所有实际远程资源 origin 仍只允许官方与备用两个 HTTPS origin。
 
-本机测试许可状态见 [许可证核查记录](third-party-licenses.md)。`.staging`、`dist` 和 `release` 都是被忽略的生成目录；可复现的源文件、模块、回归测试、字体和核心资源均在仓库内管理。
+本机测试许可状态见 [许可证核查记录](third-party-licenses.md)。`generated`、`dist` 和 `release` 都是被忽略的生成目录；可复现的源文件、模块、回归测试、字体和核心资源均在仓库内管理。
 
 ## 当前执行状态
 

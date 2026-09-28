@@ -30,7 +30,7 @@ describe('LastRO native login integration', () => {
   });
 
   it('keeps account editor inputs in normal flow alongside the legacy native form', () => {
-    const source = readFileSync('.staging/runtime/Online.js', 'utf8');
+    const source = readFileSync('generated/runtime/Online.js', 'utf8');
     const css = vm.runInNewContext(source.match(/WinLogin_default\$1 = ("[^\n]+");/)![1]!);
     const style = document.createElement('style');
     style.textContent = decorateLastROLoginStyles('WinLogin', css);
@@ -119,7 +119,7 @@ describe('LastRO native login integration', () => {
     const store = new IndexedDbAccountStore({ indexedDB: factory });
     await store.save({ serverProfileId: 'lastro-2x', label: 'Fixture', username: 'fixture-user', password: 'fixture-only' });
     const config = buildClientConfig(getAvailableServerProfile('lastro-2x'), { username: '', password: '' });
-    const source = readFileSync('.staging/runtime/Online.js', 'utf8');
+    const source = readFileSync('generated/runtime/Online.js', 'utf8');
     const html = vm.runInNewContext(source.match(/WinLogin_default\$2 = ("[^\n]+");/)![1]!);
     const host = document.createElement('div');
     const root = host.attachShadow({ mode: 'open' });

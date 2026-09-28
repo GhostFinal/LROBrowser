@@ -15,6 +15,6 @@
 | Lua/WASM 运行时 | 尚未进入 Task 7 定位步骤 | 组件、版本、许可证与打包方式均待核验 |
 | Source Han Sans CN | `vendor/core/System/Font/Source Han Sans CN{4,6}.otf` 及 `public/fonts/SourceHanSansCN-{Medium,Bold}.otf` | SIL Open Font License 1.1；许可证副本为 `vendor/core/System/Font/OFL.txt` 和 `public/fonts/OFL.txt` |
 
-用户在后续指令中明确允许暂不处理分发许可，继续本机运行和调用。因此 Phase A 的本机私有构建和测试签名不再因许可证据缺失而阻塞。源文件固定保存在仓库的 `vendor/` 目录；`.staging`、`dist`、`release` 和本地测试密钥仍是被 Git 忽略的构建或测试产物。此授权不包含公开源码、上传 bundle 或部署。
+用户在后续指令中明确允许暂不处理分发许可，继续本机运行和调用。因此 Phase A 的本机私有构建和测试签名不再因许可证据缺失而阻塞。源文件固定保存在仓库的 `vendor/` 目录；`generated`、`dist`、`release` 和本地测试密钥仍是被 Git 忽略的构建或测试产物。此授权不包含公开源码、上传 bundle 或部署。
 
 将来分发前再为上述类别提供或定位可核验的许可证/授权材料，明确覆盖的文件或版本，以及源码提交和签名 bundle 再分发的条件。不得把“可以公开下载”“本地已能运行”或局部库的许可标记视为完整授权。

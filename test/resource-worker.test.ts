@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { patchResourceHandler, patchResourceWorker } from '../scripts/patch-resource-worker.mjs';
 
 async function loadWorker(responses: Array<Response | Error>, manifest: string[] = []) {
-  const source = await readFile('.staging/runtime/LastROThreadEventHandler.js', 'utf8');
+  const source = await readFile('generated/runtime/LastROThreadEventHandler.js', 'utf8');
   const urls: string[] = [];
   const tcpRequests: { host: string; port: number; request: string }[] = [];
   const saved: ArrayBuffer[] = [];
@@ -55,7 +55,7 @@ async function loadWorker(responses: Array<Response | Error>, manifest: string[]
       close = async () => { this.closeHandler(); };
     },
   };
-  const loader = await readFile('.staging/runtime/lastro-resource-loader.js', 'utf8');
+  const loader = await readFile('generated/runtime/lastro-resource-loader.js', 'utf8');
   vm.runInNewContext(loader, context);
   vm.runInNewContext(source, context, { filename: 'LastROThreadEventHandler.js' });
   return { urls, tcpRequests, saved, load: (path: string) => new Promise<{ data: ArrayBuffer | null; error?: string }>((resolve) => {
@@ -102,7 +102,7 @@ describe('LastRO resource worker', () => {
   });
 
   it('bundles the Direct TCP HTTP transport for remote passive resources', async () => {
-    const loader = await readFile('.staging/runtime/lastro-resource-loader.js', 'utf8');
+  const loader = await readFile('generated/runtime/lastro-resource-loader.js', 'utf8');
     expect(loader).toContain('function createDirectHttpFetch');
     expect(loader).toContain('new constructorForSocket(host, 80');
     expect(loader).toContain('nativeFetch');

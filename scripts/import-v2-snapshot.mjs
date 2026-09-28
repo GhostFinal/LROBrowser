@@ -9,7 +9,7 @@ import ts from 'typescript';
 import { namespaceUris, sanitizeReviewedSource } from './sanitize-v2-source.mjs';
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
-const staging = path.join(repo, '.staging');
+const generated = path.join(repo, 'generated');
 const policy = JSON.parse(await readFile(new URL('../config/forbidden-source-patterns.json', import.meta.url), 'utf8'));
 const inventory = JSON.parse(await readFile(new URL('../config/lastro-module-inventory.json', import.meta.url), 'utf8'));
 const executable = /\.(?:[cm]?js|wasm|lua|lub)$/i;
@@ -97,8 +97,8 @@ async function importSnapshot() {
   } });
   if (!values.source || !path.isAbsolute(values.source)) fail('absolute-source-required');
   const source = path.resolve(values.source);
-  const output = path.resolve(values.out ?? staging);
-  if (output !== staging && !output.startsWith(staging + path.sep)) fail('staging-output-required');
+  const output = path.resolve(values.out ?? generated);
+  if (output !== generated && !output.startsWith(generated + path.sep)) fail('generated-output-required');
   if (source === output || output.startsWith(source + path.sep) || source.startsWith(output + path.sep)) fail('overlapping-roots');
   await rejectSymlinkParents(source);
   await rejectSymlinkParents(output);
@@ -149,7 +149,7 @@ async function importSnapshot() {
   await rejectSymlinkParents(destination);
   try {
     const existing = await inspectTree(destination);
-    if (existing.some(name => !allowed.has(name))) fail('stale-staging');
+    if (existing.some(name => !allowed.has(name))) fail('stale-generated');
   } catch (error) { if (error.code !== 'ENOENT') throw error; }
   for (const file of files) {
     const target = path.join(destination, file.path);

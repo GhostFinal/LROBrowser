@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { buildClientConfig } from '../src/runtime/client-config';
 import { getAvailableServerProfile } from '../src/servers/server-profiles';
 
-const runtime = readFileSync('.staging/runtime/Online.js', 'utf8');
+const runtime = readFileSync('generated/runtime/Online.js', 'utf8');
 const configsRegion = runtime.split('//#region src/Core/Configs.js')[1]!.split('//#endregion')[0]!;
 const selectLogin = runtime.slice(runtime.indexOf('function selectLoginUIVersion('), runtime.indexOf('var publicName, versionInfo, Controller;'));
 

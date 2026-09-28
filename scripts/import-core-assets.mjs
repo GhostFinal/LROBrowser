@@ -77,7 +77,7 @@ async function addFile(entries, destinations, source, destination, kind, output)
 export async function importCoreAssets({ coreRoot, moduleRoot, runtimePath, output }) {
   const core = requireAbsolute(coreRoot, 'core-root');
   const modules = requireAbsolute(moduleRoot ?? path.join(repo, 'vendor/v2'), 'module-root');
-  const destinationRoot = path.resolve(output ?? path.join(repo, '.staging/core'));
+  const destinationRoot = path.resolve(output ?? path.join(repo, 'generated/core'));
   await ensureSafeRoot(core, 'core');
   await ensureSafeRoot(modules, 'module');
   const entries = [];
@@ -130,7 +130,7 @@ async function main() {
   const manifest = await importCoreAssets({
     coreRoot: values['core-root'] ?? path.join(repo, 'vendor/core'),
     moduleRoot: values['module-root'] ?? path.join(repo, 'vendor/v2'),
-    runtimePath: values.runtime ?? path.join(repo, '.staging/runtime/Online.js'), output: values.output,
+    runtimePath: values.runtime ?? path.join(repo, 'generated/runtime/Online.js'), output: values.output,
   });
   process.stdout.write(JSON.stringify({ files: manifest.files.length, bytes: manifest.files.reduce((sum, file) => sum + file.bytes, 0) }) + '\n');
 }

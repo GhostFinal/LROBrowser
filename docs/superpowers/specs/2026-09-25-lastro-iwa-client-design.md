@@ -57,14 +57,14 @@ RoBrowserV2/
     resources/resource-policy.ts
     resources/resource-resolver.ts
     runtime/client-bootstrap.ts
-  .staging/v2/
+  generated/v2/
     Online.js
     LastROThreadEventHandler.js
     ThreadEventHandler.js
     PathFindingWorker.js
     lastro-*.mjs
     lastro-resource-path.js
-  .staging/core/
+  generated/core/
     executable-assets.json
     System/*.lua
     data/luafiles514/lua files/**/*.lua
@@ -87,7 +87,7 @@ RoBrowserV2/
 
 `RoBrowserV2` 是独立项目，不导入、不修改也不发布露天商店网站、市场 Worker、MySQL 协议或网站 V1 iframe/POPUP 代码。
 
-`.staging` 始终被 Git 忽略。只有在第三方许可证和再分发权得到记录后，允许公开提交的 V2 源文件才可以迁入 `vendor/v2`；无论是否提交源码，签名产物中实际包含的每个第三方文件都必须通过发布许可证门禁。
+`generated` 始终被 Git 忽略。只有在第三方许可证和再分发权得到记录后，允许公开提交的 V2 源文件才可以迁入 `vendor/v2`；无论是否提交源码，签名产物中实际包含的每个第三方文件都必须通过发布许可证门禁。
 
 ## 服务器配置模型
 

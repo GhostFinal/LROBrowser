@@ -8,7 +8,7 @@ Phase A 支持本地构建、审计、unsigned Web Bundle 和被 Git 忽略的�
 
 `vendor/v2/` 是本项目固定管理的 V2 runtime、Worker、LastRO 模块和回归测试；`vendor/core/` 是本项目固定管理的 Lua/LUB、WASM、启动数据和 Source Han Sans CN 字体。`Online.js` 及其使用到的 `*.mjs` 都从这些目录进入构建。个人旧配置 `lastro-v2-config.js` 不属于本项目，也不会被复制。
 
-`.staging/` 不是源码目录，而是 `pnpm prepare:runtime` 生成的可删除构建中间目录，包含 patched runtime、Worker、核心资源和 executable manifest。删除它后重新运行 `pnpm prepare:runtime`、`pnpm test` 或 `pnpm build` 即可恢复。外部 `/run/media/.../ROWeb` 只属于历史来源，不是本项目的测试、构建或发布依赖。
+`generated/` 不是源码目录，而是 `pnpm prepare:runtime` 生成的可删除构建中间目录，包含 patched runtime、Worker、核心资源和 executable manifest。删除它后重新运行 `pnpm prepare:runtime`、`pnpm test` 或 `pnpm build` 即可恢复。外部 `/run/media/.../ROWeb` 只属于历史来源，不是本项目的测试、构建或发布依赖。
 
 ## 本地命令
 

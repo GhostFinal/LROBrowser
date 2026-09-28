@@ -65,7 +65,7 @@
 - [ ] **Step 2: Run the focused test and verify failure.** Run `pnpm exec vitest run test/manifest.test.ts`; expect module/file-not-found failures.
 - [ ] **Step 3: Add the standalone package.** Create the root Vite TypeScript app with scripts `dev`, `build`, `test`, `typecheck`, `audit:iwa`, `bundle:iwa`, and `sign:iwa`. Pin the selected Vite/Vitest/TypeScript versions in this repository; add no UI framework.
 - [ ] **Step 4: Add the IWA manifest and direct entry.** Place the manifest at the required well-known path, use a local SVG icon, import only local CSS/TypeScript, and load the V2 runtime directly. Do not render a separate account shell.
-- [ ] **Step 5: Wire standalone scripts and ignores.** Add root scripts for development, build, testing, type checking, import, audit, bundle, and signing. Ignore `dist`, `.staging`, `release`, `*.wbn`, `*.swbn`, `*.pem`, and signing passphrase files.
+- [ ] **Step 5: Wire standalone scripts and ignores.** Add root scripts for development, build, testing, type checking, import, audit, bundle, and signing. Ignore `dist`, `generated`, `release`, `*.wbn`, `*.swbn`, `*.pem`, and signing passphrase files.
 - [ ] **Step 6: Verify and commit.** Run `pnpm exec vitest run test/manifest.test.ts`, `pnpm build`, `pnpm typecheck`, and `git diff --check`; commit `feat(iwa): scaffold isolated LastRO client`.
 
 ### Task 2: Establish provenance, license, and credential gates
@@ -81,7 +81,7 @@
 - Modify: `package.json`
 
 **Interfaces:**
-- `pnpm import:v2 -- --source <absolute-v2-path>` copies only allowlisted files to `.staging/v2` and writes `.staging/v2-manifest.json`.
+- `pnpm import:v2 -- --source <absolute-v2-path>` copies only allowlisted files to `generated/v2` and writes `generated/v2-manifest.json`.
 - Manifest entries are `{ path: string; bytes: number; sha256: string }` sorted by path.
 - The importer exits non-zero on missing allowlist entries, credentials/private profiles, or unexpected executable files. It records known legacy WebSocket/NodeSocket markers in the source manifest; Tasks 6 and 11 require those markers to be absent from production staging and `dist`.
 
@@ -90,7 +90,7 @@
 - [ ] **Step 3: Define the reviewed allowlist.** Include `Online.js`, `LastROThreadEventHandler.js`, `ThreadEventHandler.js`, `PathFindingWorker.js`, `lastro-resource-path.js`, every production `lastro-*.mjs` imported by `Online.js`, and required tiny bootstrap assets. Exclude all `*.test.mjs`, `lastro-v2-config.js`, HTML entry files, XKore-only configuration, screenshots, and personal quick-login data.
 - [ ] **Step 4: Implement hard-failure and migration-marker scanning.** Reject `quickLoginAccounts`, XKore profile definitions, known private profile IDs, embedded username/password object pairs, and PEM markers without printing matched secrets. Extract absolute HTTP(S)/WS(S) origins and reject every origin outside the approved official/backup pair without echoing the rejected origin into generated manifests or logs. Separately count `socketProxy`, `WebSocket`, `wss://`, `ws://`, `electronAPI`, and `NodeSocket` only inside the expected raw `Online.js`; reject those markers in every other imported file and carry only marker counts into the manifest for Task 6 to eliminate.
 - [ ] **Step 5: Document provenance and redistribution status.** Record every imported category, its source path, upstream project/license evidence, LastRO-specific authorship, and the status of official Lua/LUB/game data. State that an unknown redistribution status blocks a public source commit or public `.swbn`, while local private test builds may use ignored staging.
-- [ ] **Step 6: Verify against the real baseline without committing artifacts.** Run `pnpm import:v2 -- --source /run/media/parker/7A9F-F871/ROWeb/v2`; inspect only file names, counts, sizes, and hashes. Run the focused test and `git status --short`; confirm `.staging` is ignored and no credential-bearing source was added.
+- [ ] **Step 6: Verify against the real baseline without committing artifacts.** Run `pnpm import:v2 -- --source /run/media/parker/7A9F-F871/ROWeb/v2`; inspect only file names, counts, sizes, and hashes. Run the focused test and `git status --short`; confirm `generated` is ignored and no credential-bearing source was added.
 - [ ] **Step 7: Commit the importer and policy.** Run `git diff --check`; commit `build(iwa): add reviewed V2 import gate`.
 
 ### Task 3: Define immutable LastRO server profiles
@@ -168,7 +168,7 @@
 - Create: `src/runtime/client-bootstrap.ts`
 - Modify: `src/main.ts`
 - Modify: `package.json`
-- Generated in ignored staging: `.staging/runtime/*`
+- Generated in ignored output: `generated/runtime/*`
 
 **Interfaces:**
 - `buildClientConfig(profile)` returns a frozen V2 config with exactly one server, `lastroProtocol=true`, `lastroCustomPackets=true`, package-local executable roots, and no `socketProxy`/quick-login/XKore fields.
@@ -179,10 +179,10 @@
 - [ ] **Step 1: Write config tests.** Assert each available profile maps exact address/port/version/langtype/packetver/keys/hash/clientVer values, App服 throws, `servers.length === 1`, `autoLogin` contains only the user-selected current credentials, and serialized config contains no WSS/XKore/private quick-login fields.
 - [ ] **Step 2: Write patch tests with a small fixture.** Assert the patch replaces the V2 `defaultSocketFactory` body with an injected Direct TCP factory hook, removes initialization/use of WebSocket and NodeSocket helpers from production runtime, and fails closed when anchors drift.
 - [ ] **Step 3: Run focused tests and verify failure.** Run `pnpm exec vitest run test/v2-runtime-patch.test.ts`; expect missing patch/bootstrap failures.
-- [ ] **Step 4: Patch the real ignored snapshot.** Run import then patch against `.staging/v2/Online.js`. Replace `defaultSocketFactory` with the exact `globalThis.LastRODirectSocketFactory(host, port)` contract, remove the WebSocket/NodeSocket initialization paths, and preserve the existing handoff-aware NetworkManager close behavior. Do not edit the 12.7 MB artifact by unconstrained global replacements. Record pre/post SHA-256 and each transformed anchor in `.staging/runtime-manifest.json`.
+- [ ] **Step 4: Patch the real ignored snapshot.** Run import then patch against `generated/v2/Online.js`. Replace `defaultSocketFactory` with the exact `globalThis.LastRODirectSocketFactory(host, port)` contract, remove the WebSocket/NodeSocket initialization paths, and preserve the existing handoff-aware NetworkManager close behavior. Do not edit the 12.7 MB artifact by unconstrained global replacements. Record pre/post SHA-256 and each transformed anchor in `generated/runtime-manifest.json`.
 - [ ] **Step 5: Add the bootstrap adapter.** Install `globalThis.ROConfig`, register `createDirectSocket`, mount the runtime in the IWA page, and call the existing V2 login path. Keep login/character/map server handoff logic inside the V2 protocol runtime.
 - [ ] **Step 6: Add unsupported-environment UI.** Before loading V2, check `TCPSocket`; if missing, render a blocking Chinese message with supported Chrome/IWA instructions. Do not render a “use WSS instead” action.
-- [ ] **Step 7: Verify no legacy transport remains.** Run `rg -n "new WebSocket|wss://|ws://|socketProxy|electronAPI|NodeSocket" .staging/runtime`; expect no matches. Run focused tests and build.
+- [ ] **Step 7: Verify no legacy transport remains.** Run `rg -n "new WebSocket|wss://|ws://|socketProxy|electronAPI|NodeSocket" generated/runtime`; expect no matches. Run focused tests and build.
 - [ ] **Step 8: Commit source adapters only.** Confirm staging remains ignored; commit `feat(iwa): bootstrap V2 over Direct TCP`.
 
 ### Task 7: Build the package-local executable asset set
@@ -192,7 +192,7 @@
 - Create: `scripts/build-core-manifest.mjs`
 - Create: `config/core-asset-roots.json`
 - Create: `test/core-assets.test.ts`
-- Generated in ignored staging: `.staging/core/**`
+- Generated in ignored output: `generated/core/**`
 - Generated in build output: `dist/core/executable-assets.json`
 - Modify: `package.json`
 
@@ -218,8 +218,8 @@
 - Create: `test/csp-runtime-audit.test.ts`
 - Modify staged module during build: `lastro-worldmap-details.mjs`
 - Modify generated staged runtime: `Online.js`
-- Generated: `.staging/core/data/world/world-data.json`
-- Generated: `.staging/core/data/world/mob-data.json`
+- Generated: `generated/core/data/world/world-data.json`
+- Generated: `generated/core/data/world/mob-data.json`
 
 **Interfaces:**
 - `convert-world-data.mjs --world <path> --mobs <path> --out <dir>` produces deterministic JSON.
@@ -232,7 +232,7 @@
 - [ ] **Step 4: Convert AMD data at build time.** Use a Node-only isolated parser with a single captured `define(factory)` contract; reject access to Node globals, imports, side effects, or multiple definitions. Serialize stable JSON with sorted top-level keys.
 - [ ] **Step 5: Patch world-map loading.** Replace `Function('define', source)` with package-local JSON reads and preserve all existing exported helper signatures.
 - [ ] **Step 6: Remove Lodash dynamic constructors.** Patch the vendored runtime so global detection uses `globalThis` and the unused `_.template` compiler path is excluded or replaced by a function that throws a deterministic unsupported error. First run `rg` to confirm production V2 has no call to `_.template`; if a live call exists, stop this task and implement a precompiled template for that exact call before continuing.
-- [ ] **Step 7: Audit the staged production runtime.** Run the audit and `rg -n "eval\\(|new Function|Function\\(" .staging/runtime .staging/core`; expect no executable matches.
+- [ ] **Step 7: Audit the generated production runtime.** Run the audit and `rg -n "eval\\(|new Function|Function\\(" generated/runtime generated/core`; expect no executable matches.
 - [ ] **Step 8: Verify and commit.** Run focused tests, build, and `git diff --check`; commit `fix(iwa): satisfy isolated app CSP`.
 
 ### Task 9: Implement official-first passive resource resolution

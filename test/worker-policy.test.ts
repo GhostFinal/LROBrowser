@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { describe, expect, it, vi } from 'vitest';
 
-const runtime = readFileSync('.staging/runtime/Online.js', 'utf8');
+const runtime = readFileSync('generated/runtime/Online.js', 'utf8');
 const start = runtime.indexOf('function createLastROWorkerScriptUrl(');
 const helper = runtime.slice(start, runtime.indexOf('\n}', start) + 2);
 const base = 'isolated-app://test-app/runtime/Online.js?import';

@@ -9,8 +9,8 @@ const fixtures: string[] = [];
 const files = ['Online.js', 'lastro-example.mjs'];
 
 async function fixture() {
-  await mkdir('.staging/test-fixtures', { recursive: true });
-  const root = await mkdtemp(path.resolve('.staging/test-fixtures/import-'));
+  await mkdir('generated/test-fixtures', { recursive: true });
+  const root = await mkdtemp(path.resolve('generated/test-fixtures/import-'));
   fixtures.push(root);
   const source = path.join(root, 'source');
   const output = path.join(root, 'output');

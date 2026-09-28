@@ -109,18 +109,205 @@ function replacePathFindingWorkerCreation(source) {
     'const workerUrl = createLastROWorkerScriptUrl("PathFindingWorker.js");');
 }
 
-function patchAudioPlayback(source) {
+const webAudioRuntime = String.raw`
+function installLastROWebAudio() {
+	const stateKey = "__lastroWebAudio";
+	if (globalThis[stateKey]) return globalThis[stateKey];
+	const AudioContextCtor = globalThis.AudioContext || globalThis.webkitAudioContext;
+	let context;
+	let unlocked = false;
+	const buffers = new Map();
+	const bgmPositions = new Map();
+	const activeSounds = new Map();
+	let bgm = null;
+	let bgmGeneration = 0;
+	const getContext = () => {
+		if (!AudioContextCtor) throw new Error("Web Audio API is unavailable");
+		if (!context) {
+			context = LastROAudioRegisterContext(new AudioContextCtor());
+			if (unlocked && context.state === "suspended") void context.resume().catch(() => {});
+		}
+		return context;
+	};
+	const resume = () => {
+		unlocked = true;
+		if (context?.state === "suspended") void context.resume().catch(() => {});
+	};
+	const decode = (key, url) => {
+		const existing = buffers.get(key);
+		if (existing) return existing;
+		const promise = fetch(url).then((response) => {
+			if (!response.ok) throw new Error("Audio request failed: " + response.status);
+			return response.arrayBuffer();
+		}).then((bytes) => getContext().decodeAudioData(bytes));
+		buffers.set(key, promise);
+		promise.catch(() => { if (buffers.get(key) === promise) buffers.delete(key); });
+		return promise;
+	};
+	const disconnect = (node) => {
+		try { node.stop(); } catch {}
+		try { node.disconnect(); } catch {}
+	};
+	const stopBgm = () => {
+		bgmGeneration++;
+		if (!bgm) return 0;
+		const ctx = getContext();
+		const elapsed = Math.max(0, ctx.currentTime - bgm.startedAt);
+		const offset = bgm.buffer.duration ? (bgm.offset + elapsed) % bgm.buffer.duration : 0;
+		bgmPositions.set(bgm.filename, offset);
+		disconnect(bgm.source);
+		try { bgm.gain.disconnect(); } catch {}
+		bgm = null;
+		return offset;
+	};
+	const playBgm = async (filename, url, volume, requestedOffset = 0) => {
+		const generation = ++bgmGeneration;
+		const buffer = await decode("bgm:" + filename, url);
+		if (generation !== bgmGeneration) return;
+		if (bgm?.filename === filename) return;
+		stopBgm();
+		const ctx = getContext();
+		const source = ctx.createBufferSource();
+		const gain = ctx.createGain();
+		const offset = bgmPositions.get(filename) ?? requestedOffset;
+		source.buffer = buffer;
+		source.loop = true;
+		source.connect(gain);
+		gain.connect(ctx.destination);
+		gain.gain.value = Math.max(0, Math.min(1, volume));
+		source.start(0, offset);
+		bgm = { filename, source, gain, buffer, offset, startedAt: ctx.currentTime };
+	};
+	const playSound = async (filename, url, volume) => {
+		const buffer = await decode("sound:" + filename, url);
+		const ctx = getContext();
+		const source = ctx.createBufferSource();
+		const gain = ctx.createGain();
+		const entry = activeSounds.get(filename) || new Set();
+		activeSounds.set(filename, entry);
+		const item = { source, gain, baseVolume: volume };
+		entry.add(item);
+		source.buffer = buffer;
+		source.connect(gain);
+		gain.connect(ctx.destination);
+		gain.gain.value = Math.max(0, Math.min(1, volume));
+		source.addEventListener("ended", () => {
+			entry.delete(item);
+			if (!entry.size) activeSounds.delete(filename);
+			try { source.disconnect(); gain.disconnect(); } catch {}
+		}, { once: true });
+		source.start();
+	};
+	const stopSound = (filename) => {
+		const entries = filename ? [activeSounds.get(filename)] : [...activeSounds.values()];
+		for (const entry of entries) {
+			if (!entry) continue;
+			for (const item of entry) disconnect(item.source);
+		}
+		if (filename) activeSounds.delete(filename); else activeSounds.clear();
+	};
+	const setBgmVolume = (volume) => { if (bgm) bgm.gain.gain.value = Math.max(0, Math.min(1, volume)); };
+	const setSoundVolume = (volume) => {
+		for (const entry of activeSounds.values()) for (const item of entry)
+			item.gain.gain.value = Math.max(0, Math.min(1, item.baseVolume * volume));
+	};
+	const state = { getContext, decode, playBgm, stopBgm, playSound, stopSound, setBgmVolume, setSoundVolume };
+	for (const event of ["pointerdown", "keydown", "touchstart", "click"]) document.addEventListener(event, resume, { capture: true, passive: true });
+	globalThis[stateKey] = state;
+	return state;
+}
+const LastROWebAudio = installLastROWebAudio();
+`;
+
+function replaceClassExpression(source, className, replacement) {
+  const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const matches = [];
+  function visit(node) {
+    if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken
+      && node.left.getText(file) === className && ts.isClassExpression(node.right)) matches.push(node.right);
+    if (ts.isVariableDeclaration(node) && node.name.getText(file) === className
+      && node.initializer && ts.isClassExpression(node.initializer)) matches.push(node.initializer);
+    ts.forEachChild(node, visit);
+  }
+  visit(file);
+  if (matches.length !== 1) fail(`class:${className}`);
+  return source.slice(0, matches[0].getStart(file)) + replacement + source.slice(matches[0].end);
+}
+
+export function patchWebAudioPlayback(source) {
   let output = source;
-  output = replaceOnce(output, 'const playPromise = BGM.audio.play();',
-    'const playPromise = LastROAudioPlay(BGM.audio, true);');
-  output = replaceOnce(output, 'BGM.audio.play();', 'LastROAudioPlay(BGM.audio, true);');
-  output = replaceOnce(output, 'const playPromise = sound.play();',
-    'const playPromise = LastROAudioPlay(sound);');
-  output = replaceOnce(output, 'audio.play().catch((err) => {',
-    'LastROAudioPlay(audio).catch((err) => {');
-  output = replaceOnce(output, 'this.audioCtx = new AudioContext();',
-    'this.audioCtx = LastROAudioRegisterContext(new AudioContext());');
-  return output;
+  output = replaceClassExpression(output, 'BGM', `class BGM {
+		static filename = null;
+		static volume = Audio_default.BGM.volume;
+		static extension = "mp3";
+		static isInit = false;
+		static stopped = true;
+		static cache = { filename: null, currentTime: 0 };
+		static init() { BGM.isInit = true; }
+		static setAvailableExtensions(extensions) {
+			if (extensions?.length) BGM.extension = extensions[0];
+			BGM.init();
+		}
+		static play(filename) {
+			if (!filename) return;
+			if (filename.match(/bgm/i)) {
+				filename = filename.match(/\\w+\\.mp3/i)?.toString();
+				if (!filename) return;
+			}
+			if (BGM.filename === filename && !BGM.stopped) return;
+			if (BGM.filename && !BGM.stopped) BGM.cache.filename = BGM.filename;
+			BGM.filename = filename;
+			BGM.stopped = false;
+			if (Audio_default.BGM.play) Client.loadFile("BGM/" + filename, (url) => {
+				if (BGM.filename === filename) BGM.load(url);
+			});
+		}
+		static load(url) {
+			if (!Audio_default.BGM.play || !BGM.filename) return;
+			const filename = BGM.filename;
+			const targetTime = BGM.cache.filename === filename ? BGM.cache.currentTime : 0;
+			void LastROWebAudio.playBgm(filename, url, BGM.volume, targetTime).catch((error) => console.warn("Failed to play BGM:", error));
+		}
+		static stop() {
+			BGM.cache.filename = BGM.filename;
+			BGM.cache.currentTime = LastROWebAudio.stopBgm();
+			BGM.stopped = true;
+		}
+		static setVolume(volume) {
+			BGM.volume = Math.max(0, Math.min(1, volume));
+			Audio_default.BGM.volume = BGM.volume;
+			Audio_default.save();
+			LastROWebAudio.setBgmVolume(BGM.volume);
+		}
+	}`,);
+  output = replaceClassExpression(output, 'SoundManager', `class SoundManager {
+		static volume = Audio_default.Sound.volume;
+		static play(filename, vol) {
+			const volume = (vol === undefined ? 1 : vol) * this.volume;
+			if (volume <= 0 || !Audio_default.Sound.play || !filename) return;
+			Client.loadFile("data/wav/" + filename, (url) => {
+				void LastROWebAudio.playSound(filename, url, volume).catch((error) => console.warn("Failed to play sound:", error));
+			});
+		}
+		static playPosition(filename, srcPosition) {
+			const dist = Math.floor(gl_matrix_default.vec2.dist(srcPosition, SessionStorage_default.Entity.position));
+			const vol = Math.max(1 - Math.abs((dist - 1) * .99 / 24 + .01), .1);
+			SoundManager.play(filename, vol);
+		}
+		static stop(filename) { LastROWebAudio.stopSound(filename); }
+		static setVolume(volume) {
+			this.volume = Math.max(0, Math.min(1, volume));
+			Audio_default.Sound.volume = this.volume;
+			Audio_default.save();
+			LastROWebAudio.setSoundVolume(this.volume);
+		}
+	}`,);
+  output = replaceOnce(
+    output,
+    'this.audioCtx = new AudioContext();',
+    'this.audioCtx = LastROAudioRegisterContext(new AudioContext());',
+  );
+  return webAudioRuntime + output;
 }
 
 /**
@@ -342,7 +529,7 @@ ${normalizedSource}`;
   output = replaceOnce(output, 'savingFiles(files);', 'console.info("[LastRO IWA] initializing remote client resources");\n\t\t\tThread.send("CLIENT_INIT", { files: [], save: false }, (...args) => Client.onFilesLoaded(...args));');
   output = replaceFunctionBody(output, 'defaultSocketFactory', '{\n\tif (typeof globalThis.LastRODirectSocketFactory !== "function") throw new Error("Direct TCP factory unavailable");\n\treturn globalThis.LastRODirectSocketFactory(host, port);\n}');
   output = patchLoginRegistrationHook(output);
-  output = patchAudioPlayback(output);
+  output = patchWebAudioPlayback(output);
   output = replaceOnce(output, 'init_WebSocket();', '');
   output = replaceOnce(output, 'init_NodeSocket();', '');
   output = replaceWorkerCreation(output);

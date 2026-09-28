@@ -8,7 +8,7 @@ const roots: string[] = [];
 afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))); });
 
 async function fixture() {
-  const root = await mkdtemp(path.resolve('.staging/core-fixtures-'));
+    const root = await mkdtemp(path.resolve('generated/core-fixtures-'));
   roots.push(root);
   const core = path.join(root, 'core');
   const modules = path.join(root, 'modules');
