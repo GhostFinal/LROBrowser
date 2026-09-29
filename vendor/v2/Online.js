@@ -207502,6 +207502,9 @@ function createStorage(config) {
         );
         searchBtn.addEventListener("click", () => Component.onSearch());
       }
+      const searchInput = root.querySelector("#storage-search-input");
+      if (searchInput)
+        searchInput.addEventListener("input", () => Component.onSearch());
     }
     if (hasOrderBy) {
       const orderBySelect = root.querySelector(".storage-order-by");
@@ -207679,7 +207682,12 @@ function createStorage(config) {
       if (typeof Component.onClosePressed === "function")
         Component.onClosePressed();
     }
-    if (hasSearch && (event.which === KEYS.ENTER || event.key === "Enter")) {
+    if (
+      hasSearch &&
+      (event.which === KEYS.ENTER || event.key === "Enter") &&
+      !event.isComposing &&
+      event.keyCode !== 229
+    ) {
       if (typeof Component.onEnterPressed === "function")
         Component.onEnterPressed();
     }
@@ -207688,7 +207696,7 @@ function createStorage(config) {
     Component.onSearch = function onSearch() {
       const searchInput = this.getRoot().querySelector("#storage-search-input");
       if (!searchInput) return;
-      const searchTerm = searchInput.value.toLowerCase();
+      const searchTerm = searchInput.value.trim().toLowerCase();
       const filteredItems = _list.filter((item) => {
         return DB.getItemName(item).toLowerCase().indexOf(searchTerm) > -1;
       });
@@ -207711,6 +207719,7 @@ function createStorage(config) {
           ItemType_default.SEARCH,
         );
     };
+  if (hasSearch) Component.onEnterPressed = Component.onSearch;
   function onResize() {
     const top = Component._host.offsetTop;
     let lastHeight = 0;

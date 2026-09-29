@@ -11,7 +11,7 @@ describe('immutable LastRO profiles', () => {
     ] as const) {
       expect(getAvailableServerProfile(id)).toEqual({
         id, displayName: id === 'lastro-3x' ? '3转服' : id === 'lastro-2x' ? '2转服' : 'App服', availability: 'available',
-        loginAddress: '45.248.8.68', loginPort: port, version: 45, langtype, packetver: 20211103,
+        loginAddress: 'port.lastro.cn', loginPort: port, version: 45, langtype, packetver: 20211103,
         packetKeys, clientHash: id === 'lastro-app' ? '23ba069fd7c9e5683c435cecd507b11d' : '83ba069fd7c9e7683c435cecd507b18d',
         clientVer: id === 'lastro-app' ? 5 : ver, lastroNid: ver, resourceProfileId: 'lastro-public',
       });
@@ -20,7 +20,7 @@ describe('immutable LastRO profiles', () => {
       id: "lastro-app",
       displayName: "App服",
       availability: "available",
-      loginAddress: "45.248.8.68",
+      loginAddress: "port.lastro.cn",
       loginPort: 27569,
       version: 45,
       langtype: 4,

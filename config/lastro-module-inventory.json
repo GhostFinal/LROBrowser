@@ -19,7 +19,7 @@
     { "module": "lastro-resource-path.js", "tests": ["lastro-resource-path.test.mjs"], "capability": "legacy resource path candidates", "required": true },
     { "module": "lastro-v1-migration.mjs", "tests": ["lastro-v1-migration.test.mjs", "lastro-buying-store-packet.test.mjs", "lastro-ground-item.test.mjs", "lastro-item-reform.test.mjs", "lastro-status-charset.test.mjs"], "capability": "LastRO V1 packet and data migration", "required": true },
     { "module": "lastro-worldmap-details.mjs", "tests": ["lastro-worldmap-details.test.mjs"], "capability": "world map and monster details", "required": true },
-    { "module": "Online.js", "tests": ["lastro-battle-settings-labels.test.mjs", "lastro-body-palette.test.mjs", "lastro-cashshop-entry.test.mjs", "lastro-cashshop-list.test.mjs", "lastro-debug-enter.test.mjs", "lastro-enchant-grade.test.mjs", "lastro-equipment-costume.test.mjs", "lastro-fog-default.test.mjs", "lastro-hat-table.test.mjs", "lastro-quest-panel.test.mjs"], "capability": "bundle-embedded LastRO UI and gameplay behavior", "required": true }
+    { "module": "Online.js", "tests": ["lastro-battle-settings-labels.test.mjs", "lastro-body-palette.test.mjs", "lastro-cashshop-entry.test.mjs", "lastro-cashshop-list.test.mjs", "lastro-debug-enter.test.mjs", "lastro-enchant-grade.test.mjs", "lastro-equipment-costume.test.mjs", "lastro-fog-default.test.mjs", "lastro-hat-table.test.mjs", "lastro-quest-panel.test.mjs", "lastro-storage-search.test.mjs"], "capability": "bundle-embedded LastRO UI and gameplay behavior", "required": true }
   ],
   "regressionTests": [
     "lastro-battle-settings-labels.test.mjs",
@@ -48,6 +48,7 @@
     "lastro-receive-framing.test.mjs",
     "lastro-resource-path.test.mjs",
     "lastro-status-charset.test.mjs",
+    "lastro-storage-search.test.mjs",
     "lastro-v1-migration.test.mjs",
     "lastro-worldmap-details.test.mjs"
   ]

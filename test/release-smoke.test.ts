@@ -35,7 +35,7 @@ describe('Phase A release smoke', () => {
     expect([...urls].every((url) => !url.includes('://'))).toBe(true);
     for (const entry of coreManifest.files) expect(urls).toContain(`core/${entry.path}`);
     for (const entry of inventory.entries) expect(urls).toContain(`core/runtime/${entry.module}`);
-    expect(LASTRO_SERVER_PROFILES.find((profile) => profile.id === 'lastro-app')).toMatchObject({ availability: 'available', loginAddress: '45.248.8.68', loginPort: 27569, lastroNid: 6 });
+    expect(LASTRO_SERVER_PROFILES.find((profile) => profile.id === 'lastro-app')).toMatchObject({ availability: 'available', loginAddress: 'port.lastro.cn', loginPort: 27569, lastroNid: 6 });
     expect(execFileSync('git', ['ls-files', '--', 'release', 'generated'], { encoding: 'utf8' })).toBe('');
   });
 });

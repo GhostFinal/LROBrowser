@@ -63,6 +63,6 @@ describe('remote server handoff', () => {
     vm.runInContext(init, context);
     const invocation = engine === 'CharEngine' ? 'init({ ip: 16777343, port: 26570 })' : 'init(16777343, 26571, "prontera")';
     expect(() => vm.runInContext(invocation, context)).toThrow(stop.message);
-    expect(connections).toEqual([['45.248.8.68', engine === 'CharEngine' ? 26570 : 26571]]);
+    expect(connections).toEqual([['port.lastro.cn', engine === 'CharEngine' ? 26570 : 26571]]);
   });
 });
