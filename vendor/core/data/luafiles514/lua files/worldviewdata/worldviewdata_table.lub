@@ -812,9 +812,9 @@ worldtable_main = {
   {
     16,
     "nif_fild01.rsw",
-    190,
+    0,
     661,
-    280,
+    90,
     695,
     WORLD_MSGID.MSI_16_NIF_FILD01,
     "105"
@@ -822,9 +822,9 @@ worldtable_main = {
   {
     16,
     "nif_fild02.rsw",
-    190,
+    95,
     661,
-    280,
+    185,
     695,
     WORLD_MSGID.MSI_16_NIF_FILD02,
     "110"

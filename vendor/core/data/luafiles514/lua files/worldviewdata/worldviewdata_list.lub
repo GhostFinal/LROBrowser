@@ -1,48 +1,48 @@
 World_List = {
   {
-    "ä¸­åœŸå¤§é™†",
+    "ÖÐÍÁ´óÂ½",
     "worldtable_main",
     "worldtable_main_Dun",
     "worldmap.jpg"
   },
   {
-    "ä¸­åœŸå¤§é™†åŒ—éƒ¨",
+    "ÖÐÍÁ´óÂ½±±²¿",
     "worldtable_north",
     "worldtable_north_Dun",
     "midgard_north.jpg"
   },
   {
-    "æ¬¡å…ƒå¤§é™†",
+    "´ÎÔª´óÂ½",
     "worldtable_dimensions",
     "worldtable_dimensions_Dun",
     "worldmap_dimension.bmp"
   },
   {
-    "æ¬¡å…ƒè£‚éš™",
+    "´ÎÔªÁÑÏ¶",
     "worldtable_Crack_of_Dimension1",
     "worldtable_Crack_of_Dimension1_Dun",
     "Crack_of_Dimension1.jpg"
   },
   {
-    "å±€éƒ¨åœ°å›¾ 01",
+    "¾Ö²¿µØÍ¼ 01",
     "worldtable_localizing1",
     "worldtable_localizing1_Dun",
     "worldmap_localizing1.bmp"
   },
   {
-    "å±€éƒ¨åœ°å›¾ 02",
+    "¾Ö²¿µØÍ¼ 02",
     "worldtable_localizing2",
     "worldtable_localizing2_Dun",
     "worldmap_localizing2.bmp"
   },
   {
-    "å¤šå…°å²›",
+    "¶àÀ¼µº",
     "worldtable_Doram",
     "worldtable_Doram_Dun",
     "pasta.jpg"
   },
   {
-    "ä¼Šæ–¯åŠ å°”ç‰¹",
+    "ÒÁË¹¼Ó¶ûÌØ",
     "worldtable_Isgard",
     "worldtable_Isgard_Dun",
     "WorldMap_Isgard.jpg"

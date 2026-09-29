@@ -43,7 +43,7 @@ describe('achievement runtime integration', () => {
     const source = await runtimeSource();
     expect(source).toContain('this.achievementID = 0;');
     expect(source).toContain('pkt_buf.writeULong(this.achievementID || this.ach_id);');
-    expect(source).toContain('pkt.achievementID = this.selectedAchId;');
+    expect(source).toContain('pkt.achievementID = claimId;');
   });
 
   it('treats a non-zero official reward ACK result as success', async () => {
@@ -58,15 +58,24 @@ describe('achievement runtime integration', () => {
     expect(source).toContain('return Array.isArray(reward) ? reward[0] : reward;');
     expect(source).toContain('function hasAchievementReward(reward)');
     expect(source).toContain('const reward = getAchievementRewardInfo(info.reward);');
-    expect(source).toContain('const canClaim = hasAchievementReward(info.reward)');
   });
 
   it('renders a visible claim label instead of relying on a background-only image', async () => {
     const source = await runtimeSource();
     expect(source).toContain('>领取奖励</ui-button>');
-    expect(source).toContain('claimBtn.textContent = canClaim ? "领取奖励" : isClaimed ? "已领取" : isCompleted ? "领取奖励" : "未完成";');
-    expect(source).toContain('claimBtn.disabled = !canClaim;');
-    expect(source).toContain('claimBtn.style.display = hasReward ? "flex" : "none";');
+    expect(source).toContain('claimBtn.textContent = "领取奖励";');
+    expect(source).toContain('claimBtn.disabled = false;');
+    expect(source).toContain('const claimId = this.selectedAchId;');
+    expect(source).toContain('if (claimId !== null) {');
+    expect(source).toContain('this.claimingAchId = claimId;');
+    expect(source).toContain('pkt.achievementID = claimId;');
+    expect(source).not.toContain('claimBtn.disabled = !canClaim;');
+    expect(source).not.toContain('const canClaim = hasAchievementReward(info.reward)');
+    expect(source).toContain('claimBtn.style.display = "flex";');
+    expect(source).not.toContain('claimBtn.style.display = info ? "flex" : "none";');
+    expect(source).toContain('root.querySelector(".js-d-claim").style.display = "flex";');
+    expect(source).toContain('.detail-view .d-claim-btn {\\r\\n\\tposition: absolute;\\r\\n\\tbottom: 10px;\\r\\n\\tright: 10px;');
+    expect(source).toContain('\\tleft: auto;\\r\\n\\twidth: 110px;\\r\\n\\theight: 26px;');
     expect(source).toContain('.d-claim-btn:active {\\r\\n\\tbackground: #d8bb70;\\r\\n}\\r\\n\\r\\n/* Scrollbar area */');
     expect(source).not.toContain('#d8bb70;\\r\\n}}\\r\\n\\r\\n/* Scrollbar area */');
   });

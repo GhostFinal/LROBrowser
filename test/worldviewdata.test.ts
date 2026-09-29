@@ -6,7 +6,7 @@ const worldMapDirectory = path.join(
   process.cwd(),
   'vendor/core/data/luafiles514/lua files/worldviewdata',
 );
-const listSource = readFileSync(path.join(worldMapDirectory, 'worldviewdata_list.lub'), 'utf8');
+const listSource = new TextDecoder('gbk').decode(readFileSync(path.join(worldMapDirectory, 'worldviewdata_list.lub')));
 const tableSource = readFileSync(path.join(worldMapDirectory, 'worldviewdata_table.lub'), 'utf8');
 const languageSource = new TextDecoder('gbk').decode(readFileSync(path.join(worldMapDirectory, 'worldviewdata_language.lub')));
 const worldData = JSON.parse(readFileSync('vendor/core/data/world/world-data.json', 'utf8')) as Record<string, { name?: string }>;
@@ -16,6 +16,8 @@ const categories = [...listSource.matchAll(/\{\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s
 const mapIds = new Set([...tableSource.matchAll(/"([a-z0-9_]+)\.rsw"/gi)].map(([, id]) => id!.toLowerCase()));
 const mapRows = [...tableSource.matchAll(/\{\s*\d+\s*,\s*"([a-z0-9_]+)\.rsw"\s*,[\s\S]*?WORLD_MSGID\.(MSI_[A-Za-z0-9_]+)\s*,\s*"[^"]*"\s*\}/g)]
   .map(([, id, key]) => ({ id: id!.toLowerCase(), key: key! }));
+const nifheimRows = [...tableSource.matchAll(/\{\s*16\s*,\s*"(nif(?:lheim|_fild0[12]))\.rsw"\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,/g)]
+  .map(([, id, left, top, right, bottom]) => ({ id, left: Number(left), top: Number(top), right: Number(right), bottom: Number(bottom) }));
 const languageNames = new Map([...languageSource.matchAll(/^\s*(MSI_[A-Za-z0-9_]+)\s*=\s*"([^"]*)"\s*,?\s*$/gm)]
   .map(([, key, name]) => [key, name]));
 
@@ -57,5 +59,18 @@ describe('world map Lua catalog', () => {
 
   it('decodes GBK-encoded Lua labels using the client data charset', () => {
     expect(languageNames.get('MSI_16_NIF_FILD01')).toBe('斯凯领顿 (尼芙菲姆 偏远村落)');
+  });
+
+  it('lays out the Niflheim field maps as separate left-to-right world-map cells', () => {
+    expect(nifheimRows).toEqual([
+      { id: 'niflheim', left: 190, top: 661, right: 280, bottom: 695 },
+      { id: 'nif_fild01', left: 0, top: 661, right: 90, bottom: 695 },
+      { id: 'nif_fild02', left: 95, top: 661, right: 185, bottom: 695 },
+    ]);
+    expect(nifheimRows.map(({ id }) => id).sort()).toEqual(['nif_fild01', 'nif_fild02', 'niflheim'].sort());
+    const orderedRows = [...nifheimRows].sort((left, right) => left.left - right.left);
+    for (let index = 0; index < orderedRows.length - 1; index += 1) {
+      expect(orderedRows[index]!.right).toBeLessThanOrEqual(orderedRows[index + 1]!.left);
+    }
   });
 });

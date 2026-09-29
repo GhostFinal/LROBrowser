@@ -533,9 +533,10 @@ export function patchAchievementClaimButton(source) {
     '.detail-view .d-claim-btn {',
     '\tposition: absolute;',
     '\tbottom: 10px;',
-    '\tleft: 90px;',
-    '\twidth: 148px;',
-    '\theight: 20px;',
+    '\tright: 10px;',
+    '\tleft: auto;',
+    '\twidth: 110px;',
+    '\theight: 26px;',
     '\tdisplay: none;',
     '\talign-items: center;',
     '\tjustify-content: center;',
@@ -569,11 +570,34 @@ export function patchAchievementClaimButton(source) {
     + lineBreak + lineBreak
     + source.slice(scrollbarStart);
 
+  const clickAnchors = [
+    ['const allAch = DB.getAchievementTable();\n          const sessAch =\n            SessionStorage_default.Achievement &&\n            SessionStorage_default.Achievement.list\n              ? SessionStorage_default.Achievement.list\n              : {};\n          const info = allAch[this.selectedAchId];\n          const state = sessAch[this.selectedAchId];\n          const canClaim =\n            this.selectedAchId !== null &&\n            this.claimingAchId !== this.selectedAchId &&\n            hasAchievementReward(info && info.reward) &&\n            !!state &&\n            !!(state.completed || state.Completed) &&\n            !(state.reward || state.rewarded);\n          if (canClaim) {',
+      'const claimId = this.selectedAchId;\n          if (claimId !== null) {'],
+  ];
+  if (count(source, clickAnchors[0][0]) === 1) source = source.replace(clickAnchors[0][0], clickAnchors[0][1]);
+  else if (!source.includes('const claimId = this.selectedAchId;')) fail('anchor:achievement-claim-click');
+  source = source.replace(
+    'this.claimingAchId = this.selectedAchId;\n            const pkt = new PACKET.CZ.REQ_ACH_REWARD();\n            pkt.achievementID = this.selectedAchId;',
+    'this.claimingAchId = claimId;\n            const pkt = new PACKET.CZ.REQ_ACH_REWARD();\n            pkt.achievementID = claimId;',
+  );
+
+  const emptyDetailDisplayAnchor = 'root.querySelector(".js-d-claim").style.display = "none";';
+  if (count(source, emptyDetailDisplayAnchor) === 1) {
+    source = source.replace(
+      emptyDetailDisplayAnchor,
+      'root.querySelector(".js-d-claim").textContent = "领取奖励";\n'
+        + '        root.querySelector(".js-d-claim").disabled = false;\n'
+        + '        root.querySelector(".js-d-claim").style.display = "flex";',
+    );
+  } else if (!source.includes('root.querySelector(".js-d-claim").style.display = "flex";')) {
+    fail('anchor:achievement-claim-empty-detail-display');
+  }
+
   const displayAnchors = [
+    ['const canClaim = hasAchievementReward(info.reward) &&\n        !!s &&\n        !!(s.completed || s.Completed) &&\n        !(s.reward || s.rewarded);\n      claimBtn.textContent = "领取奖励";\n      claimBtn.style.display = canClaim ? "flex" : "none";',
+      'claimBtn.textContent = "领取奖励";\n      claimBtn.disabled = false;\n      claimBtn.style.display = "flex";'],
     ['if (canClaim)\n        claimBtn.style.display = "";\n      else claimBtn.style.display = "none";',
-      'const hasReward = hasAchievementReward(info.reward);\n      const isCompleted = !!(s && (s.completed || s.Completed));\n      const isClaimed = !!(s && (s.reward || s.rewarded));\n      claimBtn.textContent = canClaim ? "领取奖励" : isClaimed ? "已领取" : isCompleted ? "领取奖励" : "未完成";\n      claimBtn.disabled = !canClaim;\n      claimBtn.style.display = hasReward ? "flex" : "none";'],
-    ['claimBtn.textContent = "领取奖励";\n      claimBtn.style.display = canClaim ? "flex" : "none";',
-      'const hasReward = hasAchievementReward(info.reward);\n      const isCompleted = !!(s && (s.completed || s.Completed));\n      const isClaimed = !!(s && (s.reward || s.rewarded));\n      claimBtn.textContent = canClaim ? "领取奖励" : isClaimed ? "已领取" : isCompleted ? "领取奖励" : "未完成";\n      claimBtn.disabled = !canClaim;\n      claimBtn.style.display = hasReward ? "flex" : "none";'],
+      'claimBtn.textContent = "领取奖励";\n      claimBtn.disabled = false;\n      claimBtn.style.display = "flex";'],
   ];
   if (count(source, displayAnchors[0][0]) === 1) source = source.replace(displayAnchors[0][0], displayAnchors[0][1]);
   else if (count(source, displayAnchors[1][0]) === 1) source = source.replace(displayAnchors[1][0], displayAnchors[1][1]);
