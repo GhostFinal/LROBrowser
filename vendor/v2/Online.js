@@ -270402,7 +270402,7 @@ function loadStateIconInfo(basePath, callback, onEnd) {
 function getLuaTableValueCharset(valueTableFilename, fallbackCharset) {
   const normalizedPath = String(valueTableFilename || "").replace(/\\\\/g, "/");
   return /(?:^|\/)addrandomoptionnametable(?:_f)?\.lub$/i.test(normalizedPath)
-    ? "big5"
+    ? "gbk"
     : fallbackCharset;
 }
 function applyLastROPetJobOverrides(jobNames) {

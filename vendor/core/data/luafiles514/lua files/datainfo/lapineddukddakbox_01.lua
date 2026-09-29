@@ -44,7 +44,7 @@ SourceItems = {
 {"SLD_Pyuriel_Card", 1, 27222}, 
 {"SLD_Kades_Card", 1, 27224}, 
 {"SLD_Timeholder_Card", 1, 27225}, 
-{"ºÀÀÎµÈÅ¸¿À±ºÄ«Ä«µå", 1, 4493}}, NeedSource_String = "ÜæìÔñıBoss?ø¸"}, 
+{"ºÀÀÎµÈÅ¸¿À±ºÄ«Ä«µå", 1, 4493}}, NeedSource_String = "·âÓ¡Ö®Boss?Æ¬"}, 
 MagicalShadow_Mix = {ItemID = 100887, NeedCount = 6, NeedRefineMin = 7, NeedRefineMax = 10, 
 SourceItems = {
 {"¸ÅÁöÄÃ¿şÆùS", 1, 24022}, 
@@ -52,7 +52,7 @@ SourceItems = {
 {"¸ÅÁöÄÃÆæ´øÆ®S", 1, 24023}, 
 {"S_Magical_Shoes", 1, 24396}, 
 {"S_Magical_Armor", 1, 24398}, 
-{"S_Magical_Shield", 1, 24397}}, NeedSource_String = "ØªÛöç¯í­??"}, 
+{"S_Magical_Shield", 1, 24397}}, NeedSource_String = "Ä§·¨Ó°×Ó??"}, 
 PhysicalShadow_Mix = {ItemID = 100888, NeedCount = 6, NeedRefineMin = 7, NeedRefineMax = 10, 
 SourceItems = {
 {"ÇÇÁöÄÃ¿şÆùS", 1, 24019}, 
@@ -60,7 +60,7 @@ SourceItems = {
 {"ÇÇÁöÄÃÆæ´øÆ®S", 1, 24020}, 
 {"S_Physical_Shoes", 1, 24393}, 
 {"S_Physical_Armor", 1, 24395}, 
-{"S_Physical_Shield", 1, 24394}}, NeedSource_String = "Úª×âç¯í­??"}, 
+{"S_Physical_Shield", 1, 24394}}, NeedSource_String = "ÎïÀíÓ°×Ó??"}, 
 MajorAutoSpell_Mix = {ItemID = 100783, NeedCount = 6, NeedRefineMin = 7, NeedRefineMax = 10, 
 SourceItems = {
 {"S_AutoSpell_Shoes", 1, 24724}, 
@@ -68,7 +68,7 @@ SourceItems = {
 {"S_AutoSpell_Weapon", 1, 24725}, 
 {"S_AutoSpell_Shield", 1, 24722}, 
 {"S_AutoSpell_Earring", 1, 24727}, 
-{"S_AutoSpell_Pendant", 1, 24726}}, NeedSource_String = "í»??óİç¯í­??"}, 
+{"S_AutoSpell_Pendant", 1, 24726}}, NeedSource_String = "×Ô??³ªÓ°×Ó??"}, 
 AbsorbShadow_Mix = {ItemID = 100691, NeedCount = 5, NeedRefineMin = 7, NeedRefineMax = 10, 
 SourceItems = {
 {"½ºÇÇ¸®Ãò¾ó¿şÆùS", 1, 24078}, 
@@ -78,7 +78,7 @@ SourceItems = {
 {"¸Å¸®¼Å½º¾Æ¸ÓS", 1, 24081}, 
 {"¸Å¸®¼Å½º½´ÁîS", 1, 24082}, 
 {"¸Å¸®¼Å½º½¯µåS", 1, 24083}, 
-{"¸Å¸®¼Å½º¾Æ¸ÓS2", 1, 24325}}, NeedSource_String = "ç¯ñıïñãê??, ç¯í­ıüêó??"}, 
+{"¸Å¸®¼Å½º¾Æ¸ÓS2", 1, 24325}}, NeedSource_String = "Ó°Ö®¾«Éñ??, Ó°×ÓÏ¡ÓĞ??"}, 
 EXPShadow_Mix = {ItemID = 100661, NeedCount = 5, NeedRefineMin = 7, NeedRefineMax = 10, 
 SourceItems = {
 {"ºñ±â³Ê½´ÁîS", 1, 24210}, 
@@ -88,7 +88,7 @@ SourceItems = {
 {"¾îµåº¥½ºµå½´ÁîS", 1, 24214}, 
 {"¾îµåº¥½ºµå½¯µåS", 1, 24215}, 
 {"ÀÍ½ºÆÛÆ®½´ÁîS", 1, 24208}, 
-{"ÀÍ½ºÆÛÆ®½¯µåS", 1, 24209}}, NeedSource_String = "ç¯ñı??"}, 
+{"ÀÍ½ºÆÛÆ®½¯µåS", 1, 24209}}, NeedSource_String = "Ó°Ö®??"}, 
 True_GemShadow_Mix = {ItemID = 100620, NeedCount = 6, NeedRefineMin = 7, NeedRefineMax = 10, 
 SourceItems = {
 {"Áª½ºÅæ½´ÁîS", 1, 24085}, 
@@ -99,7 +99,7 @@ SourceItems = {
 {"Áª½ºÅæ¾Æ¸ÓS", 1, 24084}, 
 {"Áª½ºÅæ¿şÆùS2", 1, 24335}, 
 {"Áª½ºÅæ½¯µåS2", 1, 24336}, 
-{"Áª½ºÅæÀÌ¾î¸µS2", 1, 24322}}, NeedSource_String = "ç¯í­?à´??"}, 
+{"Áª½ºÅæÀÌ¾î¸µS2", 1, 24322}}, NeedSource_String = "Ó°×Ó?Ê¯??"}, 
 Mammoth_Mix = {ItemID = 100621, NeedCount = 6, NeedRefineMin = 7, NeedRefineMax = 10, 
 SourceItems = {
 {"S_Mammoth_Armor", 1, 24669}, 
@@ -107,7 +107,7 @@ SourceItems = {
 {"S_Mammoth_Pendant", 1, 24671}, 
 {"S_Mammoth_Earring", 1, 24672}, 
 {"S_Mammoth_Weapon", 1, 24673}, 
-{"S_Mammoth_Shield", 1, 24674}}, NeedSource_String = "Øí?ç¯í­??"}, 
+{"S_Mammoth_Shield", 1, 24674}}, NeedSource_String = "ÃÍ?Ó°×Ó??"}, 
 Shadow_Mix_Recipe2 = {ItemID = 100600, NeedCount = 3, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"ÇÇÁöÄÃÀÌ¾î¸µS", 1, 24018}, 
@@ -768,7 +768,7 @@ SourceItems = {
 {"S_Clever_Weapon", 1, 24736}, 
 {"S_Clever_Shield", 1, 24737}, 
 {"S_CriticalHit_Weapon", 1, 24738}, 
-{"S_KingbirdAnc_Weapon", 1, 24745}}, NeedSource_String = "ç¯ñı??"}, 
+{"S_KingbirdAnc_Weapon", 1, 24745}}, NeedSource_String = "Ó°Ö®??"}, 
 Illusion_Module_Mix = {ItemID = 100601, NeedCount = 5, NeedRefineMin = 0, NeedRefineMax = 0, 
 SourceItems = {
 {"EP17_1_EVT03", 1, 25670}, 
@@ -806,7 +806,7 @@ SourceItems = {
 {"EP17_1_EVT35", 1, 25702}, 
 {"EP17_1_EVT36", 1, 25703}, 
 {"EP17_1_EVT37", 1, 25704}, 
-{"EP17_1_EVT38", 1, 25705}}, NeedSource_String = "ü³ç¯?Ëì"}, 
+{"EP17_1_EVT38", 1, 25705}}, NeedSource_String = "»ÃÓ°?¼ş"}, 
 FullTempShadow_Mix = {ItemID = 100596, NeedCount = 10, NeedRefineMin = 7, NeedRefineMax = 10, 
 SourceItems = {
 {"ÅÛÆä½ºÆ®½´ÁîS", 1, 24346}, 
@@ -835,7 +835,7 @@ SourceItems = {
 {"S_M_Fis_In_Weapon", 1, 24430}, 
 {"S_M_Sci_Hu_Weapon", 1, 24429}, 
 {"S_M_Viv_Dr_Weapon", 1, 24428}, 
-{"S_M_Exo_Co_Weapon", 1, 24427}}, NeedSource_String = "+7ì¤ß¾ç¯í­??"}, 
+{"S_M_Exo_Co_Weapon", 1, 24427}}, NeedSource_String = "+7ÒÔÉÏÓ°×Ó??"}, 
 Automatic_Module_Mix = {ItemID = 100602, NeedCount = 5, NeedRefineMin = 0, NeedRefineMax = 0, 
 SourceItems = {
 {"EP17_2_NO1", 1, 1000105}, 
@@ -935,7 +935,7 @@ SourceItems = {
 {"EP17_2_EP50", 1, 1000201}, 
 {"EP17_2_EP51", 1, 1000202}, 
 {"EP17_2_RA21", 1, 1000207}, 
-{"EP17_2_UQ12", 1, 1000208}}, NeedSource_String = "îïí»?Ù¼?"}, 
+{"EP17_2_UQ12", 1, 1000208}}, NeedSource_String = "È«×Ô?Ä£?"}, 
 FullPeneShadow_Mix = {ItemID = 100572, NeedCount = 10, NeedRefineMin = 7, NeedRefineMax = 10, 
 SourceItems = {
 {"Æä´ÏÆ®·¹ÀÌ¼Ç½´ÁîS", 1, 24373}, 
@@ -964,70 +964,70 @@ SourceItems = {
 {"S_Fis_In_Weapon", 1, 24435}, 
 {"S_Sci_Hu_Weapon", 1, 24436}, 
 {"S_Viv_Dr_Weapon", 1, 24437}, 
-{"S_Exo_Co_Weapon", 1, 24438}}, NeedSource_String = "+7ì¤ß¾ç¯í­??"}, 
+{"S_Exo_Co_Weapon", 1, 24438}}, NeedSource_String = "+7ÒÔÉÏÓ°×Ó??"}, 
 PendantStoneForWork = {ItemID = 100579, NeedCount = 1, NeedRefineMin = 0, NeedRefineMax = 0, 
 SourceItems = {
-{"Thanatos_Pendant", 1, 490099}}, NeedSource_String = "??öõŞÙ??"}, 
+{"Thanatos_Pendant", 1, 490099}}, NeedSource_String = "??ÍĞË¹??"}, 
 Egirnion_Box = {ItemID = 100468, NeedCount = 1, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"¿¡±â¸£Çï¸§K", 1, 19026}, 
 {"¿¡±â¸£¾Æ¸ÓK", 1, 15138}, 
 {"¿¡±â¸£½´ÁîK", 1, 22059}, 
-{"¿¡±â¸£¸ÁÅäK", 1, 20756}}, NeedSource_String = "äïÑÎÒù???"}, 
+{"¿¡±â¸£¸ÁÅäK", 1, 20756}}, NeedSource_String = "°£¼ªÄá???"}, 
 OneSkyOneSun_Cube = {ItemID = 100402, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"OneSkyOneSun", 1, 28631}}, NeedSource_String = "ìíêÅãê?"}, 
+{"OneSkyOneSun", 1, 28631}}, NeedSource_String = "ÈÕÔÂÉñ?"}, 
 SoulWeight_Cube = {ItemID = 100403, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"SoulWeight", 1, 26154}}, NeedSource_String = "Õáí­?ûëà´"}, 
+{"SoulWeight", 1, 26154}}, NeedSource_String = "Á¿×Ó?»êÊ¯"}, 
 Crimson_Rose_Cube = {ItemID = 100404, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Crimson_Rose", 1, 32302}}, NeedSource_String = "???ñ§?â¢?"}, 
+{"Crimson_Rose", 1, 32302}}, NeedSource_String = "???×ó?ÊÖ?"}, 
 Master_Soul_Rifle_Cube = {ItemID = 100405, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Master_Soul_Rifle", 1, 28255}}, NeedSource_String = "?ûëÓŞ??ÜØ?"}, 
+{"Master_Soul_Rifle", 1, 28255}}, NeedSource_String = "?»ê´ó??¸£?"}, 
 Golden_L_Launcher_Cube = {ItemID = 100406, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Golden_L_Launcher", 1, 28257}}, NeedSource_String = "ÑÑßäíÉŞÍ×´??"}, 
+{"Golden_L_Launcher", 1, 28257}}, NeedSource_String = "½ğÉ«¾ôÊ¿Áñ??"}, 
 The_Black_Gatling_Cube = {ItemID = 100407, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"The_Black_Gatling", 1, 28258}}, NeedSource_String = "øÖ?Ğº"}, 
+{"The_Black_Gatling", 1, 28258}}, NeedSource_String = "²¼?¿Ë"}, 
 Demon_S_Shot_Cube = {ItemID = 100408, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Demon_S_Shot", 1, 28256}}, NeedSource_String = "?ØªÓŞ?îÃ??"}, 
+{"Demon_S_Shot", 1, 28256}}, NeedSource_String = "?Ä§´ó?¾Ñ??"}, 
 MeawFoxtail_Cube = {ItemID = 100399, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"MeawFoxtail", 1, 26155}}, NeedSource_String = "ÙŞ??ûÏÚ­õ®"}, 
+{"MeawFoxtail", 1, 26155}}, NeedSource_String = "Ã¨??ºüÎ²²İ"}, 
 Fog_Dew_Sword_Cube = {ItemID = 100400, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Fog_Dew_Sword", 1, 28764}}, NeedSource_String = "?ÖÚ?"}, 
+{"Fog_Dew_Sword", 1, 28764}}, NeedSource_String = "?Â¶?"}, 
 Humma_Clear_Cube = {ItemID = 100401, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Humma_Clear", 1, 13345}}, NeedSource_String = "?Øª??ñı?Ù¥"}, 
+{"Humma_Clear", 1, 13345}}, NeedSource_String = "?Ä§??Ö®?Ã÷"}, 
 Iron_Nail_K_Cube = {ItemID = 100388, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Iron_Nail_K", 1, 1847}}, NeedSource_String = "Í¯ÓÛçÈê©Ïë÷ß"}, 
+{"Iron_Nail_K", 1, 1847}}, NeedSource_String = "¹Å´úÓ¢ĞÛÈ­Ì×"}, 
 Ray_Knuckle_Cube = {ItemID = 100390, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Ray_Knuckle", 1, 560002}}, NeedSource_String = "ÖôûÛÏë÷ß"}, 
+{"Ray_Knuckle", 1, 560002}}, NeedSource_String = "À×»¢È­Ì×"}, 
 Undine_Spear_K_Cube = {ItemID = 100393, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Undine_Spear_K", 1, 32018}}, NeedSource_String = "â©ïñ?ÜÁİç?ÙÃ"}, 
+{"Undine_Spear_K", 1, 32018}}, NeedSource_String = "Ë®¾«?±£±Ó?Ã¬"}, 
 Light_Blade_Cube = {ItemID = 100394, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Light_Blade", 1, 500003}}, NeedSource_String = "?ÎÃ?"}, 
+{"Light_Blade", 1, 500003}}, NeedSource_String = "?¹â?"}, 
 Iron_Staff_Cube = {ItemID = 100395, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Iron_Staff", 1, 2048}}, NeedSource_String = "?í­îÜéÚù«ü¨"}, 
+{"Iron_Staff", 1, 2048}}, NeedSource_String = "?×ÓµÄÅ£Æ¤Ñ¥"}, 
 Blue_Crystal_Staff_Cube = {ItemID = 100396, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Blue_Crystal_Staff", 1, 640004}}, NeedSource_String = "Í¯ÓÛâ©ïÜñı?Øªíè"}, 
+{"Blue_Crystal_Staff", 1, 640004}}, NeedSource_String = "¹Å´úË®¾§Ö®?Ä§ÕÈ"}, 
 Demon_Hunt_Bible_Cube = {ItemID = 100397, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Demon_Hunting_Bible_K", 1, 28630}}, NeedSource_String = "?Øª?"}, 
+{"Demon_Hunting_Bible_K", 1, 28630}}, NeedSource_String = "?Ä§?"}, 
 Saint_Hall_Cube = {ItemID = 100398, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Saint_Hall", 1, 590003}}, NeedSource_String = "Í¯ÓÛ?îü?÷÷?"}, 
+{"Saint_Hall", 1, 590003}}, NeedSource_String = "¹Å´ú?µî?ÅĞ?"}, 
 EnchantStone_Recipe_3m = {ItemID = 100433, NeedCount = 1, NeedRefineMin = 0, NeedRefineMax = 0, 
 SourceItems = {
 {"C_Pretty_Bear_WH", 1, 31799}, 
@@ -1053,16 +1053,16 @@ SourceItems = {
 {"C_Blinking_Eyes_RD", 1, 31716}}, NeedSource_String = "??"}, 
 Royal_Bow_K_Cube = {ItemID = 100376, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Royal_Bow_K", 1, 18164}}, NeedSource_String = "èİãøÙ£Ïá"}, 
+{"Royal_Bow_K", 1, 18164}}, NeedSource_String = "ÍõÊÒÃû¹­"}, 
 Scalet_Dragon_L_Cube = {ItemID = 100377, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Scalet_Dragon_L_Bow", 1, 700003}}, NeedSource_String = "ûı?ô¾ãıãêÏá"}, 
+{"Scalet_Dragon_L_Bow", 1, 700003}}, NeedSource_String = "»ğ?´©ĞÄÉñ¹­"}, 
 Shadow_Staff_K_Cube = {ItemID = 100378, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Shadow_Staff_K", 1, 26118}}, NeedSource_String = "Í¯ÓÛçÈê©Øªíè"}, 
+{"Shadow_Staff_K", 1, 26118}}, NeedSource_String = "¹Å´úÓ¢ĞÛÄ§ÕÈ"}, 
 Freezing_Rod_Cube = {ItemID = 100379, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Freezing_Rod", 1, 550007}}, NeedSource_String = "ùÎãıÔöíè"}, 
+{"Freezing_Rod", 1, 550007}}, NeedSource_String = "º®ĞÄÌÙÕÈ"}, 
 ["3Lv_9Refine_Weapon_7Gu"] = {ItemID = 100381, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 9, 
 SourceItems = {
 {"ÁøÈ«ÀÇ³ÊÅ¬", 1, 1839}, 
@@ -1081,7 +1081,7 @@ SourceItems = {
 {"ÁøÈ«ÀÇÄ«Å¸¸£", 1, 28007}, 
 {"ÁøÈ«ÀÇÅõÇÚµå¼Òµå", 1, 21015}, 
 {"ÁøÈ«ÀÇÅõÇÚµå¾×½º", 1, 28106}, 
-{"ÁøÈ«ÀÇÇ³¸¶¼ö¸®°Ë", 1, 13327}}, NeedSource_String = "+9 Lv3ÙëĞï"}, 
+{"ÁøÈ«ÀÇÇ³¸¶¼ö¸®°Ë", 1, 13327}}, NeedSource_String = "+9 Lv3ÎäÆ÷"}, 
 ["3Lv_10Refine_Weapon_8Gu"] = {ItemID = 100382, NeedCount = 1, NeedRefineMin = 10, NeedRefineMax = 10, 
 SourceItems = {
 {"ÁøÈ«ÀÇ³ÊÅ¬", 1, 1839}, 
@@ -1100,7 +1100,7 @@ SourceItems = {
 {"ÁøÈ«ÀÇÄ«Å¸¸£", 1, 28007}, 
 {"ÁøÈ«ÀÇÅõÇÚµå¼Òµå", 1, 21015}, 
 {"ÁøÈ«ÀÇÅõÇÚµå¾×½º", 1, 28106}, 
-{"ÁøÈ«ÀÇÇ³¸¶¼ö¸®°Ë", 1, 13327}}, NeedSource_String = "+10 Lv3ÙëĞï"}, 
+{"ÁøÈ«ÀÇÇ³¸¶¼ö¸®°Ë", 1, 13327}}, NeedSource_String = "+10 Lv3ÎäÆ÷"}, 
 ["3Lv_11Refine_Weapon_9Gu"] = {ItemID = 100383, NeedCount = 1, NeedRefineMin = 11, NeedRefineMax = 11, 
 SourceItems = {
 {"ÁøÈ«ÀÇ³ÊÅ¬", 1, 1839}, 
@@ -1119,7 +1119,7 @@ SourceItems = {
 {"ÁøÈ«ÀÇÄ«Å¸¸£", 1, 28007}, 
 {"ÁøÈ«ÀÇÅõÇÚµå¼Òµå", 1, 21015}, 
 {"ÁøÈ«ÀÇÅõÇÚµå¾×½º", 1, 28106}, 
-{"ÁøÈ«ÀÇÇ³¸¶¼ö¸®°Ë", 1, 13327}}, NeedSource_String = "+11 Lv3ÙëĞï"}, 
+{"ÁøÈ«ÀÇÇ³¸¶¼ö¸®°Ë", 1, 13327}}, NeedSource_String = "+11 Lv3ÎäÆ÷"}, 
 ["3Lv_12Refine_Weapon_10G"] = {ItemID = 100384, NeedCount = 1, NeedRefineMin = 12, NeedRefineMax = 12, 
 SourceItems = {
 {"ÁøÈ«ÀÇ³ÊÅ¬", 1, 1839}, 
@@ -1138,7 +1138,7 @@ SourceItems = {
 {"ÁøÈ«ÀÇÄ«Å¸¸£", 1, 28007}, 
 {"ÁøÈ«ÀÇÅõÇÚµå¼Òµå", 1, 21015}, 
 {"ÁøÈ«ÀÇÅõÇÚµå¾×½º", 1, 28106}, 
-{"ÁøÈ«ÀÇÇ³¸¶¼ö¸®°Ë", 1, 13327}}, NeedSource_String = "+12 Lv3ÙëĞï"}, 
+{"ÁøÈ«ÀÇÇ³¸¶¼ö¸®°Ë", 1, 13327}}, NeedSource_String = "+12 Lv3ÎäÆ÷"}, 
 ["4Lv_9Refine_Weapon_8Gu"] = {ItemID = 100385, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 9, 
 SourceItems = {
 {"Å¸³ë½ºÀÇ°Ë", 1, 13441}, 
@@ -1171,7 +1171,7 @@ SourceItems = {
 {"»ç³äÀÇÅõÇÚµå¼Òµå", 1, 21016}, 
 {"»ç³äÀÇÅõÇÚµå¾×½º", 1, 28107}, 
 {"»ç³äÀÇÇ³¸¶¼ö¸®°Ë", 1, 13328}, 
-{"»ç³äÀÇÇÇ½ºÆ®", 1, 1800}}, NeedSource_String = "+9 Lv4ÙëĞï"}, 
+{"»ç³äÀÇÇÇ½ºÆ®", 1, 1800}}, NeedSource_String = "+9 Lv4ÎäÆ÷"}, 
 ["4Lv_10Refine_Weapon_9Gu"] = {ItemID = 100386, NeedCount = 1, NeedRefineMin = 10, NeedRefineMax = 10, 
 SourceItems = {
 {"Å¸³ë½ºÀÇ°Ë", 1, 13441}, 
@@ -1204,7 +1204,7 @@ SourceItems = {
 {"»ç³äÀÇÅõÇÚµå¼Òµå", 1, 21016}, 
 {"»ç³äÀÇÅõÇÚµå¾×½º", 1, 28107}, 
 {"»ç³äÀÇÇ³¸¶¼ö¸®°Ë", 1, 13328}, 
-{"»ç³äÀÇÇÇ½ºÆ®", 1, 1800}}, NeedSource_String = "+10 Lv4ÙëĞï"}, 
+{"»ç³äÀÇÇÇ½ºÆ®", 1, 1800}}, NeedSource_String = "+10 Lv4ÎäÆ÷"}, 
 ["4Lv_11Refine_Weapon_10G"] = {ItemID = 100387, NeedCount = 1, NeedRefineMin = 11, NeedRefineMax = 11, 
 SourceItems = {
 {"Å¸³ë½ºÀÇ°Ë", 1, 13441}, 
@@ -1237,69 +1237,69 @@ SourceItems = {
 {"»ç³äÀÇÅõÇÚµå¼Òµå", 1, 21016}, 
 {"»ç³äÀÇÅõÇÚµå¾×½º", 1, 28107}, 
 {"»ç³äÀÇÇ³¸¶¼ö¸®°Ë", 1, 13328}, 
-{"»ç³äÀÇÇÇ½ºÆ®", 1, 1800}}, NeedSource_String = "+11 Lv4ÙëĞï"}, 
+{"»ç³äÀÇÇÇ½ºÆ®", 1, 1800}}, NeedSource_String = "+11 Lv4ÎäÆ÷"}, 
 Avenger_Cube = {ItemID = 100360, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Avenger", 1, 28130}}, NeedSource_String = "?Îûíº?İ¨"}, 
+{"Avenger", 1, 28130}}, NeedSource_String = "?³ğÕß?¸«"}, 
 Meteor_Striker_Cube = {ItemID = 100361, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Meteor_Striker", 1, 590002}}, NeedSource_String = "×µàøîñ??"}, 
+{"Meteor_Striker", 1, 590002}}, NeedSource_String = "Á÷ĞÇÇ°??"}, 
 Magic_Sword_Cube = {ItemID = 100362, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Magic_Sword", 1, 28744}}, NeedSource_String = "Øª??"}, 
+{"Magic_Sword", 1, 28744}}, NeedSource_String = "Ä§??"}, 
 Fatalist_Cube = {ItemID = 100363, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Fatalist", 1, 510006}}, NeedSource_String = "Í¯ÓÛĞ¾í©?"}, 
+{"Fatalist", 1, 510006}}, NeedSource_String = "¹Å´ú¼¬´Ì?"}, 
 Sword_Of_Bluefire_Cube = {ItemID = 100327, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
 {"Sword_Of_Bluefire", 1, 13485}}, NeedSource_String = "???"}, 
 Slate_Sword_Cube = {ItemID = 100328, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Slate_Sword", 1, 500004}}, NeedSource_String = "à´÷ù??"}, 
+{"Slate_Sword", 1, 500004}}, NeedSource_String = "Ê¯°å??"}, 
 Narcis_Bow_Cube = {ItemID = 100329, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Narcis_Bow", 1, 18170}}, NeedSource_String = "?à¤ŞÙÏá"}, 
+{"Narcis_Bow", 1, 18170}}, NeedSource_String = "?Î÷Ë¹¹­"}, 
 Trumpet_Shell_K_Cube = {ItemID = 100330, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Trumpet_Shell_K", 1, 570002}}, NeedSource_String = "Í¯ÓÛ???îŞ"}, 
+{"Trumpet_Shell_K", 1, 570002}}, NeedSource_String = "¹Å´ú???µÑ"}, 
 Barb_Wire_K_Cube = {ItemID = 100331, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Barb_Wire_K", 1, 580002}}, NeedSource_String = "Óî?ôÓ?ø½"}, 
+{"Barb_Wire_K", 1, 580002}}, NeedSource_String = "µ¹?¼â?±Ş"}, 
 Remodel_Hero_Boots = {ItemID = 100273, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Ancient_Hero_Boots", 1, 22171}}, NeedSource_String = "?Í¯çÈê©ñıü¨"}, 
+{"Ancient_Hero_Boots", 1, 22171}}, NeedSource_String = "?¹ÅÓ¢ĞÛÖ®Ñ¥"}, 
 Oriental_Sword_Cube = {ItemID = 100274, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Oriental_Sword", 1, 21038}}, NeedSource_String = "?Øª?"}, 
+{"Oriental_Sword", 1, 21038}}, NeedSource_String = "?Ä§?"}, 
 Dragonic_Slayer_Cube = {ItemID = 100275, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Dragonic_Slayer", 1, 600004}}, NeedSource_String = "Í¯ÓÛ??Ëİ?"}, 
+{"Dragonic_Slayer", 1, 600004}}, NeedSource_String = "¹Å´ú??¾Ş?"}, 
 Shiver_Katar_K_Cube = {ItemID = 100276, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Shiver_Katar_K", 1, 28039}}, NeedSource_String = "Í¯ÓÛ?×ÊÏëìÓ"}, 
+{"Shiver_Katar_K", 1, 28039}}, NeedSource_String = "¹Å´ú?ÀõÈ­ÈĞ"}, 
 Blade_Katar_Cube = {ItemID = 100277, NeedCount = 1, NeedRefineMin = 9, NeedRefineMax = 20, 
 SourceItems = {
-{"Blade_Katar", 1, 610003}}, NeedSource_String = "Óï??÷²ÏëìÓ"}, 
+{"Blade_Katar", 1, 610003}}, NeedSource_String = "µ¶??ËşÈ­ÈĞ"}, 
 Skill_Sha_M_S_Weapon = {ItemID = 100151, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 50, 25731}, 
-{"Shadowdecon", 50, 25729}}, NeedSource_String = "ç¯ñıÑÑ?, ûÓà´"}, 
+{"Shadowdecon", 50, 25729}}, NeedSource_String = "Ó°Ö®½ğ?, ğ©Ê¯"}, 
 Skill_Sha_M_S_Shield = {ItemID = 100209, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 50, 25731}, 
-{"Shadowdecon", 50, 25729}}, NeedSource_String = "ç¯ñıÑÑ?, ûÓà´"}, 
+{"Shadowdecon", 50, 25729}}, NeedSource_String = "Ó°Ö®½ğ?, ğ©Ê¯"}, 
 Skill_Sha_M_S_Pendant = {ItemID = 100210, NeedCount = 1, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
-{"Shadowdecon", 50, 25729}}, NeedSource_String = "ûÓà´"}, 
+{"Shadowdecon", 50, 25729}}, NeedSource_String = "ğ©Ê¯"}, 
 Skill_Sha_M_S_Earing = {ItemID = 100211, NeedCount = 1, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
-{"Shadowdecon", 50, 25729}}, NeedSource_String = "ûÓà´"}, 
+{"Shadowdecon", 50, 25729}}, NeedSource_String = "ğ©Ê¯"}, 
 Skill_Sha_M_S_Shoes = {ItemID = 100212, NeedCount = 1, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
-{"Zelunium", 50, 25731}}, NeedSource_String = "?ÑÑà´"}, 
+{"Zelunium", 50, 25731}}, NeedSource_String = "?½ğÊ¯"}, 
 Skill_Sha_M_S_Armor = {ItemID = 100213, NeedCount = 1, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
-{"Zelunium", 50, 25731}}, NeedSource_String = "?ÑÑà´"}, 
+{"Zelunium", 50, 25731}}, NeedSource_String = "?½ğÊ¯"}, 
 EnchantStone_Recipe_4m = {ItemID = 100060, NeedCount = 1, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"CÈòÅä³¢ÀÇ±Í", 1, 31139}, 
@@ -1334,12 +1334,12 @@ SourceItems = {
 {"Ä¿·´Æ®¿şÆùS", 1, 24162}, 
 {"¹ÙÀÌºê·¹ÀÌ¼Ç¿şÆùS", 1, 24163}, 
 {"È¦¸®¿öÅÍ¿şÆùS", 1, 24164}, 
-{"½ÃÀú½º¿şÆùS", 1, 24165}}, NeedSource_String = "+7ì¤ß¾îÜç¯í­??"}, 
+{"½ÃÀú½º¿şÆùS", 1, 24165}}, NeedSource_String = "+7ÒÔÉÏµÄÓ°×Ó??"}, 
 Hasty_Mix = {ItemID = 100058, NeedCount = 2, NeedRefineMin = 7, NeedRefineMax = 20, 
 SourceItems = {
 {"ÇìÀÌ½ºÆ¼½´ÁîS2", 1, 24320}, 
 {"ÇìÀÌ½ºÆ¼¾Æ¸ÓS", 1, 24197}, 
-{"ÇìÀÌ½ºÆ¼½´ÁîS", 1, 24196}}, NeedSource_String = "+7ì¤ß¾îÜç¯í­??"}, 
+{"ÇìÀÌ½ºÆ¼½´ÁîS", 1, 24196}}, NeedSource_String = "+7ÒÔÉÏµÄÓ°×Ó??"}, 
 PerfectSize_Mix = {ItemID = 100010, NeedCount = 3, NeedRefineMin = 7, NeedRefineMax = 20, 
 SourceItems = {
 {"ºò¿şÆùS", 1, 24075}, 
@@ -1347,7 +1347,7 @@ SourceItems = {
 {"½º¸ô¿şÆùS", 1, 24077}, 
 {"ºò¾Æ¸ÓS", 1, 24072}, 
 {"¹Ìµğ¿ò¾Æ¸ÓS", 1, 24073}, 
-{"½º¸ô¾Æ¸ÓS", 1, 24074}}, NeedSource_String = "+7ì¤ß¾îÜç¯í­??"}, 
+{"½º¸ô¾Æ¸ÓS", 1, 24074}}, NeedSource_String = "+7ÒÔÉÏµÄÓ°×Ó??"}, 
 MagicPiercing_Mix = {ItemID = 100011, NeedCount = 2, NeedRefineMin = 7, NeedRefineMax = 20, 
 SourceItems = {
 {"¸ÅÁ÷¾×¼­Å¥¼­³Ê¿şÆùS", 1, 24170}, 
@@ -1359,12 +1359,12 @@ SourceItems = {
 {"¸ÅÁ÷Ä¿·´Æ®¿şÆùS", 1, 24176}, 
 {"¸ÅÁ÷¹ÙÀÌºê·¹ÀÌ¼Ç¿şÆùS", 1, 24177}, 
 {"¸ÅÁ÷È¦¸®¿öÅÍ¿şÆùS", 1, 24178}, 
-{"¸ÅÁ÷½ÃÀú½º¿şÆùS", 1, 24179}}, NeedSource_String = "+7ì¤ß¾îÜç¯í­??"}, 
+{"¸ÅÁ÷½ÃÀú½º¿şÆùS", 1, 24179}}, NeedSource_String = "+7ÒÔÉÏµÄÓ°×Ó??"}, 
 IDTest_Special = {ItemID = 100000, NeedCount = 3, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Á©·ÎÇÇ", 1, 909}, 
 {"¼ØÅĞ", 1, 914}, 
-{"´Ü´ÜÇÑ²®Áú", 1, 935}}, NeedSource_String = "Íı?,?Ù¾ûú??"}, 
+{"´Ü´ÜÇÑ²®Áú", 1, 935}}, NeedSource_String = "¹û?,?Ã«ºÍ??"}, 
 EnchantStone_Recipe_9m = {ItemID = 23967, NeedCount = 1, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"CÃ¼ÀÎÆÛÆê", 1, 19960}, 
@@ -1390,151 +1390,151 @@ SourceItems = {
 Bs_Item_M_S_2 = {ItemID = 23818, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 10, 25731}, 
-{"Token_of_OrcGeneral", 150, 25508}}, NeedSource_String = "?ÑÑà´, ?ìÑ??ıÅíñ"}, 
+{"Token_of_OrcGeneral", 150, 25508}}, NeedSource_String = "?½ğÊ¯, ?ÈË??»ÕÕÂ"}, 
 Bs_Item_M_S_8 = {ItemID = 23819, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 10, 25731}, 
-{"¹ßÇÒ¶óÀÇ²É", 150, 7510}}, NeedSource_String = "?ÑÑà´, ÷éùëÕÃîÜü£"}, 
+{"¹ßÇÒ¶óÀÇ²É", 150, 7510}}, NeedSource_String = "?½ğÊ¯, °Í¹şÀ­µÄ»¨"}, 
 Bs_Item_M_S_10 = {ItemID = 23820, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 10, 25731}, 
-{"ºÎ¼­Áø¿Õ°ü", 150, 7754}}, NeedSource_String = "?ÑÑà´, ÷òÖ®îÜèİÎ®"}, 
+{"ºÎ¼­Áø¿Õ°ü", 150, 7754}}, NeedSource_String = "?½ğÊ¯, ÆÆÁÑµÄÍõ¹Ú"}, 
 Bs_Item_M_S_11 = {ItemID = 23821, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 10, 25731}, 
-{"¾î¸Ó´ÏÀÇ¾Ç¸ù", 150, 7020}}, NeedSource_String = "?ÑÑà´, ??ñıà´"}, 
+{"¾î¸Ó´ÏÀÇ¾Ç¸ù", 150, 7020}}, NeedSource_String = "?½ğÊ¯, ??Ö®Ê¯"}, 
 Bs_Item_M_S_34 = {ItemID = 23822, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 10, 25731}, 
-{"ÇØ°ñ°©¿ÊÁ¶°¢", 150, 7450}}, NeedSource_String = "?ÑÑà´, Íéğ¤?Ë£îÜáïø¸"}, 
+{"ÇØ°ñ°©¿ÊÁ¶°¢", 150, 7450}}, NeedSource_String = "?½ğÊ¯, ¹ÇÖÆ?¼×µÄËéÆ¬"}, 
 Bs_Item_M_S_41 = {ItemID = 23823, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 10, 25731}, 
-{"¾î¸Ó´ÏÀÇ¾Ç¸ù", 150, 7020}}, NeedSource_String = "?ÑÑà´, ??ñıà´"}, 
+{"¾î¸Ó´ÏÀÇ¾Ç¸ù", 150, 7020}}, NeedSource_String = "?½ğÊ¯, ??Ö®Ê¯"}, 
 Bs_Item_M_S_42 = {ItemID = 23824, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 10, 25731}, 
-{"ºû³ª´ÂÃ¢³¯", 50, 7109}}, NeedSource_String = "?ÑÑà´, ?ÕÕîÜ??"}, 
+{"ºû³ª´ÂÃ¢³¯", 50, 7109}}, NeedSource_String = "?½ğÊ¯, ?ÁÁµÄ??"}, 
 Bs_Item_M_S_43 = {ItemID = 23825, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 10, 25731}, 
-{"¿À½Ã¸®½ºÀÎÇü", 30, 751}}, NeedSource_String = "?ÑÑà´, ä­ßİ×ìŞÙèßèß"}, 
+{"¿À½Ã¸®½ºÀÎÇü", 30, 751}}, NeedSource_String = "?½ğÊ¯, ¶íÈûÀïË¹ÍŞÍŞ"}, 
 Bs_Item_M_S_44 = {ItemID = 23826, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 10, 25731}, 
-{"°¡¸§ÀÇÀÌ»¡", 120, 7036}}, NeedSource_String = "?ÑÑà´, ??ñıä³"}, 
+{"°¡¸§ÀÇÀÌ»¡", 120, 7036}}, NeedSource_String = "?½ğÊ¯, ??Ö®ÑÀ"}, 
 Bs_Sha_M_S_1 = {ItemID = 23827, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Shadowdecon", 10, 25729}, 
-{"È¸Áß½Ã°è", 50, 7513}}, NeedSource_String = "ç¯í­ãêİúÑÑ?, ?øú"}, 
+{"È¸Áß½Ã°è", 50, 7513}}, NeedSource_String = "Ó°×ÓÉñÃØ½ğ?, ?±í"}, 
 Bs_Sha_M_S_17 = {ItemID = 23828, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Shadowdecon", 10, 25729}, 
-{"¿À½Ã¸®½ºÀÎÇü", 10, 751}}, NeedSource_String = "ç¯í­ãêİúÑÑ?, ä­ßİ×ìŞÙèßèß"}, 
+{"¿À½Ã¸®½ºÀÎÇü", 10, 751}}, NeedSource_String = "Ó°×ÓÉñÃØ½ğ?, ¶íÈûÀïË¹ÍŞÍŞ"}, 
 Bs_Sha_M_S_18 = {ItemID = 23829, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Shadowdecon", 10, 25729}, 
-{"¹ÙÆ÷¸ŞÆ®ÀÎÇü", 10, 750}}, NeedSource_String = "ç¯í­ãêİúÑÑ?, ÷é?÷åèßèß"}, 
+{"¹ÙÆ÷¸ŞÆ®ÀÎÇü", 10, 750}}, NeedSource_String = "Ó°×ÓÉñÃØ½ğ?, °Í?ÌØÍŞÍŞ"}, 
 Bs_Sha_M_S_19 = {ItemID = 23830, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Shadowdecon", 10, 25729}, 
-{"ºû³ª´ÂÃ¢³¯", 50, 7109}}, NeedSource_String = "ç¯í­ãêİúÑÑ?, ?ÕÕîÜ??"}, 
+{"ºû³ª´ÂÃ¢³¯", 50, 7109}}, NeedSource_String = "Ó°×ÓÉñÃØ½ğ?, ?ÁÁµÄ??"}, 
 Bs_Sha_M_S_20 = {ItemID = 23831, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Shadowdecon", 10, 25729}, 
-{"·ÎÅ°ÀÇ¼Ó»èÀÓ", 50, 7019}}, NeedSource_String = "ç¯í­ãêİúÑÑ?, çìØ·ñıßÀ"}, 
+{"·ÎÅ°ÀÇ¼Ó»èÀÓ", 50, 7019}}, NeedSource_String = "Ó°×ÓÉñÃØ½ğ?, °ÁÂıÖ®Ïñ"}, 
 Bs_Item_M_S_4 = {ItemID = 23832, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"¹ÙÆ÷¸ŞÆ®ÀÎÇü", 30, 750}}, NeedSource_String = "?ÑÑà´, ÷é?÷åèßèß"}, 
+{"¹ÙÆ÷¸ŞÆ®ÀÎÇü", 30, 750}}, NeedSource_String = "?½ğÊ¯, °Í?ÌØÍŞÍŞ"}, 
 Bs_Item_M_S_6 = {ItemID = 23833, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"È£¶ûÀÌÀÇ¹ß¹Ù´Ú", 150, 1030}}, NeedSource_String = "?ÑÑà´, ûÛíæ"}, 
+{"È£¶ûÀÌÀÇ¹ß¹Ù´Ú", 150, 1030}}, NeedSource_String = "?½ğÊ¯, »¢ÕÆ"}, 
 Bs_Item_M_S_7 = {ItemID = 23834, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"White_Snake_Tear", 150, 25622}}, NeedSource_String = "?ÑÑà´, ÛÜŞïñı?"}, 
+{"White_Snake_Tear", 150, 25622}}, NeedSource_String = "?½ğÊ¯, °×ÉßÖ®?"}, 
 Bs_Item_M_S_12 = {ItemID = 23835, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"¿ø¼®", 150, 7300}}, NeedSource_String = "?ÑÑà´, ?à´ê«à´"}, 
+{"¿ø¼®", 150, 7300}}, NeedSource_String = "?½ğÊ¯, ?Ê¯Ô­Ê¯"}, 
 Bs_Item_M_S_13 = {ItemID = 23836, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"¾î¸°³ª¹µ°¡Áö", 150, 7018}}, NeedSource_String = "?ÑÑà´, á³?ò«"}, 
+{"¾î¸°³ª¹µ°¡Áö", 150, 7018}}, NeedSource_String = "?½ğÊ¯, Ğ¡?Ö¦"}, 
 Bs_Item_M_S_15 = {ItemID = 23837, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"ÅÂ±ØÆĞ", 150, 7169}}, NeedSource_String = "?ÑÑà´, ÷¼??"}, 
+{"ÅÂ±ØÆĞ", 150, 7169}}, NeedSource_String = "?½ğÊ¯, Ì«??"}, 
 Bs_Item_M_S_28 = {ItemID = 23838, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"¾óÀ½ºñ´Ã", 150, 7562}}, NeedSource_String = "?ÑÑà´, ???ø¸"}, 
+{"¾óÀ½ºñ´Ã", 150, 7562}}, NeedSource_String = "?½ğÊ¯, ???Æ¬"}, 
 Bs_Item_M_S_29 = {ItemID = 23839, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"¿ø¼®", 150, 7300}}, NeedSource_String = "?ÑÑà´, ?à´ê«à´"}, 
+{"¿ø¼®", 150, 7300}}, NeedSource_String = "?½ğÊ¯, ?Ê¯Ô­Ê¯"}, 
 Bs_Item_M_S_31 = {ItemID = 23840, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"°ËºÓÀººñ´ÃÁ¶°¢", 150, 6091}}, NeedSource_String = "?ÑÑà´, ??áïø¸"}, 
+{"°ËºÓÀººñ´ÃÁ¶°¢", 150, 6091}}, NeedSource_String = "?½ğÊ¯, ??ËéÆ¬"}, 
 Bs_Item_M_S_32 = {ItemID = 23841, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"¾î¸Ó´ÏÀÇ¾Ç¸ù", 150, 7020}}, NeedSource_String = "?ÑÑà´, ??ñıà´"}, 
+{"¾î¸Ó´ÏÀÇ¾Ç¸ù", 150, 7020}}, NeedSource_String = "?½ğÊ¯, ??Ö®Ê¯"}, 
 Bs_Item_M_S_33 = {ItemID = 23842, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"ºÎ¼­Áø¿Õ°ü", 150, 7754}}, NeedSource_String = "?ÑÑà´, ÷òÖ®îÜèİÎ®"}, 
+{"ºÎ¼­Áø¿Õ°ü", 150, 7754}}, NeedSource_String = "?½ğÊ¯, ÆÆÁÑµÄÍõ¹Ú"}, 
 Bs_Item_M_S_36 = {ItemID = 23843, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"È£¶ûÀÌÀÇ¹ß¹Ù´Ú", 150, 1030}}, NeedSource_String = "?ÑÑà´, ûÛíæ"}, 
+{"È£¶ûÀÌÀÇ¹ß¹Ù´Ú", 150, 1030}}, NeedSource_String = "?½ğÊ¯, »¢ÕÆ"}, 
 Bs_Item_M_S_37 = {ItemID = 23844, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"·ÎÅ°ÀÇ¼Ó»èÀÓ", 150, 7019}}, NeedSource_String = "?ÑÑà´, çìØ·ñıßÀ"}, 
+{"·ÎÅ°ÀÇ¼Ó»èÀÓ", 150, 7019}}, NeedSource_String = "?½ğÊ¯, °ÁÂıÖ®Ïñ"}, 
 Bs_Item_M_S_38 = {ItemID = 23845, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"È¸Áß½Ã°è", 150, 7513}}, NeedSource_String = "?ÑÑà´, ?øú"}, 
+{"È¸Áß½Ã°è", 150, 7513}}, NeedSource_String = "?½ğÊ¯, ?±í"}, 
 Bs_Item_M_S_39 = {ItemID = 23846, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"ÅõÅºÄ«¸à¸¶½ºÅ©", 150, 7114}}, NeedSource_String = "?ÑÑà´, ÔáÓĞ??ØüÎı"}, 
+{"ÅõÅºÄ«¸à¸¶½ºÅ©", 150, 7114}}, NeedSource_String = "?½ğÊ¯, ¶ÅÌÆ??Ãæ¾ß"}, 
 Bs_Item_M_S_40 = {ItemID = 23847, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"±úÁøÆÄ¶ó¿À»óÂ¡", 150, 7113}}, NeedSource_String = "?ÑÑà´, ÷òáïîÜÛöÖÕèİßÚïÖ"}, 
+{"±úÁøÆÄ¶ó¿À»óÂ¡", 150, 7113}}, NeedSource_String = "?½ğÊ¯, ÆÆËéµÄ·¨ÀÏÍõÏóÕ÷"}, 
 Bs_Item_M_S_45 = {ItemID = 23848, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"°ËºÓÀººñ´ÃÁ¶°¢", 150, 6091}}, NeedSource_String = "?ÑÑà´, ??áïø¸"}, 
+{"°ËºÓÀººñ´ÃÁ¶°¢", 150, 6091}}, NeedSource_String = "?½ğÊ¯, ??ËéÆ¬"}, 
 Bs_Item_M_S_46 = {ItemID = 23849, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"È­·æÀÇºñ´ÃÁ¶°¢", 150, 7451}}, NeedSource_String = "?ÑÑà´, ?ÕªîÜ?ßä??"}, 
+{"È­·æÀÇºñ´ÃÁ¶°¢", 150, 7451}}, NeedSource_String = "?½ğÊ¯, ?ÂäµÄ?É«??"}, 
 Bs_Item_M_S_47 = {ItemID = 23850, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"Konts_Letter", 150, 25629}}, NeedSource_String = "?ÑÑà´, ü£?ï×?"}, 
+{"Konts_Letter", 150, 25629}}, NeedSource_String = "?½ğÊ¯, »¨?Çé?"}, 
 Bs_Item_M_S_48 = {ItemID = 23851, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"¿À½Ã¸®½ºÀÎÇü", 30, 751}}, NeedSource_String = "?ÑÑà´, ä­ßİ×ìŞÙèßèß"}, 
+{"¿À½Ã¸®½ºÀÎÇü", 30, 751}}, NeedSource_String = "?½ğÊ¯, ¶íÈûÀïË¹ÍŞÍŞ"}, 
 Bs_Item_M_S_49 = {ItemID = 23852, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"Token_of_OrcGeneral", 150, 25508}}, NeedSource_String = "?ÑÑà´, ?ìÑ??ıÅíñ"}, 
+{"Token_of_OrcGeneral", 150, 25508}}, NeedSource_String = "?½ğÊ¯, ?ÈË??»ÕÕÂ"}, 
 Bs_Item_M_S_50 = {ItemID = 23853, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"¾î¸°³ª¹µ°¡Áö", 150, 7018}}, NeedSource_String = "?ÑÑà´, á³?ò«"}, 
+{"¾î¸°³ª¹µ°¡Áö", 150, 7018}}, NeedSource_String = "?½ğÊ¯, Ğ¡?Ö¦"}, 
 Bs_Item_M_S_51 = {ItemID = 23894, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Zelunium", 20, 25731}, 
-{"¿©¿ÕÀÇ³¯°³Á¶°¢", 150, 6326}}, NeedSource_String = "?ÑÑà´, Ò³èİîÜãÇÛ¹áïø¸"}, 
+{"¿©¿ÕÀÇ³¯°³Á¶°¢", 150, 6326}}, NeedSource_String = "?½ğÊ¯, Å®ÍõµÄ³á°òËéÆ¬"}, 
 Bs_Sha_M_S_2 = {ItemID = 23854, NeedCount = 2, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Shadowdecon", 20, 25729}, 
@@ -3779,7 +3779,7 @@ SourceItems = {
 {"WanderMinstrel_Middle", 1, 29486},
 {"WanderMinstrel_Bottom", 1, 29487},
 {"WanderMinstrel_Robe", 1, 29488},
-}, NeedSource_String = "İ¾Øªà´"}, 
+}, NeedSource_String = "¸½Ä§Ê¯"}, 
 Enchanted_Stone_Reform_2 = {ItemID = 2001002, NeedCount = 6, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Strength1", 1, 4700},
@@ -4423,7 +4423,7 @@ SourceItems = {
 {"WanderMinstrel_Middle", 1, 29486},
 {"WanderMinstrel_Bottom", 1, 29487},
 {"WanderMinstrel_Robe", 1, 29488},
-}, NeedSource_String = "İ¾Øªà´"}, 
+}, NeedSource_String = "¸½Ä§Ê¯"}, 
 Fashion_Reform_1 = {ItemID = 2001003, NeedCount = 3, NeedRefineMin = 0, NeedRefineMax = 20, 
 SourceItems = {
 {"Ro_Item38", 1, 2140038},

@@ -1,10 +1,10 @@
 --[[
-    GRF Editor [ç‰ˆæœ¬ - 1.8.2.7]  [ç¼–è¯‘ - 1.5.3.3063]
+    GRF Editor [°æ±¾ - 1.8.2.7]  [±àÒë - 1.5.3.3063]
   
-    è¯¥æ–‡ä»¶ç”± GRF Editor åˆ›å»º
+    ¸ÃÎÄ¼şÓÉ GRF Editor ´´½¨
 --______________________________________________________]]
 
--- ä½¿ç”¨ GRF Editor åç¼–è¯‘å™¨ (beta 1.0.4)
+-- Ê¹ÓÃ GRF Editor ·´±àÒëÆ÷ (beta 1.0.4)
 
 SKILL_TREEVIEW_FOR_JOB = {
 	[JOBID.JT_NOVICE] = { [0] = SKID.NV_BASIC, [7] = SKID.NV_FIRSTAID, [14] = SKID.NV_TRICKDEAD },
@@ -1487,13 +1487,13 @@ SKILL_TREEVIEW_FOR_JOB = {
 		[41] = SKID.SS_ANKOKURYUUAKUMU
 	}
 }
-JobSkillTab.ChangeSkillTabName(JOBID.JT_NOVICE, "ç•´åšèƒ¶Â·1ç’æµè¯€", "2ç’Â·å‚ˆé“°æµè¯€", "3ç’æµè¯€", "4ç’æµè¯€")
-JobSkillTab.ChangeSkillTabName(JOBID.JT_NINJA, "NVÂ·EX1", "æƒ‘å›°EX1", "æƒ‘å›°EX2")
-JobSkillTab.ChangeSkillTabName(JOBID.JT_GUNSLINGER, "NVÂ·EX1", "æƒ‘å›°EX1", "æƒ‘å›°EX2")
-JobSkillTab.ChangeSkillTabName(JOBID.JT_SUPERNOVICE, "NVÂ·EX1", "æƒ‘å›°EX1", "æƒ‘å›°EX2")
-JobSkillTab.ChangeSkillTabName(JOBID.JT_TAEKWON, "NVÂ·EX1", "EX2", "æƒ‘å›°EX1", "æƒ‘å›°EX2")
-JobSkillTab.ChangeSkillTabName(JOBID.JT_STAR, "NVÂ·EX1", "EX2", "æƒ‘å›°EX1", "æƒ‘å›°EX2")
-JobSkillTab.ChangeSkillTabName(JOBID.JT_LINKER, "NVÂ·EX1", "EX2", "æƒ‘å›°EX1", "æƒ‘å›°EX2")
-JobSkillTab.ChangeSkillTabName(JOBID.JT_STAR2, "NVÂ·EX1", "EX2", "æƒ‘å›°EX1", "æƒ‘å›°EX2")
-JobSkillTab.ChangeSkillTabName(JOBID.JT_DO_SUMMONER, "æ¡£æ©ç»ƒÂ·å®¶åˆ¸è¤", "å»é£è¤")
-JobSkillTab.ChangeSkillTabName(JOBID.JT_DO_SUMMONER_B, "æ¡£æ©ç»ƒÂ·å®¶åˆ¸è¤", "å»é£è¤")
+JobSkillTab.ChangeSkillTabName(JOBID.JT_NOVICE, "³ëºñ½º¡¤1Â÷Á÷¾÷", "2Â÷¡¤Àü½ÂÁ÷¾÷", "3Â÷Á÷¾÷", "4Â÷Á÷¾÷")
+JobSkillTab.ChangeSkillTabName(JOBID.JT_NINJA, "NV¡¤EX1", "»óÀ§EX1", "»óÀ§EX2")
+JobSkillTab.ChangeSkillTabName(JOBID.JT_GUNSLINGER, "NV¡¤EX1", "»óÀ§EX1", "»óÀ§EX2")
+JobSkillTab.ChangeSkillTabName(JOBID.JT_SUPERNOVICE, "NV¡¤EX1", "»óÀ§EX1", "»óÀ§EX2")
+JobSkillTab.ChangeSkillTabName(JOBID.JT_TAEKWON, "NV¡¤EX1", "EX2", "»óÀ§EX1", "»óÀ§EX2")
+JobSkillTab.ChangeSkillTabName(JOBID.JT_STAR, "NV¡¤EX1", "EX2", "»óÀ§EX1", "»óÀ§EX2")
+JobSkillTab.ChangeSkillTabName(JOBID.JT_LINKER, "NV¡¤EX1", "EX2", "»óÀ§EX1", "»óÀ§EX2")
+JobSkillTab.ChangeSkillTabName(JOBID.JT_STAR2, "NV¡¤EX1", "EX2", "»óÀ§EX1", "»óÀ§EX2")
+JobSkillTab.ChangeSkillTabName(JOBID.JT_DO_SUMMONER, "µµ¶÷Á·¡¤¼ÒÈ¯»ç", "È¥·É»ç")
+JobSkillTab.ChangeSkillTabName(JOBID.JT_DO_SUMMONER_B, "µµ¶÷Á·¡¤¼ÒÈ¯»ç", "È¥·É»ç")
