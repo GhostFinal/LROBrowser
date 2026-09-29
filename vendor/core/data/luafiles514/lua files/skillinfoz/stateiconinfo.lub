@@ -1,29 +1,29 @@
 --[[		
 ===================================================================		
-[羭ㄒ]		
+[舉例]		
 StateIconList[EFST_IDs.EFST_INC_AGI] = 		
 {		
 	haveTimeLimit = 1,	
 	posTimeLimitStr = 3,	
 	descript = 	
 	{	
-		{"硉砃", 255, 255, 0 },
-		{"簿笆のю阑硉糤", },
+		{"加速術", 255, 255, 0 },
+		{"移動及攻擊速度增加", },
 		{"%s", COLOR_TIME },
 	}	
 }		
 		
-1. EFST_IDs.EFST_INC_AGI : BuffIDs ﹚竡 ID		
+1. EFST_IDs.EFST_INC_AGI : BuffIDs 上定義的 ID值		
 		
-[匡拒块]		
-1. haveTimeLimit : 琌Τ戳拜肈? Yes : 1, No : 0 (膀セ借 : 0)		
-2. posTimeLimitStr : descript丁块竚 : 琌璶 Refresh 丁戈癟		
-3. descript : 絬BUFF弧戈癟の肅︹戈癟 (肅︹戈癟 : 0~255 RGB )		
+[選擇輸入值]		
+1. haveTimeLimit : 是否有到期問題? Yes : 1, No : 0 (基本質 : 0)		
+2. 於posTimeLimitStr : descript上的時間輸入位置 : 是為了要 Refresh 時間資訊		
+3. descript : 各線BUFF說明資訊及顏色資訊 (顏色資訊 : 0~255 RGB 值)		
 		
-<才腹陪ボ絋粄よ猭>		
-そずノめ狠块 /EFST [EFSTID], /EFST [EFST腹] 		
-陪ボ才腹薄猵穦陪ボ才腹虑ㄓ絋粄穨薄		
-EFSTID, EFST腹 EFSTIDs.lua 郎い絋粄		
+<符號顯示確認方法>		
+於公司內用戶端輸入 /EFST [EFSTID], /EFST [EFST序號] 時		
+可顯示符號情況下才會顯示符號，可藉此來確認作業情形		
+EFSTID, EFST序號可在 EFSTIDs.lua 檔案中確認		
 ===================================================================		
 --]]		
 			
@@ -42,10 +42,10 @@ StateIconList[EFST_IDs.EFST_OVERTHRUSTMAX] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"た程 (Overthrust Max)", COLOR_TITLE_BUFF },
+		{"凶砍最大值 (Overthrust Max)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟ю阑糤", },
-		{"猌竟瘆胊┦糤", },
+		{"武器攻擊力增加", },
+		{"武器破壞的可能性增加", },
 	}	
 }		
 		
@@ -56,9 +56,9 @@ StateIconList[EFST_IDs.EFST_SUFFRAGIUM] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"碾褐(Suffragium)", COLOR_TITLE_BUFF },
+		{"犧牲祈福(Suffragium)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"碟佰硉", },
+		{"詠唱速度降低", },
 	}	
 }		
 		
@@ -69,10 +69,10 @@ StateIconList[EFST_IDs.EFST_OVERTHRUST] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"た(Over Thrust)", COLOR_TITLE_BUFF },
+		{"凶砍(Over Thrust)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟ю阑糤", },
-		{"猌竟瘆胊┦糤", },
+		{"武器攻擊力增加", },
+		{"武器破壞的可能性增加", },
 	}	
 }		
 		
@@ -81,8 +81,8 @@ StateIconList[EFST_IDs.EFST_AUTOBERSERK] =
 {		
 	descript = 	
 	{	
-		{"╣忌篈 (Auto Berserk)", COLOR_TITLE_BUFF },
-		{"羬薄猵穦极", },
+		{"狂暴狀態 (Auto Berserk)", COLOR_TITLE_BUFF },
+		{"臨死情況時會憤怒", },
 	}	
 }		
 		
@@ -93,10 +93,10 @@ StateIconList[EFST_IDs.EFST_BEYOND_OF_WARCRY] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"驹纙┘狠", COLOR_TITLE_BUFF },
+		{"戰嚎的彼端", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"瞶ю阑矗ど", },
-		{"臸猭ю阑", },
+		{"物理攻擊力提升", },
+		{"魔法攻擊力下降", },
 	}	
 }		
 		
@@ -105,11 +105,11 @@ StateIconList[EFST_IDs.EFST_SWORDREJECT] =
 {		
 	descript = 	
 	{	
-		{"臦活", COLOR_TITLE_BUFF },
-		{"癸癸よ產糃╰猌竟ю阑", },
-		{"(癸癸よ┣┮Τю阑)", },
-		{"ㄌ诀瞯端甡 1/2", },
-		{"逞1/2 吏倒癸よ", },
+		{"霸王魂", COLOR_TITLE_BUFF },
+		{"對於對方玩家劍系武器的攻擊", },
+		{"(對於對方怪物的所有攻擊)", },
+		{"依機率傷害下降為 1/2", },
+		{"剩下1/2 返環給對方", },
 	}	
 }		
 		
@@ -120,10 +120,10 @@ StateIconList[EFST_IDs.EFST_MANU_DEF] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"臸種в", COLOR_TITLE_BUFF },
+		{"魔怒克的意志", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"臸偿綝┣", },
-		{"瞶, 臸猭端甡", },
+		{"於魔怒克原野遭受怪物的", },
+		{"物理, 魔法傷害降低", },
 	}	
 }		
 		
@@ -134,10 +134,10 @@ StateIconList[EFST_IDs.EFST_ENERVATION] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ㄣ : 礚 ", COLOR_TITLE_BUFF },
+		{"面具 : 無力 ", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑", },
-		{"甡俐丁瞴", },
+		{"攻擊力降低", },
+		{"受害瞬間消耗氣球", },
 	}	
 }		
 		
@@ -148,10 +148,10 @@ StateIconList[EFST_IDs.EFST_CONCENTRATION] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"み井籈(Attention concentrate)", COLOR_TITLE_BUFF },
+		{"心神凝聚(Attention concentrate)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"DEX, AGI糤", },
-		{"ㄏノ俐丁祇瞷留旅寄", },
+		{"DEX, AGI增加", },
+		{"使用瞬間可發現隱藏附近的敵人", },
 	}	
 }		
 		
@@ -160,7 +160,7 @@ StateIconList[EFST_IDs.EFST_GRIFFON] =
 {		
 	descript = 	
 	{	
-		{"粪鴏脋穎い", COLOR_TITLE_BUFF },
+		{"獅鷲獸搭乘中", COLOR_TITLE_BUFF },
 	}	
 }		
 		
@@ -171,13 +171,13 @@ StateIconList[EFST_IDs.EFST_GS_MADNESSCANCEL] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"浩╣惩吹贾(Madness Canceler)", COLOR_TITLE_BUFF },
+		{"瘋狂凱斯樂(Madness Canceler)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ATK糤", },
-		{"ю阑硉糤", },
+		{"ATK增加", },
+		{"攻擊速度增加", },
 --		{"ATK +100", },
---		{"ю阑硉 +20%", },
-		{"ぃ簿笆", },
+--		{"攻擊速度 +20%", },
+		{"不可移動", },
 	}	
 }		
 		
@@ -188,12 +188,12 @@ StateIconList[EFST_IDs.EFST_GS_ACCURACY] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"㏑い瞯患糤(Increasing Accuracy)", COLOR_TITLE_BUFF },
+		{"命中率遞增(Increasing Accuracy)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"㏑い瞯糤", },
-		{"DEX糤", },
-		{"AGI糤", },
---		{"㏑い瞯 +20", },
+		{"命中率增加", },
+		{"DEX增加", },
+		{"AGI增加", },
+--		{"命中率 +20", },
 --		{"DEX +4", },
 --		{"AGI +4", },
 	}	
@@ -207,7 +207,7 @@ StateIconList[EFST_IDs.EFST_FOOD_STR] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"STR矗ど", },
+		{"STR提升", },
 	}	
 }		
 		
@@ -218,10 +218,10 @@ StateIconList[EFST_IDs.EFST_HALLUCINATIONWALK] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ほ紇˙ (HALLUCINATIONWALK)", COLOR_TITLE_BUFF },
+		{"幻影步 (HALLUCINATIONWALK)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癹磷瞯矗ど", },
-		{"Τ﹚诀瞯ぃ瞶穦臸猭端甡", },
+		{"迴避率提升", },
+		{"有一定機率不理會魔法傷害", },
 	}	
 }		
 		
@@ -230,10 +230,10 @@ StateIconList[EFST_IDs.EFST_STORMKICK_ON] =
 {		
 	descript = 	
 	{	
-		{"癹臂非称", COLOR_TITLE_BUFF },
-		{"ю阑㏑い寄", },
-		{"ㄌ诀瞯穦蹦癹臂金非称墩", },
---		{"15%诀瞯蹦癹臂金非称墩", },
+		{"迴旋準備", COLOR_TITLE_BUFF },
+		{"攻擊命中敵人時", },
+		{"依機率會採迴旋踢準備姿勢", },
+--		{"以15%機率採迴旋踢準備姿勢", },
 	}	
 }		
 		
@@ -244,9 +244,9 @@ StateIconList[EFST_IDs.EFST_KAUPE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"惩粃共", COLOR_TITLE_BUFF },
+		{"凱誣僕", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄌ诀瞯癹磷寄ю阑", },
+		{"依機率迴避敵人的攻擊", },
 	}	
 }		
 		
@@ -257,9 +257,9 @@ StateIconList[EFST_IDs.EFST_SHIELDSPELL_DEF] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"〨 - ň", COLOR_TITLE_BUFF },
+		{"盾咒 - 防", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄌ礟ň縨τ祇笆臸猭", },
+		{"依盾牌防禦度而發動魔法", },
 	}	
 }		
 		
@@ -270,11 +270,11 @@ StateIconList[EFST_IDs.EFST_WARMER] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"荐竟", COLOR_TITLE_BUFF },
+		{"加熱器", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"秆埃, , 挡篈", },
-		{"ぃ穦い, , 挡", },
-		{"–3確﹚秖 HP", },
+		{"解除冷凍, 冰凍, 結冰狀態", },
+		{"不會中冷凍, 冰凍, 結冰", },
+		{"每3秒可恢復一定量的 HP", },
 	}	
 }		
 		
@@ -285,9 +285,9 @@ StateIconList[EFST_IDs.EFST_PROTECT_MDEF] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"臸猭ň縨媚", COLOR_TITLE_BUFF },
+		{"魔法防禦藥水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"臸猭ю阑瑻┦糤", },
+		{"魔法攻擊耐性增加", },
 	}	
 }		
 		
@@ -298,9 +298,9 @@ StateIconList[EFST_IDs.EFST_STAR_COMFORT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"琍琍キ稰", COLOR_TITLE_BUFF },
+		{"星星的平安感", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑硉矗ど", },
+		{"攻擊速度提升", },
 	}	
 }		
 		
@@ -312,7 +312,7 @@ StateIconList[EFST_IDs.EFST_FOOD_CRITICALSUCCESSVALUE] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"ゲ炳ю阑瞯矗ど", },
+		{"必殺攻擊率提升", },
 	}	
 }		
 		
@@ -324,7 +324,7 @@ StateIconList[EFST_IDs.EFST_PROPERTYTELEKINESIS] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"├妮┦続ノ", },
+		{"念屬性適用", },
 	}	
 }		
 		
@@ -335,11 +335,11 @@ StateIconList[EFST_IDs.EFST_GLOOMYDAY] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"槽┠ぱ紐苳", COLOR_TITLE_BUFF },
+		{"羞怯一天的憂鬱", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"糤疭﹚м端甡", },
---		{"肕ю阑/脸臂阑/阑/癹臂阑/硈尿阑/溃阑", },
-		{"癹磷瞯籔ю阑硉", },
+		{"增加特定技能的傷害", },
+--		{"騎乘攻擊/螺旋擊刺/盾擊/迴旋盾擊/連續盾擊/重壓盾擊", },
+		{"降低迴避率與攻擊速度", },
 	}	
 }		
 		
@@ -350,9 +350,9 @@ StateIconList[EFST_IDs.EFST_SIRCLEOFNATURE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"碻吏礛ぇ", COLOR_TITLE_BUFF },
+		{"循環的大自然之音", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"–﹚秖 SP , 確  HP ", },
+		{"每秒消耗一定量的 SP , 恢復  HP ", },
 	}	
 }		
 		
@@ -363,11 +363,11 @@ StateIconList[EFST_IDs.EFST_DEADLYINFECT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"璓㏑稰琕", COLOR_TITLE_BUFF },
+		{"致命感染", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑┪", },
-		{"ㄓю阑寄", },
-		{"肚琕┮Τ钵盽篈", },
+		{"自己去攻擊或", },
+		{"來攻擊自己的敵人", },
+		{"傳染所有的異常狀態", },
 	}	
 }		
 		
@@ -378,9 +378,9 @@ StateIconList[EFST_IDs.EFST_SYMPHONY_LOVE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{" 攀ユ臫贾", COLOR_TITLE_BUFF },
+		{" 戀人交響樂", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"臸猭ň縨瞯ど", },
+		{"魔法防禦率上升", },
 	}	
 }		
 		
@@ -391,9 +391,9 @@ StateIconList[EFST_IDs.EFST_BANDING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"籈栋", COLOR_TITLE_BUFF },
+		{"聚集", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"籈栋篈", },
+		{"聚集狀態", },
 	}	
 }		
 		
@@ -404,10 +404,10 @@ StateIconList[EFST_IDs.EFST_NJ_BUNSINJYUTSU] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ほ紇だō", COLOR_TITLE_BUFF },
+		{"幻影分身", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癹磷﹚Ω计禯瞒, 环禯瞒瞶ю阑", },
-		{"ぃň縨臸猭ю阑", },
+		{"可迴避一定次數的近距離, 遠距離物理的攻擊", },
+		{"不可防禦魔法攻擊", },
 	}	
 }		
 		
@@ -418,10 +418,10 @@ StateIconList[EFST_IDs.EFST_WUGRIDER] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"肕疶砃 (WUG RIDER)", COLOR_TITLE_BUFF },
+		{"騎狼術 (WUG RIDER)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ぃㄏノ", },
-		{"ㄏノ疶盡妮м", },
+		{"不可使用弓", },
+		{"限使用狼專屬技能", },
 	}	
 }		
 		
@@ -432,9 +432,9 @@ StateIconList[EFST_IDs.EFST_ATKER_BLOOD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"SP 秖搭ぶ媚", COLOR_TITLE_BUFF },
+		{"SP 消耗量減少藥水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄏノм SP 秖", },
+		{"使用技能時 SP 消耗量降低", },
 	}	
 }		
 		
@@ -445,12 +445,12 @@ StateIconList[EFST_IDs.EFST_BODYPAINT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"砰眒酶   ", COLOR_TITLE_BUFF },
+		{"人體彩繪   ", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"秆埃鞍杆篈", },
-		{"ㄌ诀瞯穦祇ネ堵穞", },
-		{"ㄌ诀瞯ю阑硉", },
---		{"ㄌ诀瞯ю阑硉 25%", },
+		{"解除偽裝狀態", },
+		{"依機率會發生黑暗", },
+		{"依機率攻擊速度降低", },
+--		{"依機率攻擊速度降低 25%", },
 	}	
 }		
 		
@@ -461,11 +461,11 @@ StateIconList[EFST_IDs.EFST_NJ_UTSUSEMI] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"峦叉催", COLOR_TITLE_BUFF },
+		{"金蟬脫殼", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癹磷﹚Ω计ю阑", },
---		{"ㄌ单ぃτΤ 1/1/2/2/3Ω", },
-		{"绰ю阑はよ簿笆", },
+		{"可迴避一定次數的攻擊", },
+--		{"依等級不同而有 1/1/2/2/3次", },
+		{"朝攻擊者的反方向移動", },
 	}	
 }		
 		
@@ -476,9 +476,9 @@ StateIconList[EFST_IDs.EFST_POISONINGWEAPON] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"粿瑀猌竟 (POISONING WEAPON )", COLOR_TITLE_BUFF },
+		{"劇毒武器 (POISONING WEAPON )", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑ヘ夹琁额瑀猌竟瑀狦", },
+		{"攻擊時向目標施以塗毒武器的毒效果", },
 	}	
 }		
 		
@@ -490,7 +490,7 @@ StateIconList[EFST_IDs.EFST_CASH_DEATHPENALTY] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"竒喷ぃ穦穕ア", },
+		{"死亡時經驗值不會損失", },
 	}	
 }		
 		
@@ -501,14 +501,14 @@ StateIconList[EFST_IDs.EFST_GS_ADJUSTMENT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"沧伐皗跟(Adjustment)", COLOR_TITLE_BUFF },
+		{"終極閃躲(Adjustment)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"㏑い瞯", },
-		{"癹磷瞯糤", },
-		{"ㄓ环禯瞒瞶ю阑端甡", },
---		{"㏑い瞯 -30", },
---		{"癹磷瞯 +30", },
---		{"ㄓ环禯瞒瞶ю阑端甡 20%", },
+		{"命中率降低", },
+		{"迴避率增加", },
+		{"來自遠距離物理攻擊的傷害降低", },
+--		{"命中率 -30", },
+--		{"迴避率 +30", },
+--		{"來自遠距離物理攻擊的傷害降低 20%", },
 	}	
 }		
 		
@@ -519,12 +519,12 @@ StateIconList[EFST_IDs.EFST_AUTOSPELL] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"笆├〨 (Auto Spell)", COLOR_TITLE_BUFF },
+		{"自動念咒 (Auto Spell)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑いㄌ诀瞯", },
-		{"┮匡мぃ惠碟佰钡琁", },
-		{"SP ㄏノ 2/3", },
-		{"SP ぃì礚猭祇笆м", },
+		{"一般攻擊中依機率", },
+		{"所選的技能不需詠唱可直接施放", },
+		{"SP 消耗為一般使用時的 2/3", },
+		{"SP 不足時無法發動技能", },
 	}	
 }		
 		
@@ -535,10 +535,10 @@ StateIconList[EFST_IDs.EFST_DEC_AGI] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"庇倍(Decrease agility)", COLOR_TITLE_BUFF },
+		{"敏捷降低(Decrease agility)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"簿笆硉", },
-		{"ю阑硉", },
+		{"移動速度降低", },
+		{"攻擊速度降低", },
 	}	
 }		
 		
@@ -549,9 +549,9 @@ StateIconList[EFST_IDs.EFST_NOEQUIPWEAPON] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"埃猌竟", COLOR_TITLE_BUFF },
+		{"卸除武器", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"礚猭杆竚猌竟", },
+		{"無法裝置武器", },
 	}	
 }		
 		
@@ -562,9 +562,9 @@ StateIconList[EFST_IDs.EFST_SHIELDSPELL_MDEF] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"〨 - 臸", COLOR_TITLE_BUFF },
+		{"盾咒 - 魔", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄌ礟臸猭ň縨τ祇笆臸猭", },
+		{"依盾牌魔法防禦值而發動魔法", },
 	}	
 }		
 		
@@ -575,9 +575,9 @@ StateIconList[EFST_IDs.EFST_AUTOGUARD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"笆ň縨 (Auto Guard)", COLOR_TITLE_BUFF },
+		{"自動防禦 (Auto Guard)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"禯瞒, 环禯瞒瞶ю阑ㄌ﹚诀瞯咀", },
+		{"近距離, 遠距離物理攻擊依一定機率阻擋", },
 	}	
 }		
 		
@@ -588,9 +588,9 @@ StateIconList[EFST_IDs.EFST_TAROTCARD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"㏑笲娥霉礟 (Tarot Card of Fate)", COLOR_TITLE_BUFF },
+		{"命運的塔羅牌 (Tarot Card of Fate)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸寄结ぉ14贺ぇ狦", },
+		{"對敵人賦予14種卡片之一的效果", },
 	}	
 }		
 		
@@ -601,10 +601,10 @@ StateIconList[EFST_IDs.EFST_FEARBREEZE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"稬倪 (FEAR BREEZE)", COLOR_TITLE_BUFF },
+		{"微風恐懼 (FEAR BREEZE)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑ㄌ诀瞯", },
-		{"肂祇笆ю阑", },
+		{"弓攻擊時依機率", },
+		{"額外發動攻擊", },
 	}	
 }		
 		
@@ -615,9 +615,9 @@ StateIconList[EFST_IDs.EFST_GN_CARTBOOST] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"も崩ó硉", COLOR_TITLE_BUFF },
+		{"手推車加速", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"杆竚も崩ó硉糤", },
+		{"裝置手推車時速度增加", },
 	}	
 }		
 		
@@ -628,9 +628,9 @@ StateIconList[EFST_IDs.EFST_SHIELDSPELL_REF] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"〨 - 铃", COLOR_TITLE_BUFF },
+		{"盾咒 - 鍊", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄌ礟弘絤τ祇笆臸猭", },
+		{"依盾牌精練值而發動魔法", },
 	}	
 }		
 		
@@ -642,7 +642,7 @@ StateIconList[EFST_IDs.EFST_FOOD_INT_CASH] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"INT矗ど", },
+		{"INT提升", },
 	}	
 }		
 		
@@ -653,9 +653,9 @@ StateIconList[EFST_IDs.EFST_NOEQUIPSHIELD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"埃礟", COLOR_TITLE_DEBUFF },
+		{"卸除盾牌", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ杆竚礟", },
+		{"不可裝置盾牌", },
 	}	
 }		
 		
@@ -666,12 +666,12 @@ StateIconList[EFST_IDs.EFST_MELTDOWN] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"偿芞た (Meltdown)", COLOR_TITLE_BUFF },
+		{"野蠻凶砍 (Meltdown)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"讽ю阑產", },
-		{"Τ﹚诀瞯穦瘆胊產猌竟┪ňㄣ", },
-		{"ю阑┣", },
-		{"穦┣ю阑┪ň縨瞯", },
+		{"當攻擊玩家時", },
+		{"有一定機率會破壞玩家的武器或防具", },
+		{"攻擊怪物時", },
+		{"會降低怪物的攻擊力或防禦率", },
 	}	
 }		
 		
@@ -682,10 +682,10 @@ StateIconList[EFST_IDs.EFST_QUAGMIRE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"猟猦(Quagmire)", COLOR_TITLE_DEBUFF },
+		{"泥沼地(Quagmire)", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"簿笆硉", },
-		{"AGI, DEX", },
+		{"移動速度降低", },
+		{"AGI, DEX降低", },
 	}	
 }		
 		
@@ -696,10 +696,10 @@ StateIconList[EFST_IDs.EFST_KAIZEL] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"惩", COLOR_TITLE_BUFF },
+		{"凱易哲", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"碟佰丁ぃ穦DEX紇臫", },
-		{"ミ確, 蝴 2", },
+		{"詠唱時間不會受DEX的影響", },
+		{"死亡時立即復活, 維持 2秒長度", },
 	}	
 }		
 		
@@ -710,10 +710,10 @@ StateIconList[EFST_IDs.EFST_CR_SHRINK] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"癶罽(Shrink)", COLOR_TITLE_BUFF },
+		{"退縮(Shrink)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"笆ň縨мㄓň縨", },
-		{"ㄌ诀瞯ㄓ崩秨癸よ", },
+		{"以自動防禦技能來防禦時", },
+		{"依機率來推開對方", },
 	}	
 }		
 		
@@ -725,7 +725,7 @@ StateIconList[EFST_IDs.EFST_FOOD_VIT] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"VIT矗ど", },
+		{"VIT提升", },
 	}	
 }		
 		
@@ -736,9 +736,9 @@ StateIconList[EFST_IDs.EFST_PARRYING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"蛮糃屋咀 (Parrying)", COLOR_TITLE_BUFF },
+		{"雙劍挌擋 (Parrying)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄌ诀瞯ㄓ咀癸よю阑", },
+		{"依機率以刀來阻擋對方的攻擊", },
 	}	
 }		
 		
@@ -749,9 +749,9 @@ StateIconList[EFST_IDs.EFST_PROTECTWEAPON] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"て厩猌竟玂臔 (Chemical Protection Weapon)", COLOR_TITLE_BUFF },
+		{"化學武器保護 (Chemical Protection Weapon)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟荡ぃ穦穕", },
+		{"武器絕不會受損", },
 	}	
 }		
 		
@@ -763,7 +763,7 @@ StateIconList[EFST_IDs.EFST_FOOD_AGI] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"AGI矗ど", },
+		{"AGI提升", },
 	}	
 }		
 		
@@ -774,10 +774,10 @@ StateIconList[EFST_IDs.EFST_INC_AGI] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"硉砃(Increase agility)", COLOR_TITLE_BUFF },
+		{"加速術(Increase agility)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"簿笆硉糤", },
-		{"ю阑硉糤", },
+		{"移動速度增加", },
+		{"攻擊速度增加", },
 	}	
 }		
 		
@@ -788,9 +788,9 @@ StateIconList[EFST_IDs.EFST_SHOUT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"羘驰", COLOR_TITLE_BUFF },
+		{"大聲吶喊", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"STR糤", },
+		{"STR增加", },
 --		{"STR +4", },
 	}	
 }		
@@ -803,8 +803,8 @@ StateIconList[EFST_IDs.EFST_CASH_RECEIVEITEM] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"ゴ┣", },
-		{"膀セ奔腳瞯糤2", },
+		{"打怪時", },
+		{"基本掉寶率增加2倍", },
 	}	
 }		
 		
@@ -815,10 +815,10 @@ StateIconList[EFST_IDs.EFST_SPL_DEF] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"緗┰籩骆", COLOR_TITLE_BUFF },
+		{"魯修拉的蜜醬", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"綝猧Ё腞偿┣", },
-		{"瞶, 臸猭端甡穦", },
+		{"遭受史波浪壯麗原野怪物的", },
+		{"物理, 魔法傷害會降低", },
 	}	
 }		
 		
@@ -829,11 +829,11 @@ StateIconList[EFST_IDs.EFST_ILLUSION] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ほ谋", COLOR_TITLE_DEBUFF },
+		{"幻覺", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"礶пΡ", },
-		{"端甡夹ボ钵盽", },
-		{"圾祑τい耞碟佰", },
+		{"畫面扭曲", },
+		{"傷害標示異常", },
+		{"因僵硬而中斷詠唱", },
 	}	
 }		
 		
@@ -844,9 +844,9 @@ StateIconList[EFST_IDs.EFST_HOVERING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"腶氨", COLOR_TITLE_BUFF },
+		{"懸停", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ炒ɡ┪场だヘ夹臸猭狦", },
+		{"不受陷阱或部分地面目標魔法的效果", },
 	}	
 }		
 		
@@ -859,7 +859,7 @@ StateIconList[EFST_IDs.EFST_BENEDICTIO] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"结ぉňㄣ竧妮┦", },
+		{"賦予防具聖屬性", },
 	}	
 }		
 		
@@ -870,10 +870,10 @@ StateIconList[EFST_IDs.EFST_WEAPONBLOCKING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"猌竟╄縨 (WEAPON BLOCKING)", COLOR_TITLE_BUFF },
+		{"武器抵禦 (WEAPON BLOCKING)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"綝ō瞶ю阑", },
-		{"ㄌ诀瞯端甡Ч礚", },
+		{"遭受近身物理攻擊時", },
+		{"依機率傷害完全無效", },
 	}	
 }		
 		
@@ -884,9 +884,9 @@ StateIconList[EFST_IDs.EFST_ANGELUS] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ぱㄏぇ毁纠(Angelus)", COLOR_TITLE_BUFF },
+		{"天使之障壁(Angelus)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ň縨瞯糤", },
+		{"防禦率增加", },
 	}	
 }		
 		
@@ -897,10 +897,10 @@ StateIconList[EFST_IDs.EFST_MARSHOFABYSS] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"瞏瞁猦  (MARSH OF ABYSS)", COLOR_TITLE_BUFF },
+		{"深淵沼地  (MARSH OF ABYSS)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"簿笆硉", },
-		{"ň縨瞯, 癹磷瞯", },
+		{"移動速度降低", },
+		{"防禦率, 迴避率降低", },
 	}	
 }		
 		
@@ -911,11 +911,11 @@ StateIconList[EFST_IDs.EFST_STEALTHFIELD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"留初", COLOR_TITLE_BUFF },
+		{"隱形力場", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"盢㏄瞅场ヘ夹跑Θ鞍杆篈", },
-		{"穦尿綪 SP", },
-		{"簿笆硉", },
+		{"將周圍的全部目標變成偽裝狀態", },
+		{"會持續銷耗 SP", },
+		{"移動速度降低", },
 	}	
 }		
 		
@@ -926,9 +926,9 @@ StateIconList[EFST_IDs.EFST_ADRENALINE2] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"┮Τ硉縀祇", COLOR_TITLE_BUFF },
+		{"所有速度激發", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟ю阑硉糤", },
+		{"弓以外的武器攻擊速度增加", },
 	}	
 }		
 		
@@ -939,10 +939,10 @@ StateIconList[EFST_IDs.EFST_MANU_MATK] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"臸獺├", COLOR_TITLE_BUFF },
+		{"魔怒克的信念", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸臸偿跋┣", },
-		{"臸猭ю阑端甡穦糤", },
+		{"對魔怒克原野地區的怪物", },
+		{"魔法攻擊傷害會增加", },
 	}	
 }		
 		
@@ -953,9 +953,9 @@ StateIconList[EFST_IDs.EFST_NOEQUIPARMOR] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"埃馴ヒ", COLOR_TITLE_DEBUFF },
+		{"卸除鎧甲", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"礚猭杆竚馴ヒ", },
+		{"無法裝置鎧甲", },
 	}	
 }		
 		
@@ -964,9 +964,9 @@ StateIconList[EFST_IDs.EFST_ENERGYCOAT] =
 {		
 	descript = 	
 	{	
-		{"秖甅 (Energy Coat)", COLOR_TITLE_BUFF },
-		{"ゑ酚ヘ玡 SP 秖", },
-		{"ㄓ寄端甡", },
+		{"能量外套 (Energy Coat)", COLOR_TITLE_BUFF },
+		{"比照目前的 SP 量", },
+		{"降低來自敵人的傷害", },
 	}	
 }		
 		
@@ -977,12 +977,12 @@ StateIconList[EFST_IDs.EFST_RENOVATIO] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"瞓て (RENOVATIO)", COLOR_TITLE_BUFF },
+		{"淨化 (RENOVATIO)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"–5確﹚秖  HP ", },
---		{"–5確 3% HP", },
-		{"ぃ╰┣ㄏノ", },
-		{"ㄌ琁甶单τ硑Θ﹚端甡", },
+		{"每5秒可恢復一定量的  HP ", },
+--		{"每5秒可恢復 3% HP", },
+		{"向不死系怪物使用時", },
+		{"依施展者的等級而造成一定的傷害", },
 	}	
 }		
 		
@@ -993,10 +993,10 @@ StateIconList[EFST_IDs.EFST_HIDING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"留拔(Hiding)", COLOR_TITLE_BUFF },
+		{"隱匿(Hiding)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"苝┏癹磷寄ю阑", },
-		{"穦砆寄贝代мτ祇瞷", },
+		{"鑽入地底以迴避敵人的攻擊", },
+		{"會被敵人的探測技能而發現", },
 	}	
 }		
 		
@@ -1005,8 +1005,8 @@ StateIconList[EFST_IDs.EFST_WEIGHTOVER50] =
 {		
 	descript = 	
 	{	
-		{"秖 50% ", COLOR_TITLE_DEBUFF },
-		{"HP, SP ぃ礛確", },
+		{"重量 50% 以上", COLOR_TITLE_DEBUFF },
+		{"HP, SP 不可自然恢復", },
 	}	
 }		
 		
@@ -1017,14 +1017,14 @@ StateIconList[EFST_IDs.EFST_STRUP] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"侥", COLOR_TITLE_BUFF },
+		{"衝刺", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"STR糤", },
+		{"STR增加", },
 --		{"STR +10", },
-		{"猌竟ゼ杆竚", },
-		{"ㄌ禲˙单τ糤ю阑", },
---		{"ㄌ禲˙单", },
---		{"τю阑–糤 10", },
+		{"武器未裝置時", },
+		{"依跑步等級而增加攻擊力", },
+--		{"依跑步等級", },
+--		{"而攻擊力每增加 10", },
 	}	
 }		
 		
@@ -1035,9 +1035,9 @@ StateIconList[EFST_IDs.EFST_NOEQUIPHELM] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"埃繷帛", COLOR_TITLE_DEBUFF },
+		{"卸除頭盔", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ杆竚繷帛", },
+		{"不可裝置頭盔", },
 	}	
 }		
 		
@@ -1048,10 +1048,10 @@ StateIconList[EFST_IDs.EFST_ATTHASTE_POTION3] =
 	posTimeLimitStr = 1,	
 	descript = 	
 	{	
---		{"翟︹媚, 瑀媚瞺", COLOR_TITLE_BUFF },
---		╣ぇ簀, 瑀媚瞺ㄏノ肈ヘ称爹矪瞶 
+--		{"菠色克藥水, 毒藥瓶", COLOR_TITLE_BUFF },
+--		狂怒之槍, 毒藥瓶同時使用的題目以備註處理 
 		{"%s", COLOR_TIME },
-		{"ю阑硉糤", },
+		{"攻擊速度增加", },
 	}	
 }		
 		
@@ -1062,11 +1062,11 @@ StateIconList[EFST_IDs.EFST_ENDURE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"臦砰(Endure)", COLOR_TITLE_BUFF },
+		{"霸體(Endure)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄏ砆ю阑ご簿笆┪ю阑", },
-		{"砆ю阑﹚Ω计秆埃篈", },
---		{"砆ю阑 7Ω秆埃篈", },
+		{"即使被攻擊時仍可移動或攻擊", },
+		{"被攻擊一定次數以上時解除狀態", },
+--		{"被攻擊 7次以上時解除狀態", },
 	}	
 }		
 		
@@ -1075,10 +1075,10 @@ StateIconList[EFST_IDs.EFST_TURNKICK_ON] =
 {		
 	descript = 	
 	{	
-		{"金非称", COLOR_TITLE_BUFF },
-		{"ю阑㏑い寄", },
-		{"ㄌ诀瞯锣ō金非称墩", },
---		{"15% 诀瞯蹦锣ō金非称墩", },
+		{"踢準備", COLOR_TITLE_BUFF },
+		{"攻擊命中敵人時", },
+		{"依機率轉身踢準備姿勢", },
+--		{"以15% 機率採轉身踢準備姿勢", },
 	}	
 }		
 		
@@ -1089,9 +1089,9 @@ StateIconList[EFST_IDs.EFST_ENCHANTPOISON] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"额瑀(Enchant Poison)", COLOR_TITLE_BUFF },
+		{"塗毒(Enchant Poison)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"结ぉ猌竟瑀妮┦", },
+		{"賦予武器毒屬性", },
 	}	
 }		
 		
@@ -1102,10 +1102,10 @@ StateIconList[EFST_IDs.EFST_SPL_ATK] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"挛曰Н狦骆", COLOR_TITLE_BUFF },
+		{"捕蟲堇妖果醬", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸猧Ё腞偿┣", },
-		{"糤ю阑端甡", },
+		{"對史波浪壯麗原野的怪物", },
+		{"增加攻擊傷害", },
 	}	
 }		
 		
@@ -1116,10 +1116,10 @@ StateIconList[EFST_IDs.EFST_BLESSING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ぱㄏぇ界褐(Blessing)", COLOR_TITLE_BUFF },
+		{"天使之賜福(Blessing)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"DEX, INT, STR糤", },
-		{"ㄏノ眖禔〨┪ホて篈確", },
+		{"DEX, INT, STR增加", },
+		{"使用後可從詛咒或石化狀態恢復", },
 	}	
 }		
 		
@@ -1130,9 +1130,9 @@ StateIconList[EFST_IDs.EFST_ONEHANDQUICKEN] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"虫も糃ю阑硉糤", COLOR_TITLE_BUFF },
+		{"單手劍攻擊速度增加", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄏノ虫も糃糤ю阑硉", },
+		{"使用單手劍時增加攻擊速度", },
 	}	
 }		
 		
@@ -1143,12 +1143,12 @@ StateIconList[EFST_IDs.EFST_SPEARQUICKEN] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ベ硉砃 (Spear Quicken)", COLOR_TITLE_BUFF },
+		{"長矛加速術 (Spear Quicken)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄏノ簀", },
-		{"ю阑硉糤", },
-		{"ゲ炳ю阑糤", },
-		{"癹磷瞯糤", },
+		{"使用槍時", },
+		{"攻擊速度增加", },
+		{"必殺攻擊力增加", },
+		{"迴避率增加", },
 	}	
 }		
 		
@@ -1157,7 +1157,7 @@ StateIconList[EFST_IDs.EFST_BROKENWEAPON] =
 {		
 	descript = 	
 	{	
-		{"猌竟瘆胊", COLOR_TITLE_DEBUFF },
+		{"武器破壞", COLOR_TITLE_DEBUFF },
 	}	
 }		
 		
@@ -1168,9 +1168,9 @@ StateIconList[EFST_IDs.EFST_ASSUMPTIO] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"竧ダぇ褐 (Assumptio)", COLOR_TITLE_BUFF },
+		{"聖母之祈福 (Assumptio)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ň縨瞯糤", },
+		{"防禦率增加", },
 	}	
 }		
 		
@@ -1181,10 +1181,10 @@ StateIconList[EFST_IDs.EFST_MAXIMIZE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"猌竟程て(Maximize Power)", COLOR_TITLE_BUFF },
+		{"武器值最大化(Maximize Power)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ま猌竟程┦", },
-		{"尿綪 SP", },
+		{"引出武器的最大性能", },
+		{"持續銷耗 SP", },
 	}	
 }		
 		
@@ -1195,10 +1195,10 @@ StateIconList[EFST_IDs.EFST_LG_REFLECTDAMAGE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"は甮端甡", COLOR_TITLE_BUFF },
+		{"反射傷害", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"盢綝瞶/臸猭端甡场だは甮㏄瞅", },
-		{"–﹚秖 SP ", },
+		{"將遭受的物理/魔法傷害的一部分反射到周圍", },
+		{"每秒消耗一定量的 SP ", },
 	}	
 }		
 		
@@ -1209,9 +1209,9 @@ StateIconList[EFST_IDs.EFST_PROTECTSHIELD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"て厩礟玂臔(Chemical Protection Shield)", COLOR_TITLE_BUFF },
+		{"化學盾牌保護(Chemical Protection Shield)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"礟荡癸ぃ穦穕胊", },
+		{"盾牌絕對不會損壞", },
 	}	
 }		
 		
@@ -1222,9 +1222,9 @@ StateIconList[EFST_IDs.EFST_MAGNIFICAT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"竧ダぇ箌簈(Magnificat)", COLOR_TITLE_BUFF },
+		{"聖母之頌歌(Magnificat)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"SP 確硉矗ど", },
+		{"SP 恢復速度提升", },
 	}	
 }		
 		
@@ -1235,9 +1235,9 @@ StateIconList[EFST_IDs.EFST_ATTHASTE_POTION1] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"栋い媚", COLOR_TITLE_BUFF },
+		{"集中藥水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑硉糤", },
+		{"攻擊速度增加", },
 	}	
 }		
 		
@@ -1248,11 +1248,11 @@ StateIconList[EFST_IDs.EFST_POISONREACT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"瑀┦は紆(Poison React)", COLOR_TITLE_BUFF },
+		{"毒性反彈(Poison React)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"は甮瑀妮┦ю阑", },
-		{"綝ю阑端甡", },
-		{"癸よㄏノ琁瑀м", },
+		{"反射毒屬性的攻擊", },
+		{"遭受一般攻擊的傷害時", },
+		{"向對方使用施毒技", },
 	}	
 }		
 		
@@ -1263,9 +1263,9 @@ StateIconList[EFST_IDs.EFST_MOVHASTE_HORSE] =
 	posTimeLimitStr = 1,	
 	descript = 	
 	{	
---		{"服诡咎靡", COLOR_TITLE_BUFF },
+--		{"督察憑證", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"簿笆硉糤", },
+		{"移動速度增加", },
 	}	
 }		
 		
@@ -1274,9 +1274,9 @@ StateIconList[EFST_IDs.EFST_CRESCENTELBOW] =
 {		
 	descript = 	
 	{	
-		{"瘆窰琖", COLOR_TITLE_BUFF },
-		{"ㄏヘ夹癶硑Θ端甡", },
-		{"τ穦綝场だ端甡", },
+		{"破碎柱", COLOR_TITLE_BUFF },
+		{"使目標倒退並造成傷害", },
+		{"而自己也會遭受部分傷害", },
 	}	
 }		
 		
@@ -1287,9 +1287,9 @@ StateIconList[EFST_IDs.EFST_SONG_OF_MANA] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"臸ぇ簈", COLOR_TITLE_BUFF },
+		{"魔力之歌", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"–5確 SP ", },
+		{"每5秒恢復 SP ", },
 	}	
 }		
 		
@@ -1300,10 +1300,10 @@ StateIconList[EFST_IDs.EFST_KAAHI] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"惩", COLOR_TITLE_BUFF },
+		{"凱阿希", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"綝мю阑", },
-		{"SPㄓ確 HP ", },
+		{"遭受技能以外的攻擊時", },
+		{"消耗SP來恢復 HP ", },
 	}	
 }		
 		
@@ -1314,9 +1314,9 @@ StateIconList[EFST_IDs.EFST_ECHOSONG] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ぇ簈", COLOR_TITLE_BUFF },
+		{"回音之歌", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ň縨瞯糤", },
+		{"防禦率增加", },
 	}	
 }		
 		
@@ -1327,9 +1327,9 @@ StateIconList[EFST_IDs.EFST_PRESERVE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"パ玂臔 (Preserve)", COLOR_TITLE_BUFF },
+		{"自由保護 (Preserve)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"砆мю阑ぃй脓", },
+		{"被技能攻擊也不可抄襲", },
 	}	
 }		
 		
@@ -1340,10 +1340,10 @@ StateIconList[EFST_IDs.EFST_WEAPONPERFECT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"礚跌砰ю阑(Weapon Perfection)", COLOR_TITLE_BUFF },
+		{"無視體型攻擊(Weapon Perfection)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸, い, ┣", },
-		{"硑Θ 100%端甡", },
+		{"對小型, 中型, 大型怪物", },
+		{"各造成 100%的傷害", },
 	}	
 }		
 		
@@ -1354,10 +1354,10 @@ StateIconList[EFST_IDs.EFST_PROVOKE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"珼芣(Provoke)", COLOR_TITLE_BUFF },
+		{"挑釁(Provoke)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ň縨瞯", },
-		{"ю阑糤", },
+		{"防禦率下降", },
+		{"攻擊力增加", },
 	}	
 }		
 		
@@ -1369,7 +1369,7 @@ StateIconList[EFST_IDs.EFST_MOVHASTE_POTION] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"簿笆硉糤", },
+		{"移動速度增加", },
 	}	
 }		
 		
@@ -1380,10 +1380,10 @@ StateIconList[EFST_IDs.EFST_EDP] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"璓㏑额瑀 (Enchant Deadly Poison)", COLOR_TITLE_BUFF },
+		{"致命塗毒 (Enchant Deadly Poison)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"砆猌竟ゴㄌ诀瞯穦い粿瑀", },
-		{"癸BOSS┣肂端甡玥礚", },
+		{"被此武器打到時依機率會中劇毒", },
+		{"對BOSS怪物額外傷害則無效", },
 	}	
 }		
 		
@@ -1394,16 +1394,16 @@ StateIconList[EFST_IDs.EFST_JOINTBEAT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ォゴ(Joint Beat)", COLOR_TITLE_BUFF },
+		{"巧打(Joint Beat)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄌ穕闽竊", },
-		{"Τ篈", },
---		{"竲斤闽竊 : 簿笆硉 50%", },
---		{"も得闽竊 : ю阑硉 25%", },
---		{"渐闽竊 : 簿笆硉 30%, ю阑硉 10%", },
---		{"闽竊 : 寄ň縨瞯 50%", },
---		{"竬闽竊 : 寄ň縨瞯 25%, 寄ю阑 25%", },
---		{"繴闽竊 : 端甡糤 2のゲ炳ю阑狦τ砆ю阑ぇ30眏﹀", },
+		{"依受損的關節", },
+		{"有以下狀態", },
+--		{"腳踝關節 : 移動速度 50%降低", },
+--		{"手腕關節 : 攻擊速度 25%降低", },
+--		{"膝關節 : 移動速度 30%, 攻擊速度 10%降低", },
+--		{"肩關節 : 敵人的防禦率 50%降低", },
+--		{"腰關節 : 敵人的防禦率 25%, 敵人的攻擊力 25%降低", },
+--		{"頸關節 : 因傷害增加 2倍及必殺攻擊力效果而被攻擊，之後30秒強制出血", },
 	}	
 }		
 		
@@ -1414,10 +1414,10 @@ StateIconList[EFST_IDs.EFST_PROVIDENCE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ぇ (Providence)", COLOR_TITLE_BUFF },
+		{"神祐之光 (Providence)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸碿臸╰, 竧妮┦┣", },
-		{"瑻┦糤", },
+		{"對惡魔系, 聖屬性怪物的", },
+		{"耐性增加", },
 	}	
 }		
 		
@@ -1428,10 +1428,10 @@ StateIconList[EFST_IDs.EFST_FIGHTINGSPIRIT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"き腹縞ホ ; 矗ど矮в  (Fighting Spirit)", COLOR_TITLE_BUFF },
+		{"五號盧恩石 ; 提升鬥志  (Fighting Spirit)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ATK糤", },
-		{"琁甶ю阑硉糤", },
+		{"ATK增加", },
+		{"施展者的攻擊速度增加", },
 	}	
 }		
 		
@@ -1443,7 +1443,7 @@ StateIconList[EFST_IDs.EFST_FOOD_VIT_CASH] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"VIT矗ど", },
+		{"VIT提升", },
 	}	
 }		
 		
@@ -1454,11 +1454,11 @@ StateIconList[EFST_IDs.EFST_SATURDAY_NIGHT_FEVER] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
---		{"╣舧秅ソ", COLOR_TITLE_BUFF },
-		{"浩╣", COLOR_TITLE_DEBUFF },
+--		{"狂歡週末夜", COLOR_TITLE_BUFF },
+		{"瘋狂", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"浩╣篈", },
---		{"╣舧秅ソмτ硑Θ浩╣篈", },
+		{"瘋狂狀態", },
+--		{"因狂歡週末夜技能而造成的瘋狂狀態", },
 	}	
 }		
 		
@@ -1469,11 +1469,11 @@ StateIconList[EFST_IDs.EFST_TRUESIGHT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"炳核非 (True Sight)", COLOR_TITLE_BUFF },
+		{"狙殺瞄準 (True Sight)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"场借糤", },
---		{"场借 +5", },
-		{"㏑い瞯, 端甡, ゲ炳ю阑糤", },
+		{"全部素質增加", },
+--		{"全部素質 +5", },
+		{"命中率, 傷害, 必殺攻擊力增加", },
 	}	
 }		
 		
@@ -1484,9 +1484,9 @@ StateIconList[EFST_IDs.EFST_CASH_PLUSONLYJOBEXP] =
 	posTimeLimitStr = 1,	
 	descript = 	
 	{	
---		{"嘿", COLOR_TITLE_BUFF },
+--		{"名稱", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ゴ┣JOB 竒喷莉眔 1.5", },
+		{"打怪時JOB 經驗值獲得 1.5倍", },
 	}	
 }		
 		
@@ -1498,9 +1498,9 @@ StateIconList[EFST_IDs.EFST_ARMOR_PROPERTY] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"妮┦跑て禸", COLOR_TITLE_BUFF },
+		{"屬性變化卷軸", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"妮┦跑て篈", },
+		{"屬性變化狀態", },
 	}	
 }		
 		
@@ -1511,9 +1511,9 @@ StateIconList[EFST_IDs.EFST_TENSIONRELAX] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"伐硉確 (Tension Relax)", COLOR_TITLE_BUFF },
+		{"極速回復 (Tension Relax)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"HP 確硉矗ど", },
+		{"HP 恢復速度提升", },
 	}	
 }		
 		
@@ -1524,9 +1524,9 @@ StateIconList[EFST_IDs.EFST_DEATHHURT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"γ琕ぇ瑀", COLOR_TITLE_DEBUFF },
+		{"污染之毒", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"綝確м狦", },
+		{"遭受恢復技能時效果降低", },
 	}	
 }		
 		
@@ -1537,9 +1537,9 @@ StateIconList[EFST_IDs.EFST_IMPOSITIO] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"褐(Impositio Manus)", COLOR_TITLE_BUFF },
+		{"神威祈福(Impositio Manus)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟ю阑糤", },
+		{"武器攻擊力增加", },
 	}	
 }		
 		
@@ -1550,9 +1550,9 @@ StateIconList[EFST_IDs.EFST_LEECHESEND] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"﹀ぇ瑀", COLOR_TITLE_BUFF },
+		{"吸血之毒", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"– HP ", },
+		{"每秒消耗 HP ", },
 	}	
 }		
 		
@@ -1561,9 +1561,9 @@ StateIconList[EFST_IDs.EFST_REPRODUCE] =
 {		
 	descript = 	
 	{	
-		{"羉崔", COLOR_TITLE_BUFF },
-		{"てい厩策砞﹚ヘ夹м", },
-		{"厩策мΤ1", },
+		{"繁殖", COLOR_TITLE_BUFF },
+		{"活化中可學習自己設定目標的技能", },
+		{"可學習的技能只有1個", },
 	}	
 }		
 		
@@ -1574,9 +1574,9 @@ StateIconList[EFST_IDs.EFST_ACCELERATION] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"臸旧诀ヒ硉", COLOR_TITLE_BUFF },
+		{"魔導機甲加速", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"臸旧诀ヒ簿笆硉糤", },
+		{"魔導機甲的移動速度增加", },
 	}	
 }		
 		
@@ -1587,9 +1587,9 @@ StateIconList[EFST_IDs.EFST_NJ_NEN] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"├", COLOR_TITLE_BUFF },
+		{"念", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"醇籔秖糤", },
+		{"智力與力量增加", },
 	}	
 }		
 		
@@ -1600,11 +1600,11 @@ StateIconList[EFST_IDs.EFST_FORCEOFVANGUARD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"網场钉", COLOR_TITLE_BUFF },
+		{"先鋒部隊", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"MHP, ň縨瞯糤", },
-		{"–Ω綝端甡穦仓璸极Ω计", },
-		{"てい尿綪 SP", },
+		{"MHP, 防禦率增加", },
+		{"每次遭受傷害時會累計憤怒次數", },
+		{"活化中持續銷耗 SP", },
 		
 	}	
 }		
@@ -1616,11 +1616,11 @@ StateIconList[EFST_IDs.EFST_RG_CCONFINE_M] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"候盞(Close Confine)", COLOR_TITLE_BUFF },
+		{"緊密的約束(Close Confine)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"籔寄1炒ぃ簿笆篈", },
-		{"癹磷瞯糤", },
-		{"癸BOSS礚", },
+		{"與敵1人同時陷入不可移動狀態", },
+		{"迴避率增加", },
+		{"對BOSS無效", },
 	}	
 }		
 		
@@ -1629,8 +1629,8 @@ StateIconList[EFST_IDs.EFST_TRICKDEAD] =
 {		
 	descript = 	
 	{	
-		{"杆", COLOR_TITLE_TOGGLE },
-		{"安篈", },
+		{"裝死", COLOR_TITLE_TOGGLE },
+		{"假死狀態", },
 	}	
 }		
 		
@@ -1641,9 +1641,9 @@ StateIconList[EFST_IDs.EFST_PROPERTYWATER] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"妮┦ (Frost Weapon)", COLOR_TITLE_BUFF },
+		{"水屬性附加 (Frost Weapon)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟结ぉ妮┦", },
+		{"在武器賦予水屬性", },
 	}	
 }		
 		
@@ -1654,9 +1654,9 @@ StateIconList[EFST_IDs.EFST_ADORAMUS] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"疠簈", COLOR_TITLE_BUFF },
+		{"謳歌", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"矪堵穞籔庇倍", },
+		{"處於黑暗與敏捷降低", },
 	}	
 }		
 		
@@ -1667,10 +1667,10 @@ StateIconList[EFST_IDs.EFST_GENTLETOUCH_ENERGYGAIN] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"翴マ-毕", COLOR_TITLE_BUFF },
+		{"點穴-救", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ō瞶ю阑┪綝端甡", },
-		{"穦玻ネ瞴", },
+		{"近身物理攻擊或遭受傷害時", },
+		{"會產生一個氣球", },
 	}	
 }		
 		
@@ -1681,10 +1681,10 @@ StateIconList[EFST_IDs.EFST_NEUTRALBARRIER] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"い┦ň臔竛", COLOR_TITLE_BUFF },
+		{"中性防護罩", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"瞶, 臸猭ň縨瞯矗ど", },
-		{"环禯瞒ю阑礚て", },
+		{"物理, 魔法防禦率提升", },
+		{"遠距離攻擊無效化", },
 	}	
 }		
 		
@@ -1695,11 +1695,11 @@ StateIconList[EFST_IDs.EFST_EARTHSCROLL] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"е贾ヰ", COLOR_TITLE_BUFF },
+		{"快樂的休息", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄏノ臸猭(綺砃)", },
-		{"穦﹚秖 SP", },
-		{"耕诀瞯穦〨粂", },
+		{"使用魔法書(地震術)時", },
+		{"會消耗一定量的 SP", },
+		{"以較低機率會消耗咒語書", },
 	}	
 }		
 		
@@ -1708,8 +1708,8 @@ StateIconList[EFST_IDs.EFST_FALCON] =
 {		
 	descript = 	
 	{	
-		{"攻芅砃(Falconry Mastery)", COLOR_TITLE_BUFF },
-		{"芅い", },
+		{"馴鷹術(Falconry Mastery)", COLOR_TITLE_BUFF },
+		{"鷹出租中", },
 	}	
 }		
 		
@@ -1720,10 +1720,10 @@ StateIconList[EFST_IDs.EFST_TWOHANDQUICKEN] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"蛮も糃ю阑硉糤(Two Hand Quicken)", COLOR_TITLE_BUFF },
+		{"雙手劍攻擊速度增加(Two Hand Quicken)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄏノ蛮も糃", },
-		{"ю阑硉糤", },
+		{"使用雙手劍時", },
+		{"攻擊速度增加", },
 	}	
 }		
 		
@@ -1734,9 +1734,9 @@ StateIconList[EFST_IDs.EFST_SUN_COMFORT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"び锭キ稰", COLOR_TITLE_BUFF },
+		{"太陽的平安感", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ň縨瞯矗ど", },
+		{"防禦率提升", },
 	}	
 }		
 		
@@ -1747,9 +1747,9 @@ StateIconList[EFST_IDs.EFST_KYRIE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"臦ǜぇ皚(Kyrie Eleison)", COLOR_TITLE_BUFF },
+		{"霸邪之陣(Kyrie Eleison)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ň縨縨寄毁┮砞﹚ю阑Ω计", },
+		{"可防禦禦敵屏障所設定的攻擊次數", },
 	}	
 }		
 		
@@ -1760,9 +1760,9 @@ StateIconList[EFST_IDs.EFST_PROTECTARMOR] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"て厩馴ヒ玂臔 (Chemical Protection armor)", COLOR_TITLE_BUFF },
+		{"化學鎧甲保護 (Chemical Protection armor)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"馴ヒ荡ぃ穦穕", },
+		{"鎧甲絕不會受損", },
 	}	
 }		
 		
@@ -1773,14 +1773,14 @@ StateIconList[EFST_IDs.EFST_GIANTGROWTH] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"腹縞ホ ; エΘ  (Giant Growth)", COLOR_TITLE_BUFF },
+		{"七號盧恩石 ; 巨人成長  (Giant Growth)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"STR糤", },
-		{"ō瞶ю阑 ?", },
-		{"ㄌ诀瞯端甡", },
-		{"ㄌ诀瞯猌竟瘆胊", },
---		{"15% 诀瞯 ATK 300% 端甡", },
---		{"0.1% 诀瞯猌竟瘆胊", },
+		{"STR增加", },
+		{"近身物理攻擊 ?", },
+		{"依機率重傷害", },
+		{"依機率自己的武器破壞", },
+--		{"以15% 機率 ATK 300% 傷害", },
+--		{"以0.1% 機率自己的武器破壞", },
 	}	
 }		
 		
@@ -1792,7 +1792,7 @@ StateIconList[EFST_IDs.EFST_STR_SCROLL] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"STR矗ど", },
+		{"STR提升", },
 	}	
 }		
 		
@@ -1803,9 +1803,9 @@ StateIconList[EFST_IDs.EFST_AB_SECRAMENT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"竧ㄥ", COLOR_TITLE_BUFF },
+		{"聖典", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"碟佰丁罽祏", },
+		{"詠唱時間縮短", },
 	}	
 }		
 		
@@ -1816,14 +1816,14 @@ StateIconList[EFST_IDs.EFST_PARALYSE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"陈肤ぇ瑀", COLOR_TITLE_BUFF },
+		{"麻痺之毒", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑硉", },
-		{"癹磷", },
-		{"簿笆硉", },
---		{"ю阑硉 -10%", },
---		{"癹磷 -10%", },
---		{"簿笆硉搭", },
+		{"攻擊速度降低", },
+		{"迴避降低", },
+		{"移動速度降低", },
+--		{"攻擊速度 -10%", },
+--		{"迴避 -10%", },
+--		{"移動速度減半", },
 	}	
 }		
 		
@@ -1834,9 +1834,9 @@ StateIconList[EFST_IDs.EFST_PROPERTYGROUND] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"妮┦ (Seismic Weapon)", COLOR_TITLE_BUFF },
+		{"地屬性附加 (Seismic Weapon)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟结ぉ妮┦", },
+		{"在武器上賦予地屬性", },
 	}	
 }		
 		
@@ -1847,10 +1847,10 @@ StateIconList[EFST_IDs.EFST_DOUBLECASTING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"蛮щ耏 (Double Casting)", COLOR_TITLE_BUFF },
+		{"雙倍投擲 (Double Casting)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄏノ絙砃╰м", },
-		{"ㄌ诀瞯絙砃╰м穦Ω琁甶", },
+		{"使用箭術系技能時", },
+		{"依機率箭術系技能會再次施展", },
 	}	
 }		
 		
@@ -1861,11 +1861,11 @@ StateIconList[EFST_IDs.EFST_RG_CCONFINE_S] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"候盞(Close Confine)", COLOR_TITLE_BUFF },
+		{"緊密的約束(Close Confine)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"籔寄1炒ぃ簿笆篈", },
-		{"癹磷瞯糤", },
-		{"癸BOSS礚", },
+		{"與敵1人同時陷入不可移動狀態", },
+		{"迴避率增加", },
+		{"對BOSS無效", },
 	}	
 }		
 		
@@ -1876,9 +1876,9 @@ StateIconList[EFST_IDs.EFST_OVERHEAT] =
 	posTimeLimitStr = 1,	
 	descript = 	
 	{	
-		{"筁荐 (Over Heat)", COLOR_TITLE_BUFF },
-		{"臸旧诀ヒ筁荐篈", },
-		{"–搭ぶ﹚秖 HP", },
+		{"過熱 (Over Heat)", COLOR_TITLE_BUFF },
+		{"魔導機甲過熱狀態", },
+		{"每秒減少一定量的 HP", },
 	}	
 }		
 		
@@ -1889,10 +1889,10 @@ StateIconList[EFST_IDs.EFST_SPL_MATK] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"縒à皑ぇ瞈 ", COLOR_TITLE_BUFF },
+		{"獨角飛馬之淚 ", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸猧Ё腞偿┣", },
-		{"臸猭ю阑端甡糤", },
+		{"對史波浪壯麗原野怪物的", },
+		{"魔法攻擊傷害增加", },
 	}	
 }		
 		
@@ -1904,11 +1904,11 @@ StateIconList[EFST_IDs.EFST_DEEP_SLEEP] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"↖何", COLOR_TITLE_BUFF },
+		{"沉睡", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"硄盽端甡 1.5", },
-		{"–2確﹚秖 HP/SP ", },
---		{"–2確 1% HP/SP", },
+		{"通常傷害的 1.5倍", },
+		{"每2秒可恢復一定量的 HP/SP ", },
+--		{"每2秒可恢復 1%的 HP/SP", },
 	}	
 }		
 		
@@ -1919,11 +1919,11 @@ StateIconList[EFST_IDs.EFST_RECOGNIZEDSPELL] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"臸猭", COLOR_TITLE_BUFF },
+		{"魔法省悟", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"程臸猭端甡ㄓ阑", },
-		{"SP 秖糤", },
---		{"SP 秖糤 25%", },
+		{"以最大的魔法傷害來擊", },
+		{"SP 消耗量增加", },
+--		{"SP 消耗量增加 25%", },
 	}	
 }		
 		
@@ -1935,8 +1935,8 @@ StateIconList[EFST_IDs.EFST_TARGET_ASPD] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"MSP糤, SP 秖", },
---		{"MSP +10%, SP 秖 -10%", },
+		{"MSP增加, SP 消耗量降低", },
+--		{"MSP +10%, SP 消耗量 -10%", },
 	}	
 }		
 		
@@ -1948,7 +1948,7 @@ StateIconList[EFST_IDs.EFST_FOOD_BASICAVOIDANCE] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"癹磷瞯矗ど", },
+		{"迴避率提升", },
 	}	
 }		
 		
@@ -1959,10 +1959,10 @@ StateIconList[EFST_IDs.EFST_DEFENDER] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ぇ (Defender)", COLOR_TITLE_BUFF },
+		{"光之盾 (Defender)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸环禯瞒瞶ю阑端甡", },
-		{"簿笆硉, ю阑硉", },
+		{"對遠距離物理攻擊的傷害降低", },
+		{"移動速度, 攻擊速度降低", },
 	}	
 }		
 		
@@ -1973,9 +1973,9 @@ StateIconList[EFST_IDs.EFST_WEAPONPROPERTY] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"蓟褐(Aspersio)", COLOR_TITLE_BUFF },
+		{"撒水祈福(Aspersio)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟结ぉ竧妮┦", },
+		{"在武器上賦予聖屬性", },
 	}	
 }		
 		
@@ -1986,11 +1986,11 @@ StateIconList[EFST_IDs.EFST_S_LIFEPOTION] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ネ㏑", COLOR_TITLE_BUFF },
+		{"小型生命水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"–5確﹚秖 HP ", },
---		{"–5確 4% HP ", },
-		{"╣ぇ簀篈い礚", },
+		{"每5秒可恢復一定量的 HP ", },
+--		{"每5秒可恢復 4%的 HP ", },
+		{"狂怒之槍狀態中為無效", },
 	}	
 }		
 		
@@ -2002,7 +2002,7 @@ StateIconList[EFST_IDs.EFST_FOOD_LUK] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"LUK矗ど", },
+		{"LUK提升", },
 	}	
 }		
 		
@@ -2013,11 +2013,11 @@ StateIconList[EFST_IDs.EFST_BLOODING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"﹀", COLOR_TITLE_BUFF },
+		{"出血", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"HP, SP ぃ確", },
-		{"–10酶瑈ア﹚秖 HP ", },
---		{"–10酶瑈ア 200~800 HP", },
+		{"HP, SP 不能恢復", },
+		{"每10秒繪流失一定量的 HP ", },
+--		{"每10秒繪流失 200~800 的HP", },
 	}	
 }		
 		
@@ -2028,12 +2028,12 @@ StateIconList[EFST_IDs.EFST_REFRESH] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"腹縞ホ ; 確 (Refresh)", COLOR_TITLE_BUFF },
+		{"一號盧恩石 ; 恢復 (Refresh)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄏノ秆埃┮Τ钵盽篈, DEBUFF", },
-		{"ぃ穦いヴ钵盽篈, DEBUFF", },
-		{"確﹚秖 HP ", },
---		{"確25%HP ", },
+		{"使用時可解除所有異常狀態, DEBUFF", },
+		{"不會中任何異常狀態, DEBUFF", },
+		{"恢復一定量的 HP ", },
+--		{"恢復25%的HP ", },
 	}	
 }		
 		
@@ -2045,7 +2045,7 @@ StateIconList[EFST_IDs.EFST_FOOD_LUK_CASH] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"LUK矗ど", },
+		{"LUK提升", },
 	}	
 }		
 		
@@ -2054,7 +2054,7 @@ StateIconList[EFST_IDs.EFST_BROKENARMOR] =
 {		
 	descript = 	
 	{	
-		{"ňㄣ瘆胊", COLOR_TITLE_DEBUFF },
+		{"防具破壞", COLOR_TITLE_DEBUFF },
 	}	
 }		
 		
@@ -2063,13 +2063,13 @@ StateIconList[EFST_IDs.EFST_DODGE_ON] =
 {		
 	descript = 	
 	{	
-		{"辅猭", COLOR_TITLE_BUFF },
-		{" 竲金非称墩", },
-		{"綝寄环禯瞒, 臸猭ю阑", },
-		{"ㄌ诀瞯癹磷ю阑", },
---		{"20% 诀瞯ㄓ癹磷ю阑", },
-		{"禲˙", },
-		{"禯瞒祇笆ю阑", },
+		{"落法", COLOR_TITLE_BUFF },
+		{" 飛腳踢準備姿勢", },
+		{"遭受敵人的遠距離, 魔法攻擊時", },
+		{"依機率迴避攻擊", },
+--		{"以20% 機率來迴避攻擊", },
+		{"跑步時", },
+		{"於近距離發動攻擊", },
 	}	
 }		
 		
@@ -2080,11 +2080,11 @@ StateIconList[EFST_IDs.EFST_TARGET_BLOOD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"钵盽篈╄к媚", COLOR_TITLE_BUFF },
+		{"異常狀態抵抗藥水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸篈╄к糤", },
-		{"穡痶, , ホて, 何痸, ↖纐", },
-		{"堵穞, 禔〨, 瑀, ﹀, 睼睹", },
+		{"對下列狀態的抵抗力增加", },
+		{"暈眩, 冰凍, 石化, 睡眠, 沉默", },
+		{"黑暗, 詛咒, 毒, 出血, 混亂", },
 	}	
 }		
 		
@@ -2095,10 +2095,10 @@ StateIconList[EFST_IDs.EFST_MELODYOFSINK] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"℉臂", COLOR_TITLE_BUFF },
+		{"消沈旋律", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"臸猭ю阑矗ど", },
-		{"瞶ю阑", },
+		{"魔法攻擊力提升", },
+		{"物理攻擊力下降", },
 	}	
 }		
 		
@@ -2109,9 +2109,9 @@ StateIconList[EFST_IDs.EFST_CRUCIS] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ぱㄏぇ(Signum Crucis)", COLOR_TITLE_BUFF },
+		{"天使之光(Signum Crucis)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ╰, 穞妮┦┣ň縨瞯", },
+		{"不死系, 暗屬性怪物的防禦率降低", },
 	}	
 }		
 		
@@ -2122,9 +2122,9 @@ StateIconList[EFST_IDs.EFST_SLOWCAST] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"搭絯_碟佰", COLOR_TITLE_DEBUFF },
+		{"減緩_詠唱", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"碟佰丁糤", },
+		{"詠唱時間增加", },
 	}	
 }		
 		
@@ -2135,9 +2135,9 @@ StateIconList[EFST_IDs.EFST_PROPERTYWIND] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"妮┦ (Lightning Loader)", COLOR_TITLE_BUFF },
+		{"風屬性附加 (Lightning Loader)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟结ぉ妮┦", },
+		{"在武器上賦予風屬性", },
 	}	
 }		
 		
@@ -2148,9 +2148,9 @@ StateIconList[EFST_IDs.EFST_ENCHANTBLADE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"臸糃 (Enchant Blade)", COLOR_TITLE_BUFF },
+		{"魔力劍 (Enchant Blade)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ō瞶ю阑糤臸猭ю阑", },
+		{"於近身物理攻擊上增加魔法攻擊力", },
 	}	
 }		
 		
@@ -2161,10 +2161,10 @@ StateIconList[EFST_IDs.EFST_ADRENALINE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"硉縀祇(Adrenaline Rush)", COLOR_TITLE_BUFF },
+		{"速度激發(Adrenaline Rush)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"繷籔秝竟摸猌竟", },
-		{"ю阑硉糤", },
+		{"斧頭與鈍器類的武器", },
+		{"攻擊速度增加", },
 	}	
 }		
 		
@@ -2175,12 +2175,12 @@ StateIconList[EFST_IDs.EFST_MAGICMUSHROOM] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"╣ぇ瑀 ", COLOR_TITLE_BUFF },
+		{"狂笑之毒 ", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"╣薄才腹", },
-		{"–4繦诀ㄏノм", },
-		{"–4﹚秖 HP", },
---		{"–4 3% HP", },
+		{"狂笑表情符號", },
+		{"每4秒隨機使用技能", },
+		{"每4秒消耗一定量的 HP", },
+--		{"每4秒消耗 3%的 HP", },
 	}	
 }		
 		
@@ -2192,7 +2192,7 @@ StateIconList[EFST_IDs.EFST_CASH_PLUSEXP] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"莉眔竒喷糤", },
+		{"獲得經驗值增加", },
 	}	
 }		
 		
@@ -2203,9 +2203,9 @@ StateIconList[EFST_IDs.EFST_ATTHASTE_POTION2] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"谋眶媚", COLOR_TITLE_BUFF },
+		{"覺醒藥水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑硉糤", },
+		{"攻擊速度增加", },
 	}	
 }		
 		
@@ -2216,12 +2216,12 @@ StateIconList[EFST_IDs.EFST_TOXIN] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"陈綤ぇ瑀", COLOR_TITLE_BUFF },
+		{"麻醉之毒", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"–10ň锚碟佰, м笆", },
-		{"糃辰狦礚", },
-		{"–10﹚秖 SP ", },
---		{"–10 3% SP ", },
+		{"每10秒防礙詠唱, 技能動作", },
+		{"劍魚卡片效果無效", },
+		{"每10秒消耗一定量的 SP ", },
+--		{"每10秒消耗 3%的 SP ", },
 	}	
 }		
 		
@@ -2230,13 +2230,13 @@ StateIconList[EFST_IDs.EFST_RAISINGDRAGON] =
 {		
 	descript = 	
 	{	
-		{"肩纒狜ぱ", COLOR_TITLE_BUFF },
-		{"糤程瞴计", },
-		{"糤程 HP籔 SP", },
-		{"ю阑硉糤", },
-		{"蝴脄", },
-		{"–﹚秖 HP ", },
---		{"–﹚秖 HP ", },
+		{"潛龍昇天", COLOR_TITLE_BUFF },
+		{"增加最大氣球數", },
+		{"增加最大 HP與 SP", },
+		{"攻擊速度增加", },
+		{"維持爆氣", },
+		{"每秒消耗一定量的 HP ", },
+--		{"每秒消耗一定量的 HP ", },
 	}	
 }		
 
@@ -2247,9 +2247,9 @@ StateIconList[EFST_IDs.EFST_HARMONIZE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"㎝羘簍", COLOR_TITLE_BUFF },
+		{"和聲演奏", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"秸俱借", },
+		{"調整素質加重值", },
 	}	
 }		
 		
@@ -2261,7 +2261,7 @@ StateIconList[EFST_IDs.EFST_CHASEWALK2] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"STR糤", },
+		{"STR增加", },
 --		{"STR +16", },
 	}	
 }		
@@ -2274,7 +2274,7 @@ StateIconList[EFST_IDs.EFST_FOOD_STR_CASH] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"STR矗ど", },
+		{"STR提升", },
 	}	
 }		
 		
@@ -2283,11 +2283,11 @@ StateIconList[EFST_IDs.EFST_CLOAKINGEXCEED] =
 {		
 	descript = 	
 	{	
-		{"鞍杆眏て (CLOAKING EXCEED)", COLOR_TITLE_BUFF },
-		{"ぃ穦砆挛╰, 碿臸╰祇瞷", },
-		{"┯﹚Ω计端甡", },
---		{"ㄌ单ぃτΤ 1/1/2/2/3 Ω", },
-		{"簿笆硉矗ど", },
+		{"偽裝強化 (CLOAKING EXCEED)", COLOR_TITLE_BUFF },
+		{"不會被昆蟲系, 惡魔系發現", },
+		{"可承受至一定次數的傷害", },
+--		{"依等級不同而有 1/1/2/2/3 次", },
+		{"移動速度提升", },
 	}	
 }		
 		
@@ -2298,9 +2298,9 @@ StateIconList[EFST_IDs.EFST_ASSUMPTIO2] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"竧ダぇ褐 (Assumptio)", COLOR_TITLE_BUFF },
+		{"聖母之祈福 (Assumptio)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ň縨瞯糤", },
+		{"防禦率增加", },
 	}	
 }		
 		
@@ -2311,9 +2311,9 @@ StateIconList[EFST_IDs.EFST_THORNS_TRAP] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"雌炒ɡ", COLOR_TITLE_BUFF },
+		{"荊棘陷阱", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"翴翴端甡", },
+		{"一點一點受傷害", },
 	}	
 }		
 		
@@ -2324,9 +2324,9 @@ StateIconList[EFST_IDs.EFST_SLOWPOISON] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"絯瑀砃(Slow Poison)", COLOR_TITLE_BUFF },
+		{"緩毒術(Slow Poison)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"既氨瑀┦祇", },
+		{"可暫停毒性發作", },
 	}	
 }		
 		
@@ -2337,9 +2337,9 @@ StateIconList[EFST_IDs.EFST_CLOAKING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"鞍杆(Cloaking)", COLOR_TITLE_BUFF },
+		{"偽裝(Cloaking)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ穦砆祇瞷", },
+		{"不會被別人發現", },
 	}	
 }		
 		
@@ -2351,7 +2351,7 @@ StateIconList[EFST_IDs.EFST_PARTYFLEE] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"癹磷瞯糤", },
+		{"迴避率增加", },
 	}	
 }		
 		
@@ -2362,9 +2362,9 @@ StateIconList[EFST_IDs.EFST_CRITICALPERCENT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"縤警", COLOR_TITLE_BUFF },
+		{"研磨劑", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ゲ炳ю阑瞯糤", },
+		{"必殺攻擊率增加", },
 	}	
 }		
 		
@@ -2375,14 +2375,14 @@ StateIconList[EFST_IDs.EFST_INSPIRATION] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"艶稰", COLOR_TITLE_BUFF },
+		{"靈感", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"㏑い瞯, 借糤, ю阑, MHP糤", },
-		{"疭﹚ BUFF, 钵盽篈礚て", },
-		{"尿┦ HP, SP", },
-		{"祇笆秆埃┮Τ BUFF の钵盽篈", },
-		{"祇笆穕ア﹚秖竒喷", },
---		{"祇笆穕ア 0.1%竒喷", },
+		{"命中率, 素質增加, 攻擊力, MHP增加", },
+		{"特定 BUFF, 異常狀態無效化", },
+		{"持續性的降低 HP, SP", },
+		{"發動時解除所有 BUFF 及異常狀態", },
+		{"發動時損失一定量的經驗值", },
+--		{"發動時損失 0.1%的經驗值", },
 	}	
 }		
 		
@@ -2393,11 +2393,11 @@ StateIconList[EFST_IDs.EFST_UNLIMITED_HUMMING_VOICE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"礚佰羘", COLOR_TITLE_BUFF },
+		{"無限哼唱聲", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ヘ夹м, 臸猭碟佰ぃ穦い耞", },
-		{"ㄏノм SP秖糤", },
---		{"ㄏノм SP 秖糤"15%, },
+		{"目標的技能, 魔法詠唱不會中斷", },
+		{"使用技能 SP消耗量增加", },
+--		{"使用技能 SP 消耗量增加"15%, },
 	}	
 }		
 		
@@ -2409,7 +2409,7 @@ StateIconList[EFST_IDs.EFST_FOOD_DEX] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"DEX矗ど", },
+		{"DEX提升", },
 	}	
 }		
 		
@@ -2420,9 +2420,9 @@ StateIconList[EFST_IDs.EFST_ANALYZE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"秆猂", COLOR_TITLE_BUFF },
+		{"解析", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"瞶, 臸猭ň縨瞯", },
+		{"物理, 魔法防禦率降低", },
 	}	
 }		
 		
@@ -2433,12 +2433,12 @@ StateIconList[EFST_IDs.EFST_GENTLETOUCH_REVITALIZE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"翴マ-", COLOR_TITLE_BUFF },
+		{"點穴-活", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"VIT, MHP糤", },
-		{"瞶ň縨瞯糤", },
-		{"HP 礛確硉糤", },
-		{"簿笆, ю阑い確 HP ", },
+		{"VIT, MHP增加", },
+		{"物理防禦率增加", },
+		{"HP 自然恢復速度增加", },
+		{"移動, 攻擊中時也可恢復 HP ", },
 	}	
 }		
 		
@@ -2447,10 +2447,10 @@ StateIconList[EFST_IDs.EFST_COUNTER_ON] =
 {		
 	descript = 	
 	{	
-		{"临阑非称", COLOR_TITLE_BUFF },
-		{"ю阑㏑い寄", },
-		{"ㄌ诀瞯蹦临阑金非称墩", },
---		{"20% 诀瞯ㄓ临阑金非称墩", },
+		{"還擊準備", COLOR_TITLE_BUFF },
+		{"攻擊命中敵人時", },
+		{"依機率採還擊踢準備姿勢", },
+--		{"以20% 機率來還擊踢準備姿勢", },
 	}	
 }		
 		
@@ -2461,9 +2461,9 @@ StateIconList[EFST_IDs.EFST_GLORIA] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"┋笲ぇ箌簈(Gloria)", COLOR_TITLE_BUFF },
+		{"幸運之頌歌(Gloria)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"LUK糤", },
+		{"LUK增加", },
 	}	
 }		
 		
@@ -2474,9 +2474,9 @@ StateIconList[EFST_IDs.EFST_RUSH_WINDMILL] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"绰ó阑", COLOR_TITLE_BUFF },
+		{"朝風車突擊", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑糤", },
+		{"攻擊力增加", },
 	}	
 }		
 		
@@ -2487,9 +2487,9 @@ StateIconList[EFST_IDs.EFST_PYREXIA] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"荐痜ぇ瑀", COLOR_TITLE_BUFF },
+		{"熱病之毒", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"堵穞, ほ谋篈", },
+		{"黑暗, 幻覺狀態", },
 	}	
 }		
 		
@@ -2500,10 +2500,10 @@ StateIconList[EFST_IDs.EFST_DANCE_WITH_WUG] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"籔疶籖", COLOR_TITLE_BUFF },
+		{"與狼共舞", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑硉糤", },
-		{"㏕﹚碟佰丁罽祏", },
+		{"攻擊速度增加", },
+		{"固定詠唱時間縮短", },
 	}	
 }		
 		
@@ -2514,10 +2514,10 @@ StateIconList[EFST_IDs.EFST_SWING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"穘耚籖", COLOR_TITLE_BUFF },
+		{"搖擺舞", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"簿笆硉糤", },
-		{"ю阑硉糤", },
+		{"移動速度增加", },
+		{"攻擊速度增加", },
 	}	
 }		
 		
@@ -2528,9 +2528,9 @@ StateIconList[EFST_IDs.EFST_MOON_COMFORT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"る獹キ稰", COLOR_TITLE_BUFF },
+		{"月亮的平安感", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癹磷瞯矗ど", },
+		{"迴避率提升", },
 	}	
 }		
 		
@@ -2541,9 +2541,9 @@ StateIconList[EFST_IDs.EFST_MOONLIT_SERENADE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"るΡ", COLOR_TITLE_BUFF },
+		{"月光小夜曲", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"臸猭ю阑糤", },
+		{"魔法攻擊力增加", },
 	}	
 }		
 		
@@ -2554,10 +2554,10 @@ StateIconList[EFST_IDs.EFST_GENTLETOUCH_CHANGE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"翴マ-は", COLOR_TITLE_BUFF },
+		{"點穴-反", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"砰, 臸猭ň縨瞯", },
-		{"ю阑, ю阑硉糤", },
+		{"體力, 魔法防禦率下降", },
+		{"攻擊力, 攻擊速度增加", },
 	}	
 }		
 		
@@ -2568,9 +2568,9 @@ StateIconList[EFST_IDs.EFST_STRIPACCESSARY] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"埃皌ン", COLOR_TITLE_BUFF },
+		{"卸除配件", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ杆竚皌ン", },
+		{"不可裝置配件", },
 	}	
 }		
 		
@@ -2582,7 +2582,7 @@ StateIconList[EFST_IDs.EFST_PROPERTYUNDEAD] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"结ぉぃ╰妮┦", },
+		{"賦予不死系屬性", },
 	}	
 }		
 		
@@ -2593,13 +2593,13 @@ StateIconList[EFST_IDs.EFST_INVISIBILITY] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"硓砃", COLOR_TITLE_BUFF },
+		{"透明術", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"硓篈秈︽ю阑", },
-		{"ю阑妮┦跑├妮┦ 1", },
-		{"尿┦ SP", },
---		{"ㄌ单– 9/8/7/6/5% SP", },
-		{"ぃㄏノм, 珇", },
+		{"於透明狀態下可進行攻擊", },
+		{"攻擊屬性變念屬性 1級", },
+		{"持續性的 SP降低", },
+--		{"依等級每秒消耗 9/8/7/6/5%的 SP", },
+		{"不可使用技能, 物品", },
 	}	
 }		
 		
@@ -2610,10 +2610,10 @@ StateIconList[EFST_IDs.EFST_ABUNDANCE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"せ腹縞ホ ; 伦ì (Abundance)", COLOR_TITLE_BUFF },
+		{"六號盧恩石 ; 豐足 (Abundance)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"–10確﹚秖 SP ", },
---		{"–10確 60SP", },
+		{"每10秒恢復一定量的 SP ", },
+--		{"每10秒恢復 60的SP", },
 	}	
 }		
 		
@@ -2625,7 +2625,7 @@ StateIconList[EFST_IDs.EFST_FOOD_BASICHIT] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"㏑い瞯矗ど", },
+		{"命中率提升", },
 	}	
 }		
 		
@@ -2637,7 +2637,7 @@ StateIconList[EFST_IDs.EFST_FOOD_AGI_CASH] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"AGI矗ど", },
+		{"AGI提升", },
 	}	
 }		
 		
@@ -2648,11 +2648,11 @@ StateIconList[EFST_IDs.EFST_SHADOWFORM] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"緔紇篈   ", COLOR_TITLE_BUFF },
+		{"魅影形態   ", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"Τ﹚Ω计盢端甡", },
---		{"ㄌ单ぃτΤ 5/6/7/8/9 Ω", },
-		{"穦锣簿ヘ夹產ō", },
+		{"有一定次數將自己的傷害", },
+--		{"依等級不同而有 5/6/7/8/9 次", },
+		{"會轉移到目標玩家的身上", },
 	}	
 }		
 		
@@ -2663,10 +2663,10 @@ StateIconList[EFST_IDs.EFST_AUTOSHADOWSPELL] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"笆緔紇├〨", COLOR_TITLE_BUFF },
+		{"自動魅影念咒", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄏノй脓, 羉崔┮厩", },
-		{"臸猭м", },
+		{"可以使用以抄襲, 繁殖所學的", },
+		{"魔法技能", },
 	}	
 }		
 		
@@ -2677,9 +2677,9 @@ StateIconList[EFST_IDs.EFST_SHAPESHIFT] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"篈锣传", COLOR_TITLE_BUFF },
+		{"形態轉換", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"硓筁臸旧驹ヒ诀ō跑传妮┦", },
+		{"可透過魔導戰甲的機身變換屬性", },
 	}	
 }		
 		
@@ -2690,10 +2690,10 @@ StateIconList[EFST_IDs.EFST_MANU_ATK] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"臸▆诀", COLOR_TITLE_BUFF },
+		{"魔怒克的良機", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸臸偿┣", },
-		{"糤ю阑端甡", },
+		{"對魔怒克原野的怪物", },
+		{"增加攻擊傷害", },
 	}	
 }		
 		
@@ -2705,10 +2705,10 @@ StateIconList[EFST_IDs.EFST_MARIONETTE_MASTER] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"橙纖畍р栏 (琁甶)", COLOR_TITLE_BUFF },
+		{"傀儡師的把戲 (施展)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ヘ夹產", },
-		{"锣簿借", },
+		{"向目標玩家", },
+		{"轉移素質", },
 	}	
 }		
 		
@@ -2720,10 +2720,10 @@ StateIconList[EFST_IDs.EFST_MARIONETTE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"橙纖畍р栏 (ヘ夹)", COLOR_TITLE_BUFF },
+		{"傀儡師的把戲 (目標)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"琁甶產", },
-		{"钡借", },
+		{"向施展玩家", },
+		{"接受素質", },
 	}	
 }		
 		
@@ -2734,10 +2734,10 @@ StateIconList[EFST_IDs.EFST_WZ_SIGHTBLASTER] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"(Sight Blaster)", COLOR_TITLE_BUFF },
+		{"火狩芽(Sight Blaster)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"鸟寄硑Θ臸猭ю阑", },
-		{"端甡癶秨", },
+		{"向纏住的敵人造成魔法攻擊力的", },
+		{"傷害後退開", },
 	}	
 }		
 		
@@ -2748,9 +2748,9 @@ StateIconList[EFST_IDs.EFST_LEXAETERNA] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ぱㄏぇ(Lex Aeterna)", COLOR_TITLE_DEBUFF },
+		{"天使之怒(Lex Aeterna)", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"1Ωю阑綝ㄢ端甡", },
+		{"1次的攻擊遭受兩倍的傷害", },
 	}	
 }		
 		
@@ -2761,10 +2761,10 @@ StateIconList[EFST_IDs.EFST_INFRAREDSCAN] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"絬苯核", COLOR_TITLE_BUFF },
+		{"紅外線掃瞄", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"т留拔寄", },
-		{"ㄌ诀瞯絛瞅ず┮Τヘ夹癹磷瞯", },
+		{"可找出隱匿的敵人", },
+		{"依機率範圍內的所有目標的迴避率降低", },
 	}	
 }		
 		
@@ -2776,7 +2776,7 @@ StateIconList[EFST_IDs.EFST_INT_SCROLL] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"INT矗ど", },
+		{"INT提升", },
 	}	
 }		
 		
@@ -2787,9 +2787,9 @@ StateIconList[EFST_IDs.EFST_ASPERSIO] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"蓟褐(Aspersio)", COLOR_TITLE_BUFF },
+		{"撒水祈福(Aspersio)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟结ぉ竧妮┦", },
+		{"在武器上賦予聖屬性", },
 	}	
 }		
 		
@@ -2798,7 +2798,7 @@ StateIconList[EFST_IDs.EFST_MOVHASTE_INFINITY] =
 {		
 	descript = 	
 	{	
-		{"簿笆硉糤", },
+		{"移動速度增加", },
 	}	
 }		
 		
@@ -2809,9 +2809,9 @@ StateIconList[EFST_IDs.EFST_LERADS_DEW] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"筽┰臩", COLOR_TITLE_BUFF },
+		{"雷拉多露水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"MHP糤", },
+		{"MHP增加", },
 	}	
 }		
 		
@@ -2823,7 +2823,7 @@ StateIconList[EFST_IDs.EFST_FOOD_INT] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"INT矗ど", },
+		{"INT提升", },
 	}	
 }		
 		
@@ -2834,10 +2834,10 @@ StateIconList[EFST_IDs.EFST_VENOMBLEED] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"癐畓ぇ瑀", COLOR_TITLE_DEBUFF },
+		{"衰弱之毒", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"MHP㏕﹚", },
---		{"MHP㏕﹚15%", },
+		{"MHP固定下降", },
+--		{"MHP固定降低15%", },
 	}	
 }		
 		
@@ -2848,10 +2848,10 @@ StateIconList[EFST_IDs.EFST_GS_GATLINGFEVER] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"狶╣荐(Gatling Fever)", COLOR_TITLE_BUFF },
+		{"格林狂熱(Gatling Fever)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑硉, 端甡矗ど", },
-		{"癹磷瞯, 簿笆硉", },
+		{"攻擊速度, 傷害提升", },
+		{"迴避率, 移動速度降低", },
 	}	
 }		
 		
@@ -2862,14 +2862,14 @@ StateIconList[EFST_IDs.EFST_VITALITYACTIVATION] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"腹縞ホ ; ノ砰 (Vitality Activation)", COLOR_TITLE_BUFF },
+		{"四號盧恩石 ; 活用體力 (Vitality Activation)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"糤癸┪┮ㄏノ", },
-		{"HP 確м, 珇狦", },
---		{"HP 確 м, 珇狦 1.5", },
-		{"SP ぃ礛確", },
-		{"SP 確媚狦", },
---		{"SP 確媚狦 1/2", },
+		{"增加對自己或自己所使用的", },
+		{"HP 恢復技能, 物品的效果", },
+--		{"HP 恢復 技能, 物品的效果 1.5倍", },
+		{"SP 不可自然恢復", },
+		{"SP 恢復藥水的效果降低", },
+--		{"SP 恢復藥水的效果為 1/2", },
 	}	
 }		
 		
@@ -2880,15 +2880,15 @@ StateIconList[EFST_IDs.EFST_STONEHARDSKIN] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"腹縞ホ ; 祑ホブ涧 (Stone Hard Skin)", COLOR_TITLE_BUFF },
+		{"九號盧恩石 ; 硬石皮膚 (Stone Hard Skin)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"穕ア﹚秖 HPΘ癸单秖ň縨竛", },
---		{"穕アHP 20%Θ癸单秖ň縨竛", },
-		{"讽ㄤ產ō瞶ю阑", },
-		{"ㄌ诀瞯瘆胊秈︽ю阑產猌竟", },
---		{"30% 诀瞯ㄓ瘆胊秈︽ю阑產猌竟", },
-		{"┣玥ㄌ诀瞯10ず ATK", },
---		{"┣玥ㄌ 30% 诀瞯10ず ATK -25%", },
+		{"損失一定量的 HP後可形成對等量的防禦罩", },
+--		{"損失HP 20%後可形成對等量的防禦罩", },
+		{"當其他玩家近身物理攻擊時", },
+		{"依機率可破壞進行攻擊的玩家武器", },
+--		{"以30% 機率來破壞進行攻擊的玩家武器", },
+		{"怪物則依機率10秒內 ATK下降", },
+--		{"怪物則依 30% 機率於10秒內 ATK -25%", },
 	}	
 }		
 		
@@ -2897,9 +2897,9 @@ StateIconList[EFST_IDs.EFST_WEIGHTOVER90] =
 {		
 	descript = 	
 	{	
-		{"秖 90% ", COLOR_TITLE_DEBUFF },
-		{"HP, SP ぃ礛確", },
-		{"ぃㄏノю阑, м", },
+		{"重量 90% 以上", COLOR_TITLE_DEBUFF },
+		{"HP, SP 不可自然恢復", },
+		{"不可使用攻擊, 技能", },
 	}	
 }		
 		
@@ -2910,9 +2910,9 @@ StateIconList[EFST_IDs.EFST_PROTECTHELM] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"て厩繷帛玂臔 (Chemical Protection Helm)", COLOR_TITLE_BUFF },
+		{"化學頭盔保護 (Chemical Protection Helm)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"繷帛荡癸ぃ穦穕胊", },
+		{"頭盔絕對不會損壞", },
 	}	
 }		
 		
@@ -2923,9 +2923,9 @@ StateIconList[EFST_IDs.EFST_PLUSAVOIDVALUE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ほ紇皊狹", COLOR_TITLE_BUFF },
+		{"幻影的酒杯", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"Ч癹磷糤", },
+		{"完全迴避增加", },
 	}	
 }		
 		
@@ -2936,12 +2936,12 @@ StateIconList[EFST_IDs.EFST_OBLIVIONCURSE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ア拘ぇ瑀", COLOR_TITLE_BUFF },
+		{"失憶之毒", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
---		{"? 薄才腹", },
-		{"ア拘", },
---		{"SP ぃ礛確", },
---		{"ぃノ↖纐ぇ砃, 厚︹媚单秆埃", },
+--		{"? 表情符號", },
+		{"失憶", },
+--		{"SP 不可自然恢復", },
+--		{"不能用沉默之術, 綠色藥水等解除", },
 	}	
 }		
 		
@@ -2952,10 +2952,10 @@ StateIconList[EFST_IDs.EFST_HEALPLUS] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"確矗ど媚", COLOR_TITLE_BUFF },
+		{"恢復力提升藥水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"獀隆砃籔场確珇", },
-		{"ㄏノ狦穦矗ど", },
+		{"受到的治癒術與部份恢復物品的", },
+		{"使用效果會提升", },
 	}	
 }		
 		
@@ -2966,9 +2966,9 @@ StateIconList[EFST_IDs.EFST_PROTECT_DEF] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"瞶ň縨媚", COLOR_TITLE_BUFF },
+		{"物理防禦藥水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"瞶ю阑瑻┦糤", },
+		{"物理攻擊耐性增加", },
 	}	
 }		
 		
@@ -2979,9 +2979,9 @@ StateIconList[EFST_IDs.EFST_CRITICALWOUND] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"璓㏑端", COLOR_TITLE_DEBUFF },
+		{"致命傷口", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"確╰м狦穦", },
+		{"受到的恢復系技能的效果會降低", },
 	}	
 }		
 		
@@ -2992,10 +2992,10 @@ StateIconList[EFST_IDs.EFST_PRESTIGE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"獺", COLOR_TITLE_BUFF },
+		{"威信", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄌ借甅ノ臸猭癹磷瞯", },
-		{"ň縨瞯糤", },
+		{"依素質套用於魔法迴避率", },
+		{"防禦率增加", },
 	}	
 }		
 		
@@ -3008,7 +3008,7 @@ StateIconList[EFST_IDs.EFST_FOOD_DEX_CASH] =
 	{	
 --		{"", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"DEX矗ど", },
+		{"DEX提升", },
 	}	
 }		
 		
@@ -3019,9 +3019,9 @@ StateIconList[EFST_IDs.EFST_CARTBOOST] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"も崩ó硉 (Cart Boost)", COLOR_TITLE_BUFF },
+		{"手推車加速 (Cart Boost)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄏノも崩ó簿笆硉糤", },
+		{"使用手推車時移動速度增加", },
 	}	
 }		
 		
@@ -3032,11 +3032,11 @@ StateIconList[EFST_IDs.EFST_L_LIFEPOTION] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"いネ㏑", COLOR_TITLE_BUFF },
+		{"中型生命水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"–4確﹚秖 HP ", },
---		{"–4確 7% MHP  ", },
-		{"╣ぇ簀礚 ", },
+		{"每4秒恢復一定量的 HP ", },
+--		{"每4秒恢復 7%的 MHP  ", },
+		{"於狂怒之槍時無效 ", },
 	}	
 }		
 		
@@ -3047,9 +3047,9 @@ StateIconList[EFST_IDs.EFST_WINDWALK] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ぇ˙ (Wind Walk)", COLOR_TITLE_BUFF },
+		{"風之步 (Wind Walk)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"簿笆硉, 癹磷瞯矗ど", },
+		{"移動速度, 迴避率提升", },
 	}	
 }		
 
@@ -3060,9 +3060,9 @@ StateIconList[EFST_IDs.EFST_PROPERTYFIRE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"礙妮┦ (Flame Launcher)", COLOR_TITLE_BUFF },
+		{"火焰屬性附加 (Flame Launcher)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟结ぉ妮┦", },
+		{"於武器上賦予火屬性", },
 	}	
 }		
 		
@@ -3073,9 +3073,9 @@ StateIconList[EFST_IDs.EFST_STRIKING] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"ゴ阑眏て", COLOR_TITLE_BUFF },
+		{"打擊強化", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"猌竟ю阑, ゲ炳ю阑瞯糤", },
+		{"武器攻擊力, 必殺攻擊率增加", },
 	}	
 }		
 		
@@ -3084,10 +3084,10 @@ StateIconList[EFST_IDs.EFST_DOWNKICK_ON] =
 {		
 	descript = 	
 	{	
-		{"瘂金非称", COLOR_TITLE_BUFF },
-		{"ю阑㏑い寄", },
-		{"ㄌ诀瞯瘂金非称墩", },
---		{"15% 诀瞯蹦瘂金非称墩", },
+		{"砸踢準備", COLOR_TITLE_BUFF },
+		{"攻擊命中敵人時", },
+		{"依機率砸踢準備姿勢", },
+--		{"以15% 機率採砸踢準備姿勢", },
 	}	
 }		
 		
@@ -3101,7 +3101,7 @@ StateIconList[EFST_IDs.EFST_PROPERTYDARK] =
 	{	
 --		{"", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"甅ノ穞妮┦", },
+		{"套用於暗屬性", },
 	}	
 }		
 		
@@ -3112,10 +3112,10 @@ StateIconList[EFST_IDs.EFST_REFLECTSHIELD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"は甮 (Reflect Shield)", COLOR_TITLE_BUFF },
+		{"反射盾 (Reflect Shield)", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸秈︽禯瞒瞶ю阑寄", },
-		{"は甮﹚秖端甡", },
+		{"對自己進行近距離物理攻擊的敵人", },
+		{"反射一定量的傷害", },
 	}	
 }		
 		
@@ -3125,25 +3125,25 @@ StateIconList[EFST_IDs.EFST_RIDING] =
 {		
 	descript = 	
 	{	
---		{"肕砃(Riding)", COLOR_TITLE_BUFF },
---		{"眒糒尘い", },
-		{"肕胐い", COLOR_TITLE_TOGGLE },
+--		{"騎乘術(Riding)", COLOR_TITLE_BUFF },
+--		{"七彩大嘴鳥出租中", },
+		{"騎寵出租中", COLOR_TITLE_TOGGLE },
 	}	
 }		
 		
 -- 413, effect\???.tga		
--- 20100317 霉м穝τ糤尿丁		
+-- 20100317 因修羅技能的更新而增加持續時間		
 StateIconList[EFST_IDs.EFST_LIGHTNINGWALK] =		
 {		
 	haveTimeLimit = 1,	
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"皗筿˙", COLOR_TITLE_BUFF },
+		{"閃電步", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"璝琌环禯瞒瞶, 臸猭ю阑ヘ夹", },
-		{"﹚诀瞯癹磷ю阑", },
-		{"碞簿笆癸ю阑ヘ夹玡", },
+		{"若是遠距離物理, 魔法攻擊的目標時", },
+		{"在一定機率迴避攻擊後", },
+		{"就能移動至對自己攻擊的目標面前", },
 	}	
 }		
 		
@@ -3155,10 +3155,10 @@ StateIconList[EFST_IDs.EFST_FROSTMISTY] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"挡", COLOR_TITLE_DEBUFF },
+		{"結冰", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"ň縨瞯, 簿笆硉, ю阑硉", },
-		{"㏕﹚碟佰丁糤", },
+		{"防禦率, 移動速度, 攻擊速度降低", },
+		{"固定詠唱時間增加", },
 	}	
 }		
 		
@@ -3170,10 +3170,10 @@ StateIconList[EFST_IDs.EFST_COLD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"睪砰玱紆", COLOR_TITLE_DEBUFF },
+		{"液體冷卻彈", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"妮┦端甡籔", },
-		{"挡, 钵盽篈", },
+		{"水屬性傷害與", },
+		{"結冰, 冰凍異常狀態", },
 	}	
 }		
 		
@@ -3186,53 +3186,53 @@ StateIconList[EFST_IDs.EFST_GROUNDMAGIC] =
 	descript = 	
 	{	
 		{"%s", COLOR_TIME },
-		{"甅ノм狦", },
---	眖藉じ烩办, じ烩办, 脄祇い3匡1	
+		{"套用地面技能的效果", },
+--	從賢者的水元素領域, 風元素領域, 火山爆發中3選1	
 	}	
 }		
--------------------------------------------------------------- 藉 じ烩办, じ烩办, 脄祇 м 非称		
+-------------------------------------------------------------- 賢者 水元素領域, 風元素領域, 火山爆發 技能 準備		
 --[[		
---	藉じ烩办	
+--	賢者的水元素領域	
 StateIconList[EFST_IDs.EFST_SPECIALZONE_SA_DELUGE] =		
 {		
 	haveTimeLimit = 1,	
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"じ烩办", COLOR_TITLE_BUFF },
+		{"水元素領域", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"赣竚┮Τ妮┦ю阑糤", },
-		{"MaxHp糤", },
+		{"於該位置上所有水屬性攻擊力增加", },
+		{"MaxHp增加", },
 	}	
 }		
---	藉じ烩办	
+--	賢者的風元素領域	
 StateIconList[EFST_IDs.EFST_SPECIALZONE_SA_VIOLENTGALE] =		
 {		
 	haveTimeLimit = 1,	
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"じ烩办", COLOR_TITLE_BUFF },
+		{"風元素領域", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"赣竚┮Τ妮┦ю阑糤", },
-		{"癹磷瞯糤", },
+		{"於該位置上所有風屬性攻擊力增加", },
+		{"迴避率增加", },
 	}	
 }		
---	藉脄祇	
+--	賢者的火山爆發	
 StateIconList[EFST_IDs.EFST_SPECIALZONE_SA_VOLCANO] =		
 {		
 	haveTimeLimit = 1,	
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"脄祇", COLOR_TITLE_BUFF },
+		{"火山爆發", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"赣竚┮Τ妮┦ю阑糤", },
-		{"ATK糤", },
+		{"於該位置上所有火屬性攻擊力增加", },
+		{"ATK增加", },
 	}	
 }		
 --]]		
--------------------------------------------------------------- 藉 じ烩办, じ烩办, 脄祇 м 非称 Ч		
+-------------------------------------------------------------- 賢者 水元素領域, 風元素領域, 火山爆發 技能 準備 完		
 -- 304, effect\npc_hellpower.tga		
 -- ?? ???? ??? ?? ??		
 StateIconList[EFST_IDs.EFST_HELLPOWER] =		
@@ -3241,23 +3241,23 @@ StateIconList[EFST_IDs.EFST_HELLPOWER] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"夯ぇ舦", COLOR_TITLE_BUFF },
+		{"地獄之權威", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ確", },
-		{"ぃㄏノ彼㏑ю阑", },
-		{"ぃㄏノ確ぇ靡", },
+		{"不可復活", },
+		{"不可使用捨命攻擊", },
+		{"不可使用原地復活之證", },
 	}	
 }		
--------------------------------------------------------------- 20100324 +20 穝糤瞶才腹		
+-------------------------------------------------------------- 20100324 +20 新增料理符號		
 StateIconList[EFST_IDs.EFST_SAVAGE_STEAK] =		
 {		
 	haveTimeLimit = 1,	
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"疦偿睫逼", COLOR_TITLE_BUFF },
+		{"烤小野豬排", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"STR糤", },
+		{"STR增加", },
 	}	
 }		
 StateIconList[EFST_IDs.EFST_COCKTAIL_WARG_BLOOD] =		
@@ -3266,9 +3266,9 @@ StateIconList[EFST_IDs.EFST_COCKTAIL_WARG_BLOOD] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"蔓Ю皊疶﹀", COLOR_TITLE_BUFF },
+		{"雞尾酒狼血", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"INT糤", },
+		{"INT增加", },
 	}	
 }		
 StateIconList[EFST_IDs.EFST_MINOR_BBQ] =		
@@ -3277,9 +3277,9 @@ StateIconList[EFST_IDs.EFST_MINOR_BBQ] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"μ吹縉疦", COLOR_TITLE_BUFF },
+		{"米洛斯燒烤", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"VIT糤", },
+		{"VIT增加", },
 	}	
 }		
 StateIconList[EFST_IDs.EFST_SIROMA_ICE_TEA] =		
@@ -3288,9 +3288,9 @@ StateIconList[EFST_IDs.EFST_SIROMA_ICE_TEA] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"撤脋", COLOR_TITLE_BUFF },
+		{"小雪獸冰茶", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"DEX糤", },
+		{"DEX增加", },
 	}	
 }		
 StateIconList[EFST_IDs.EFST_DROCERA_HERB_STEAMED] =		
@@ -3299,9 +3299,9 @@ StateIconList[EFST_IDs.EFST_DROCERA_HERB_STEAMED] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"挛媚肺", COLOR_TITLE_BUFF },
+		{"捕蟲草藥草煎", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"AGI糤", },
+		{"AGI增加", },
 	}	
 }		
 StateIconList[EFST_IDs.EFST_PUTTI_TAILS_NOODLES] =		
@@ -3310,9 +3310,9 @@ StateIconList[EFST_IDs.EFST_PUTTI_TAILS_NOODLES] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"拨疭纒Ю难", COLOR_TITLE_BUFF },
+		{"畢帝特龍尾麵", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"LUK糤", },
+		{"LUK增加", },
 	}	
 }		
 StateIconList[EFST_IDs.EFST_STOMACHACHE] =		
@@ -3321,12 +3321,12 @@ StateIconList[EFST_IDs.EFST_STOMACHACHE] =
 	posTimeLimitStr = 2,	
 	descript = 	
 	{	
-		{"浮礹", COLOR_TITLE_BUFF },
+		{"腹痛", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"┮Τ借", },
-		{"簿笆硉", },
-		{"–10瞷ΩГ笆", },
-		{"–10﹚秖 SP", },
+		{"所有素質加重值降低", },
+		{"移動速度降低", },
+		{"每10秒出現一次坐下動作", },
+		{"每10秒消耗一定量的 SP", },
 	}	
 }		
 		
@@ -3340,24 +3340,24 @@ StateIconList[EFST_IDs.EFST_PROTECTEXP] =
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"洱и稲眤", COLOR_TITLE_BUFF },
+		{"爸媽我愛您", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
---		{"﹚秖 SP ", },
---		{"10%SP", },
-		{"ㄏ皚ぃ穦穕ア竒喷", },
+--		{"消耗一定量的 SP ", },
+--		{"消耗10%的SP", },
+		{"即使陣亡也不會損失經驗值", },
 	}
 }
--- 314, effect\ぱㄏ臔.tga
+-- 314, effect\天使的守護.tga
 StateIconList[EFST_IDs.EFST_ANGEL_PROTECT] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"ぱㄏ臔", COLOR_TITLE_BUFF },
+		{"天使的守護", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"HP, SP確硉ど", },
---		{"HP, SP確硉 +50%", },
+		{"HP, SP恢復速度上升", },
+--		{"HP, SP恢復速度 +50%", },
 	}
 }
 -------------------------------------------------------------- 20100519 ?? ?? ????, ??? ?? ?? ?
@@ -3370,7 +3370,7 @@ StateIconList[EFST_IDs.EFST_EL_WAIT] =
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"弘艶单家Α", COLOR_TITLE_BUFF },
+		{"精靈等待模式", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
 		{"", },
 	}
@@ -3382,7 +3382,7 @@ StateIconList[EFST_IDs.EFST_EL_PASSIVE] =
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"弘艶砆笆家Α", COLOR_TITLE_BUFF },
+		{"精靈被動模式", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
 		{"", },
 	}
@@ -3394,7 +3394,7 @@ StateIconList[EFST_IDs.EFST_EL_DEFENSIVE] =
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"弘艶ň縨家Α", COLOR_TITLE_BUFF },
+		{"精靈防禦模式", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
 		{"", },
 	}
@@ -3406,7 +3406,7 @@ StateIconList[EFST_IDs.EFST_EL_OFFENSIVE] =
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"弘艶ю阑家Α", COLOR_TITLE_BUFF },
+		{"精靈攻擊模式", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
 		{"", },
 	}
@@ -3421,88 +3421,88 @@ StateIconList[EFST_IDs.EFST_MORA_BUFF] =
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"縫┰狦", COLOR_TITLE_BUFF },
+		{"穆拉水果", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"縫┰綟偿", },
-		{"﹍┣к┦糤", },
+		{"穆拉村鄰近原野", },
+		{"原始怪物的抗性增加", },
 	}
 }
 -------------------------------------------------------------- 20100609 ???? ?? ?
 -------------------------------------------------------------- 20100611 ?? ??, ??? ?? ??, ??? ??? ?? ??
--- 423, effect\ICON02.tga - 毙绘爱
+-- 423, effect\ICON02.tga - 教皇餅乾
 StateIconList[EFST_IDs.EFST_POPECOOKIE] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"毙绘爱", COLOR_TITLE_BUFF },
+		{"教皇餅乾", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ATK, MATK 糤", },
---		{"ATK, MATK 糤3% ", },
-		{"┮Τ妮┦瑻┦糤", },
---		{"┮Τ妮┦糤 3% ", },
+		{"ATK, MATK 增加", },
+--		{"ATK, MATK 增加3% ", },
+		{"所有屬性耐性增加", },
+--		{"所有屬性增加 3% ", },
 	}
 }
--- 579, effect\ICON02.tga -て媚
+-- 579, effect\ICON02.tga -活化藥水
 StateIconList[EFST_IDs.EFST_VITALIZE_POTION] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"て媚", COLOR_TITLE_BUFF },
+		{"活化藥水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ATK, MATK糤", },
+		{"ATK, MATK增加", },
 --		{"ATK, MATK+2% ", },
-		{"矗ど励隆㎝笵ㄣ確", },
---		{"励隆㎝笵ㄣ確+10%", },
+		{"提升療癒和道具恢復效能", },
+--		{"療癒和道具恢復效能+10%", },
 	}
 }
--- 578, effect\いネ㏑.tga -硉ネ㏑
+-- 578, effect\中型生命水.tga -速效生命水
 StateIconList[EFST_IDs.EFST_G_LIFEPOTION] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"硉ネ㏑", COLOR_TITLE_BUFF },
+		{"速效生命水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"–3確﹚秖HP ", },
---		{"–3HP確MHP 6% ", },
-		{"╣忌篈い礚狦", },
+		{"每3秒恢復定量的HP ", },
+--		{"每3秒HP恢復到MHP 6% ", },
+		{"狂暴狀態中無效果", },
 	}
 }
 -------------------------------------------------------------- 20100611 ?? ??, ??? ?? ??, ??? ??? ?? ?
 -------------------------------------------------------------- 20100621 ??? ? ?? ??
--- 583, effect\all_odins_power.tga - 而ぇ
+-- 583, effect\all_odins_power.tga - 奧丁之神力
 StateIconList[EFST_IDs.EFST_ODINS_POWER] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript = 
 	{
-		{"而ぇ", COLOR_TITLE_BUFF },
+		{"奧丁之神力", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ATK, MATK矗ど", },
-		{"DEF, MDEF搭ぶ", },
+		{"ATK, MATK提升", },
+		{"DEF, MDEF減少", },
 	}
 }
 -------------------------------------------------------------- 20100621 ??? ? ?? ?
--------------------------------------------------------------- 20101129 う, ??? ?? ??
--- 297, effect\う.tga - う - ??? ?? ???
+-------------------------------------------------------------- 20101129 仙丹, ??? ?? ??
+-- 297, effect\仙丹.tga - 仙丹 - ??? ?? ???
 StateIconList[EFST_IDs.EFST_ATKER_ASPD] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"う", COLOR_TITLE_BUFF },
+		{"仙丹", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"MHP糤", },
-		{"HP確糤", },
---		{"1糤MHP5%", },
---		{"1糤HP確10%", },
+		{"MHP增加", },
+		{"HP恢復力增加", },
+--		{"1個小時增加MHP5%", },
+--		{"1個小時增加HP恢復力10%", },
 	}
 }
 
@@ -3513,17 +3513,17 @@ StateIconList[EFST_IDs.EFST_ATKER_MOVESPEED] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"耴じう", COLOR_TITLE_BUFF },
+		{"歸元丹", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"MSP 糤", },
-		{"SP 確糤", },
---		{"1ずMSP +5%", },
---		{"1ずSP確 +10% ", },
+		{"MSP 增加", },
+		{"SP 恢復力增加", },
+--		{"1小時內MSP +5%", },
+--		{"1小時內SP恢復力 +10% ", },
 	}
 }
--------------------------------------------------------------- 20101129 う, ??? ?? ?
+-------------------------------------------------------------- 20101129 仙丹, ??? ?? ?
 -------------------------------------------------------------- 20101227 ?? ????? ??? ATK, MATK ?? ??? ?? ??
---  150, effect\PLUSATTACKPOWER.tga - ATK 矗ど
+--  150, effect\PLUSATTACKPOWER.tga - ATK 提升
 StateIconList[EFST_IDs.EFST_PLUSATTACKPOWER] =
 {
 	haveTimeLimit = 1,
@@ -3531,10 +3531,10 @@ StateIconList[EFST_IDs.EFST_PLUSATTACKPOWER] =
 	descript =
 	{
 		{"%s", COLOR_TIME },
-		{"ATK 矗ど", },
+		{"ATK 提升", },
 	}
 }
---  151, effect\PLUSMAGICPOWER.tga - MATK 矗ど
+--  151, effect\PLUSMAGICPOWER.tga - MATK 提升
 StateIconList[EFST_IDs.EFST_PLUSMAGICPOWER] =
 {
 	haveTimeLimit = 1,
@@ -3542,36 +3542,36 @@ StateIconList[EFST_IDs.EFST_PLUSMAGICPOWER] =
 	descript =
 	{
 		{"%s", COLOR_TIME },
-		{"MATK 矗ど", },
+		{"MATK 提升", },
 	}
 }
 -------------------------------------------------------------- 20101227 ?? ????? ??? ATK, MATK ?? ??? ?? ?
--------------------------------------------------------------- 20110106 芖笆絤╰参
---  615, effect\???.tga - 笆絤╰参ㄏノ
+-------------------------------------------------------------- 20110106 台灣自動練功系統
+--  615, effect\???.tga - 自動練功系統使用
 StateIconList[EFST_IDs.EFST_MACRO_PERMIT] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{[[笆絤╰参ㄏノ]], COLOR_TITLE_SYSTEM },
+		{[[自動練功系統使用]], COLOR_TITLE_SYSTEM },
 		{[[%s]], COLOR_TIME },
-		{[[笆絤╰参ㄏノい]], },
+		{[[自動練功系統使用中]], },
 	}
 }
---  616, effect\???.tga - 笆絤╰参┑筐丁
+--  616, effect\???.tga - 自動練功系統延遲時間
 StateIconList[EFST_IDs.EFST_MACRO_POSTDELAY] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{[[笆絤╰参]], COLOR_TITLE_SYSTEM },
+		{[[自動練功系統]], COLOR_TITLE_SYSTEM },
 		{[[%s]], COLOR_TIME },
-		{[[笆絤╰参]], },
+		{[[自動練功系統]], },
 	}
 }
--------------------------------------------------------------- 20110110 芖笆絤╰参end
+-------------------------------------------------------------- 20110110 台灣自動練功系統end
 
 -------------------------------------------------------------- 20110217 ??? ?? ??? ?? ??? ?? ??
 --  621, effect\??.tga - ??? ?? ?
@@ -3581,9 +3581,9 @@ StateIconList[EFST_IDs.EFST_MONSTER_TRANSFORM] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"跑ō┣", COLOR_TITLE_BUFF },
+		{"變身怪物", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"跑ō┣い", },
+		{"變身怪物中", },
 	}
 }
 --  622, effect\??.tga - ?? ?? ??
@@ -3591,7 +3591,7 @@ StateIconList[EFST_IDs.EFST_SIT] =
 {
 	descript =
 	{
-		{"Г", COLOR_TITLE_TOGGLE },
+		{"坐下", COLOR_TITLE_TOGGLE },
 	}
 }
 -------------------------------------------------------------- 20110221 ??? ?? ??? ?? ??? ?? ?
@@ -3601,7 +3601,7 @@ StateIconList[EFST_IDs.EFST_ALL_RIDING] =
 {
 	descript =
 	{
-		{"穎い", COLOR_TITLE_TOGGLE },
+		{"搭乘中", COLOR_TITLE_TOGGLE },
 	}
 }
 -------------------------------------------------------------- 20110224 ? ? ?? ?? ??? ?? ?
@@ -3614,7 +3614,7 @@ StateIconList[EFST_IDs.EFST_SKF_MATK] =
 	descript =
 	{
 		{"%s", COLOR_TIME },
-		{"MATK糤", },
+		{"MATK增加", },
 	}
 }
 --  634, effect\icon08.tga - ATK +24
@@ -3625,7 +3625,7 @@ StateIconList[EFST_IDs.EFST_SKF_ATK] =
 	descript =
 	{
 		{"%s", COLOR_TIME },
-		{"ATK糤", },
+		{"ATK增加", },
 	}
 }
 --  633, effect\icon08.tga - ASPD +3%
@@ -3636,10 +3636,10 @@ StateIconList[EFST_IDs.EFST_SKF_ASPD] =
 	descript =
 	{
 		{"%s", COLOR_TIME },
-		{"ю阑硉糤", },
+		{"攻擊速度增加", },
 	}
 }
---  632, effect\icon08.tga - 跑笆碟佰 ?? 5% ??
+--  632, effect\icon08.tga - 變動詠唱 ?? 5% ??
 StateIconList[EFST_IDs.EFST_SKF_CAST] =
 {
 	haveTimeLimit = 1,
@@ -3647,7 +3647,7 @@ StateIconList[EFST_IDs.EFST_SKF_CAST] =
 	descript =
 	{
 		{"%s", COLOR_TIME },
-		{"跑笆碟佰丁搭ぶ", },
+		{"變動詠唱時間減少", },
 	}
 }
 -------------------------------------------------------------- 20110302 ?? ??? ??? ??? ?? ?
@@ -3660,7 +3660,7 @@ StateIconList[EFST_IDs.EFST_REWARD_PLUSONLYJOBEXP] =
 	descript =
 	{
 		{"%s", COLOR_TIME },
-		{"JOB竒喷肂莉眔", },
+		{"JOB經驗值額外獲得", },
 	}
 }
 -------------------------------------------------------------- 20110311 ?? ???? ?? ??? ?? ?
@@ -3672,10 +3672,10 @@ StateIconList[EFST_IDs.EFST_ENERVATION] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ㄣ:礚", COLOR_TITLE_DEBUFF },
+		{"面具:無力", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑", },
-		{"砆ю阑穦ア瞴砰", },
+		{"攻擊力降低", },
+		{"被攻擊時會失去氣球體", },
 	}
 }
 -- 409, effect\Masquerade_GROOMY.tga
@@ -3685,11 +3685,11 @@ StateIconList[EFST_IDs.EFST_GROOMY] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ㄣ : 紐苳", COLOR_TITLE_DEBUFF },
+		{"面具 : 憂鬱", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑硉, ㏑い瞯", },
-		{"砆ю阑秆埃﹀娇交", },
-		{"﹀娇交ぃㄏノ", },
+		{"攻擊速度, 命中率降低", },
+		{"被攻擊時解除吸血蝙蝠", },
+		{"吸血蝙蝠不可使用", },
 	}
 }
 -- 411, effect\Masquerade_IGNORANCE.tga
@@ -3699,10 +3699,10 @@ StateIconList[EFST_IDs.EFST_IGNORANCE] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ㄣ : 礚", COLOR_TITLE_DEBUFF },
+		{"面具 : 無知", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"砆ю阑穦穕ア﹚秖SP", },
-		{"м, 臸猭ぃㄏノ", },
+		{"被攻擊時會損失一定量的SP", },
+		{"技能, 魔法不可使用", },
 	}
 }
 -- 412, effect\Masquerade_LAZINESS.tga
@@ -3712,11 +3712,11 @@ StateIconList[EFST_IDs.EFST_LAZINESS] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ㄣ : 胕床)", COLOR_TITLE_DEBUFF },
+		{"面具 : 懶散)", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"簿笆硉, 癹磷瞯", },
-		{"碟佰丁糤", },
-		{"ㄏノм穦肂﹚秖SP ", },
+		{"移動速度, 迴避率降低", },
+		{"詠唱時間增加", },
+		{"使用技能時時會額外消耗一定量的SP ", },
 	}
 }
 -- 415, effect\Masquerade_UNLUCKY.tga
@@ -3726,12 +3726,12 @@ StateIconList[EFST_IDs.EFST_UNLUCKY] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ㄣ : ぃ┋", COLOR_TITLE_DEBUFF },
+		{"面具 : 不幸", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"忌阑瞯", },
-		{"Ч癹磷瞯", },
-		{"ㄏノм穦﹚秖刽", },
-		{"砆ю阑穦祇ネ疭﹚钵盽猵", },
+		{"暴擊率降低", },
+		{"完全迴避率降低", },
+		{"使用技能時會消耗一定量的金幣", },
+		{"被攻擊時會發生特定異常狀況", },
 	}
 }
 -- 418, effect\Masquerade_WEAKNESS.tga
@@ -3741,11 +3741,11 @@ StateIconList[EFST_IDs.EFST_WEAKNESS] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ㄣ : 癐畓", COLOR_TITLE_DEBUFF },
+		{"面具 : 衰弱", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"搭ぶ﹚秖MHP ", },
-		{"砆ю阑穦埃猌竟, 礟杆称", },
-		{"猌竟, 礟ぃ杆称", },
+		{"減少一定量的MHP ", },
+		{"被攻擊時會卸除武器, 盾牌裝備", },
+		{"武器, 盾牌不可裝備", },
 	}
 }
 -------------------------------------------------------------- 20110325 ?????? ?????? ?? ?? ?? ?
@@ -3757,11 +3757,11 @@ StateIconList[EFST_IDs.EFST_STEELBODY] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ぃ胊", COLOR_TITLE_BUFF },
+		{"金剛不壞", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{" DEF, MDEF㏕﹚Θ耕蔼计", },
-		{"簿笆硉, ю阑硉", },
-		{"мぃㄏノ", },
+		{" DEF, MDEF固定成較高的數值", },
+		{"移動速度, 攻擊速度降低", },
+		{"技能不可使用", },
 	}
 }
 -- 390, effect\LG_REFLECTDAMAGE.tga		- ?? ?? - ???? ??? - 20110607 ????
@@ -3771,12 +3771,12 @@ StateIconList[EFST_IDs.EFST_LG_REFLECTDAMAGE] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"は甮端甡", COLOR_TITLE_TOGGLE },
+		{"反射傷害", COLOR_TITLE_TOGGLE },
 		{"%s", COLOR_TIME },
-		{"р綝场だ端甡だ床㏄瞅", },
---		{"р綝场だ禯瞒瞶端甡だ床㏄瞅", },
---		{"(疭﹚炒ɡ端甡埃)", },
-		{"–穦﹚秖SP", },
+		{"把遭受的部分傷害分散到周圍", },
+--		{"把遭受的部分近距離物理傷害分散到周圍", },
+--		{"(特定陷阱傷害除外)", },
+		{"每秒會消耗一定量的SP", },
 	}
 }
 -------------------------------------------------------------- 20110331 ???? ?? ?? ?
@@ -3788,11 +3788,11 @@ StateIconList[EFST_IDs.EFST_MVPCARD_TAOGUNKA] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"娥而竤辈禸", COLOR_TITLE_BUFF },
+		{"塔奧群卡捲軸", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"MHP糤", },
+		{"MHP增加", },
 --		{"MHP +100%", },
-		{"DEF/MDEF搭ぶ", },
+		{"DEF/MDEF減少", },
 --		{"DEF -50, MDEF -50", },
 	}
 }
@@ -3803,11 +3803,11 @@ StateIconList[EFST_IDs.EFST_MVPCARD_MISTRESS] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"噶辈禸", COLOR_TITLE_BUFF },
+		{"蜂后捲軸", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ礙臸膓ホㄏノ臸猭", },
-		{"SP秖糤", },
---		{"SP秖 +25% ", },
+		{"不消耗火焰魔力礦石下可使用魔法", },
+		{"SP消耗量增加", },
+--		{"SP消耗量 +25% ", },
 	}
 }
 -- 370, effect\MVPCARD_ORCHERO.tga
@@ -3817,9 +3817,9 @@ StateIconList[EFST_IDs.EFST_MVPCARD_ORCHERO] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"脋璣动禸", COLOR_TITLE_BUFF },
+		{"獸人英雄卷軸", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ穦炒穡痶", },
+		{"不會陷入暈眩", },
 	}
 }
 -- 371, effect\MVPCARD_ORCLORD.tga
@@ -3829,10 +3829,10 @@ StateIconList[EFST_IDs.EFST_MVPCARD_ORCLORD] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"脋辈禸", COLOR_TITLE_BUFF },
+		{"獸人酋長捲軸", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"穦は甮场だ禯瞒瞶ю阑", },
---		{"穦は甮30%禯瞒瞶ю阑", },
+		{"會反射部分近距離物理攻擊", },
+--		{"會反射30%的近距離物理攻擊", },
 	}
 }
 -------------------------------------------------------------- 20110526 ??? ??????? ?? ?
@@ -3844,9 +3844,9 @@ StateIconList[EFST_IDs.EFST_HANDICAPSTATE_NORECOVER] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ぃ確篈", COLOR_TITLE_DEBUFF },
+		{"不可恢復狀態", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"HP, SP 跑ぃ確篈", },
+		{"HP, SP 變不可恢復狀態", },
 	}
 }
 -- 638, effect\SETDEF.tga
@@ -3857,7 +3857,7 @@ StateIconList[EFST_IDs.EFST_SET_NUM_DEF] =
 	descript =
 	{
 		{"%s", COLOR_TIME },
-		{"DEF ㏕﹚Θ疭﹚计", }
+		{"DEF 固定成特定的數值", }
 	}
 }
 -- 639, effect\SETMDEF.tga
@@ -3868,7 +3868,7 @@ StateIconList[EFST_IDs.EFST_SET_NUM_MDEF] =
 	descript =
 	{
 		{"%s", COLOR_TIME },
-		{"MDEF㏕﹚Θ疭﹚计", }
+		{"MDEF固定成特定的數值", }
 	}
 }
 -- 640, effect\SETDEF.tga
@@ -3876,7 +3876,7 @@ StateIconList[EFST_IDs.EFST_SET_PER_DEF] =
 {
 	descript =
 	{
-		{"DEF㏕﹚Θ疭﹚κだゑ", }
+		{"DEF固定成特定百分比", }
 	}
 }
 -- 641, effect\SETMDEF.tga
@@ -3884,7 +3884,7 @@ StateIconList[EFST_IDs.EFST_SET_PER_MDEF] =
 {
 	descript =
 	{
-		{"MDEF㏕﹚Θ疭﹚κだゑ", }
+		{"MDEF固定成特定百分比", }
 	}
 }
 -------------------------------------------------------------- 20110617 ????? ??? ?? ?
@@ -3896,10 +3896,10 @@ StateIconList[EFST_IDs.EFST_EXTREMITYFIST] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"霉臦澳", COLOR_TITLE_DEBUFF },
+		{"阿修羅霸凰拳", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"SPぃ確", },
---		{"10ず SP ぃ確", },
+		{"SP不可恢復", },
+--		{"10秒內 SP 不可恢復", },
 	}
 }
 -------------------------------------------------------------- 20110627 ??? ??? ?? ?
@@ -3911,9 +3911,9 @@ StateIconList[EFST_IDs.EFST_ATTHASTE_CASH] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ASPD 眏て媚", COLOR_TITLE_BUFF },
+		{"ASPD 強化藥水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑硉糤", },
+		{"攻擊速度增加", },
 	}
 }
 -------------------------------------------------------------- 20110726 ASPD ?? ?? ?? ?
@@ -3925,11 +3925,11 @@ StateIconList[EFST_IDs.EFST_2011RWC] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"猳聾", COLOR_TITLE_BUFF },
+		{"加油鞭炮", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"场借糤", },
---		{"场借 +3", },
-		{"ATK, MATK 糤", },
+		{"全部素質增加", },
+--		{"全部素質 +3", },
+		{"ATK, MATK 增加", },
 --		{"ATK, MATK + 5%", },
 	}
 }
@@ -3942,11 +3942,11 @@ StateIconList[EFST_IDs.EFST_PHI_DEMON] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"艶キ才", COLOR_TITLE_BUFF },
+		{"古代神靈平安符", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"癸碿臸╰┣", },
-		{"瞶, 臸猭端甡糤", },
---		{"癸碿臸╰┣端甡 +10%", },
+		{"對惡魔系怪的", },
+		{"物理, 魔法傷害增加", },
+--		{"對惡魔系怪的傷害 +10%", },
 	}
 }
 -------------------------------------------------------------- 20110830 ??? ????? ?? ?? ?
@@ -3958,11 +3958,11 @@ StateIconList[EFST_IDs.EFST_GM_BATTLE] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"驹矮艶媚", COLOR_TITLE_BUFF },
+		{"戰鬥靈藥", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ATK, MATK 糤", },
+		{"ATK, MATK 增加", },
 --		{"ATK, MATK + 5%", },
-		{"MHP, MSP搭ぶ", },
+		{"MHP, MSP減少", },
 --		{"MHP, MSP - 3%", },
 	}
 }
@@ -3973,11 +3973,11 @@ StateIconList[EFST_IDs.EFST_GM_BATTLE2] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"蔼驹矮艶媚", COLOR_TITLE_BUFF },
+		{"高級戰鬥靈藥", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ATK, MATK 糤", },
+		{"ATK, MATK 增加", },
 --		{"ATK, MATK + 10%", },
-		{"MHP, MSP 搭ぶ", },
+		{"MHP, MSP 減少", },
 --		{"MHP, MSP - 5%", },
 	}
 }
@@ -3990,16 +3990,16 @@ StateIconList[EFST_IDs.EFST_2011RWC_SCROLL] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"︹崩竟", COLOR_TITLE_BUFF },
+		{"紅色助推器", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ATK, MATK 糤", },
+		{"ATK, MATK 增加", },
 --		{"ATK, MATK + 30", },
-		{"ю阑硉糤", },
-		{"跑笆碟佰", },
---		{"ю阑┑筐, 跑笆碟佰 -5%, },
-		{"瞶, 臸猭ю阑Τ诀瞯", },
-		{"祇笆み井籈м", },
---		{"祇笆み井籈м 3Lv ", },
+		{"攻擊速度增加", },
+		{"變動詠唱降低", },
+--		{"攻擊後延遲, 變動詠唱 -5%, },
+		{"物理, 魔法攻擊時有機率", },
+		{"發動心神凝聚技能", },
+--		{"發動心神凝聚技能 3Lv ", },
 	}
 }
 -------------------------------------------------------------- 20111010 RWC ??? ??? ?? ?? ?
@@ -4011,14 +4011,14 @@ StateIconList[EFST_IDs.EFST_MEIKYOUSISUI] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"描ゎ", COLOR_TITLE_BUFF },
+		{"明鏡止水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"確﹚秖 HP ", },
-		{"確﹚秖 SP ", },
-		{"ぃ簿笆", },
-		{"Τ诀瞯ぃ端甡", },
-		{"ㄏノм穦繦诀秆埃Debuff ", },
-		{"綝端甡穦秆埃狦", },
+		{"可恢復一定量的 HP ", },
+		{"可恢復一定量的 SP ", },
+		{"不可移動", },
+		{"有機率不受到傷害", },
+		{"使用技能時會隨機解除Debuff ", },
+		{"遭受傷害時會解除效果", },
 	}
 }
 -- 652, effect\IZAYOI.TGA
@@ -4028,13 +4028,13 @@ StateIconList[EFST_IDs.EFST_IZAYOI] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"材16边", COLOR_TITLE_BUFF },
+		{"第16個夜晚", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"秆埃㏕﹚碟佰", },
-		{"跑笆碟佰", },
---		{"㏕﹚碟佰 -100%, 跑笆碟佰 -50%", },
-		{"珇 MATK 糤", },
-		{"–穦﹚秖 SP ", },
+		{"解除固定詠唱", },
+		{"變動詠唱降低", },
+--		{"固定詠唱 -100%, 變動詠唱 -50%", },
+		{"物品的 MATK 增加", },
+		{"每秒會消耗一定量的 SP ", },
 	}
 }
 -- 654, effect\KG_KAGEHUMI.TGA
@@ -4044,12 +4044,12 @@ StateIconList[EFST_IDs.EFST_KG_KAGEHUMI] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"今紇", COLOR_TITLE_DEBUFF },
+		{"踏影", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ簿笆", },
-		{"秆埃疭﹚м", },
-		{"留ō俐丁簿笆м笵ㄣ单ぃㄏノ", },
-		{"候㊣мぃㄏノ", },
+		{"不能移動", },
+		{"解除特定技能", },
+		{"隱身、瞬間移動技能、道具等皆不可使用", },
+		{"緊急呼叫技能不可使用", },
 	}
 }
 -- 655, effect\KYOMU.TGA
@@ -4059,10 +4059,10 @@ StateIconList[EFST_IDs.EFST_KYOMU] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"店礚钠Мぇ紇", COLOR_TITLE_DEBUFF },
+		{"虛無飄妙之影", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"盢瞶㎝臸猭ю阑は甮狦跑礚", },
-		{"ㄏノмΤ诀瞯ㄏノм穦ア毖", },
+		{"將物理和魔法攻擊反射效果變無效", },
+		{"使用技能時有機率使用技能會失敗", },
 	}
 }
 -- 656, effect\KAGEMUSYA.TGA
@@ -4072,12 +4072,12 @@ StateIconList[EFST_IDs.EFST_KAGEMUSYA] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"紇猌", COLOR_TITLE_BUFF },
+		{"影子武士", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"结ぉ硈阑狦", },
-		{"–穦﹚秖SP", },
---		{"–穦1 SP", },
-		{"砆ю阑﹚Ω计秆埃篈", },
+		{"賦予二刀連擊效果", },
+		{"每秒會消耗一定量的SP", },
+--		{"每秒會消耗1的 SP", },
+		{"被攻擊一定次數時解除狀態", },
 	}
 }
 -- 657, effect\ZANGETSU.TGA
@@ -4087,11 +4087,11 @@ StateIconList[EFST_IDs.EFST_ZANGETSU] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"跑┒る", COLOR_TITLE_BUFF },
+		{"變形的上弦月", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ㄌ酚Base Lv结ぉ狦", },
---		{"计 - MATK 糤, ATK搭ぶ", },
---		{"案计 - ATK 糤, MATK搭ぶ", },
+		{"依照Base Lv賦予效果", },
+--		{"奇數 - MATK 增加, ATK減少", },
+--		{"偶數 - ATK 增加, MATK減少", },
 	}
 }
 -- 659, effect\GENSOU.TGA
@@ -4101,11 +4101,11 @@ StateIconList[EFST_IDs.EFST_GENSOU] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"潮るほ紇", COLOR_TITLE_BUFF },
+		{"陰月的幻影", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"HP㎝SP穦繦诀糤┪搭ぶ", },
-		{"綝臸猭ю阑,", },
-		{"Τ端甡穦锣簿癸よō", },
+		{"HP和SP會隨機增加或減少", },
+		{"遭受魔法攻擊時,", },
+		{"有一半的傷害會轉移到對方身上", },
 	}
 }
 -- 660, effect\AKAITSUKI.TGA
@@ -4115,11 +4115,11 @@ StateIconList[EFST_IDs.EFST_AKAITSUKI] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ぃ不る", COLOR_TITLE_DEBUFF },
+		{"不祥的紅月", COLOR_TITLE_DEBUFF },
 		{"%s", COLOR_TIME },
-		{"疭﹚確HPм", },
-		{"ぃ穦確τ琌綝", },
---		{"確秖 1/2端甡", },
+		{"特定恢復HP技能", },
+		{"並不會恢復，而是遭受", },
+--		{"恢復量 1/2的傷害", },
 	}
 }
 -------------------------------------------------------------- 20111025 ??? ???? ?? ?? ?
@@ -4131,9 +4131,9 @@ StateIconList[EFST_IDs.EFST_MYSTICPOWDER] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ソ", COLOR_TITLE_BUFF },
+		{"神奇粉末", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"FLEE, LUK 糤", },
+		{"FLEE, LUK 增加", },
 --		{"FLEE + 20, LUK + 10", },
 	}
 }
@@ -4146,10 +4146,10 @@ StateIconList[EFST_IDs.EFST_ACARAJE] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"┰城猳绘", COLOR_TITLE_BUFF },
+		{"阿卡拉傑油炸餅", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑硉, HIT 糤", },
---		{"ю阑硉 +10%, HIT + 5", },
+		{"攻擊速度, HIT 增加", },
+--		{"攻擊速度 +10%, HIT + 5", },
 	}
 }
 -------------------------------------------------------------- 20120112 ??? ???? ??? ?? ?? ?
@@ -4161,11 +4161,11 @@ StateIconList[EFST_IDs.EFST_M_LIFEPOTION] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"ネ㏑", COLOR_TITLE_BUFF },
+		{"神奇生命水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"–3糤﹚秖ぇHP", },
---		{"–3確4% HP", },
-		{"╣ぇ簀い礚", },
+		{"每3秒增加一定量之HP", },
+--		{"每3秒恢復4%的 HP", },
+		{"狂怒之槍中時無效", },
 	}
 }
 -------------------------------------------------------------- 20120120 ??? ??? ?? ?? ?
@@ -4177,17 +4177,17 @@ StateIconList[EFST_IDs.EFST_FLOWER_LEAF] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"璟脖盲", COLOR_TITLE_BUFF },
+		{"茂盛的花瓣", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"Flee 糤", },
---		{"Flee 10 糤", },
-		{"Ч癹磷 糤", },
--- 		{"Ч癹磷 1 糤", },
+		{"Flee 增加", },
+--		{"Flee 10 增加", },
+		{"完全迴避 增加", },
+-- 		{"完全迴避 1 增加", },
 	}
 }
 -------------------------------------------------------------- 20120327 ????_
 
--------------------------------------------------------------- 20130620 狠と竊
+-------------------------------------------------------------- 20130620 端午節
 -- 752, effect\UNLIMIT.TGA
 StateIconList[EFST_IDs.EFST_ZONGZI_POUCH_TRANS] =
 {
@@ -4195,13 +4195,13 @@ StateIconList[EFST_IDs.EFST_ZONGZI_POUCH_TRANS] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"狠と竊紋ㄥ", COLOR_TITLE_BUFF },
-		{"糤┮Τ妮┦.", },	
+		{"端午節慶典", COLOR_TITLE_BUFF },
+		{"增加所有的屬性.", },	
 		{"%s", COLOR_TIME },
 	}
 }
 
--------------------------------------------------------------- 20130612 15.1冠ほ挂秨﹍
+-------------------------------------------------------------- 20130612 15.1夢幻祕境開始
 -- 741, effect\FRIGG_SONG.TGA
 StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE1] =
 {
@@ -4209,8 +4209,8 @@ StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE1] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"眏疨30", COLOR_TITLE_BUFF },
-		{"ATK 糤", },	
+		{"強烈的30秒", COLOR_TITLE_BUFF },
+		{"ATK 增加", },	
 		{"%s", COLOR_TIME },
 	}
 }
@@ -4221,8 +4221,8 @@ StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE2] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"羙30", COLOR_TITLE_BUFF },
-		{"MATK糤", },	
+		{"聰明的30秒", COLOR_TITLE_BUFF },
+		{"MATK增加", },	
 		{"%s", COLOR_TIME },
 	}
 }
@@ -4233,8 +4233,8 @@ StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE3] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"砰30", COLOR_TITLE_BUFF },
-		{"MHP糤", },	
+		{"體力的30秒", COLOR_TITLE_BUFF },
+		{"MHP增加", },	
 		{"%s", COLOR_TIME },
 	}
 }
@@ -4245,8 +4245,8 @@ StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE4] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"臸30", COLOR_TITLE_BUFF },
-		{"MSP糤", },	
+		{"魔力的30秒", COLOR_TITLE_BUFF },
+		{"MSP增加", },	
 		{"%s", COLOR_TIME },
 	}
 }
@@ -4257,8 +4257,8 @@ StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE5] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"淮30", COLOR_TITLE_BUFF },
-		{"FLEE糤", },	
+		{"輕盈的30秒", COLOR_TITLE_BUFF },
+		{"FLEE增加", },	
 		{"%s", COLOR_TIME },
 	}
 }
@@ -4269,8 +4269,8 @@ StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE6] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"跑е30", COLOR_TITLE_BUFF },
-		{"ASPD糤", },	
+		{"變快的30秒", COLOR_TITLE_BUFF },
+		{"ASPD增加", },	
 		{"%s", COLOR_TIME },
 	}
 }
@@ -4281,8 +4281,8 @@ StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE7] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"綼30", COLOR_TITLE_BUFF },
-		{"DEF糤", },	
+		{"可靠的30秒", COLOR_TITLE_BUFF },
+		{"DEF增加", },	
 		{"%s", COLOR_TIME },
 	}
 }
@@ -4293,8 +4293,8 @@ StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE8] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"30", COLOR_TITLE_BUFF },
-		{"MDEF糤", },	
+		{"安全的30秒", COLOR_TITLE_BUFF },
+		{"MDEF增加", },	
 		{"%s", COLOR_TIME },
 	}
 }
@@ -4305,8 +4305,8 @@ StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE9] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"┋笲30", COLOR_TITLE_BUFF },
-		{"CRI糤", },	
+		{"幸運的30秒", COLOR_TITLE_BUFF },
+		{"CRI增加", },	
 		{"%s", COLOR_TIME },
 	}
 }
@@ -4317,126 +4317,126 @@ StateIconList[EFST_IDs.EFST_PACKING_ENVELOPE10] =
 	posTimeLimitStr = 3,
 	descript =
 	{
-		{"㎝坑眔30", COLOR_TITLE_BUFF },
-		{"HIT糤", },	
+		{"和諧得30秒", COLOR_TITLE_BUFF },
+		{"HIT增加", },	
 		{"%s", COLOR_TIME },
 	}
 }
 
------------------------------------------------- 20130612 15.1 冠ほ挂挡
+------------------------------------------------ 20130612 15.1 夢幻祕境結束
 
--- 926, -- 腹縞ホ 
+-- 926, -- 三號盧恩石 
 StateIconList[EFST_IDs.EFST_HELM_VERKANA] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"腹縞ホ ",COLOR_TITLE_BUFF },
+		{"三號盧恩石 ",COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"瞶, 环禯瞒, 臸猭ю阑 - 50%", },
-		{"禯瞒瞶ю阑祇笆 Lv1", },
+		{"物理, 遠距離, 魔法攻擊力 - 50%", },
+		{"受到近距離物理攻擊時發動千年神盾 Lv1", },
 	}
 }
 
--- 927, -- 腹縞ホ
+-- 927, -- 二號盧恩石
 StateIconList[EFST_IDs.EFST_HELM_RHYDO] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"腹縞ホ",COLOR_TITLE_BUFF },
+		{"二號盧恩石",COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ぃ穦癶", },
+		{"不會倒退", },
 	}
 }
 
 
--- 928, -- 腹縞ホ
+-- 928, -- 七號盧恩石
 StateIconList[EFST_IDs.EFST_HELM_TURISUS] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"腹縞ホ",COLOR_TITLE_BUFF },
+		{"七號盧恩石",COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
 		{"STR +30, INT -30", },
 	}
 }
 
--- 929, -- 腹縞ホ
+-- 929, -- 九號盧恩石
 StateIconList[EFST_IDs.EFST_HELM_HAGALAS] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"腹縞ホ",COLOR_TITLE_BUFF },
+		{"九號盧恩石",COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"禯瞒瞶ю阑は甮端甡 10%", },
+		{"受到近距離物理攻擊時反射傷害 10%", },
 	}
 }
 
 
--- 930, -- 腹縞ホ
+-- 930, -- 四號盧恩石
 StateIconList[EFST_IDs.EFST_HELM_ISIA] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"腹縞ホ",COLOR_TITLE_BUFF },
+		{"四號盧恩石",COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"10ずHP確 500", },
+		{"10秒內HP恢復 500", },
 	}
 }
 
 
--- 931, -- き腹縞ホ
+-- 931, -- 五號盧恩石
 StateIconList[EFST_IDs.EFST_HELM_ASIR] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"き腹縞ホ",COLOR_TITLE_BUFF },
+		{"五號盧恩石",COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
 		{"ATK +10, ASPD + 10%", },
 	}
 }
 
--- 932, -- せ腹縞ホ
+-- 932, -- 六號盧恩石
 StateIconList[EFST_IDs.EFST_HELM_URJ] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"せ腹縞ホ",COLOR_TITLE_BUFF },
+		{"六號盧恩石",COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"10ず SP確 40", },
+		{"10秒內 SP恢復 40", },
 	}
 }
 
----------------------------------------------- 20131018 芖 Plus GO纗笆秨﹍
--- 799, -- effect\ネ㏑.TGA
+---------------------------------------------- 20131018 台灣 Plus GO儲值活動開始
+-- 799, -- effect\小型生命水.TGA
 StateIconList[EFST_IDs.EFST_S_HEALPOTION] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"眏確媚", COLOR_TITLE_BUFF },
+		{"強效恢復力藥水", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"–10確﹚秖HPSP ", },
-		{"!!╣忌篈礚狦", },
+		{"每10秒恢復定量的HP、SP ", },
+		{"!!狂暴狀態下無效果", },
 	}
 }
------------------------------------------------ 20131015 芖Plus GO纗笆挡
+----------------------------------------------- 20131015 台灣Plus GO儲值活動結束
 
------------------------------------------------ 20130722 芖竒喷笆秨﹍
+----------------------------------------------- 20130722 台灣經驗值活動開始
 -- 780, effect\exp.tga
 StateIconList[EFST_IDs.EFST_OVERSEAEXPUP] =
 {
@@ -4445,35 +4445,35 @@ StateIconList[EFST_IDs.EFST_OVERSEAEXPUP] =
 	descript =
 	{
 		{"%s", COLOR_TIME },
-		{"莉眔竒喷糤", },
+		{"獲得經驗值增加", },
 	}
 }
----------------------------------------------------- 20130722 芖竒喷笆糤
----------------------------------------------------- 20130909 い竊笆秨﹍
--- 783, effect\う.tga
+---------------------------------------------------- 20130722 台灣經驗值活動增加
+---------------------------------------------------- 20130909 中秋節活動開始
+-- 783, effect\仙丹.tga
 StateIconList[EFST_IDs.EFST_BEEF_RIB_STEW] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"縉逼", COLOR_TITLE_BUFF },
+		{"紅燒牛小排", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"跑笆碟佰搭ぶ", },
-		{" SP秖搭ぶ", },
+		{"變動詠唱減少", },
+		{" SP消耗量減少", },
 	}
 }
--- 784, effect\耴じう.tga
+-- 784, effect\歸元丹.tga
 StateIconList[EFST_IDs.EFST_PORK_RIB_STEW] =
 {
 	haveTimeLimit = 1,
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"縉睫逼", COLOR_TITLE_BUFF },
+		{"紅燒豬小排", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"ю阑硉糤", },
-		{"搭ぶSP秖", },
+		{"攻擊速度增加", },
+		{"減少SP消耗量", },
 	}
 }
 -- 785, effect\gogi.tga
@@ -4483,10 +4483,10 @@ StateIconList[EFST_IDs.EFST_CHUSEOK_MONDAY] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"眏て妮┦", COLOR_TITLE_BUFF },
+		{"強化屬性", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"━妮┦┣糤端甡", },
-		{"竧妮┦к┦糤", },
+		{"岩屬性怪物增加傷害", },
+		{"聖屬性抗性增加", },
 	}
 }
 -- 786, effect\gogi.tga
@@ -4496,10 +4496,10 @@ StateIconList[EFST_IDs.EFST_CHUSEOK_TUESDAY] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"眏て妮┦", COLOR_TITLE_BUFF },
+		{"強化屬性", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"妮┦┣糤端甡", },
-		{"妮┦к┦糤", },
+		{"地屬性怪物增加傷害", },
+		{"火屬性抗性增加", },
 	}
 }
 -- 787, effect\gogi.tga
@@ -4509,10 +4509,10 @@ StateIconList[EFST_IDs.EFST_CHUSEOK_WEDNESDAY] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"眏て妮┦", COLOR_TITLE_BUFF },
+		{"強化屬性", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"妮┦┣糤端甡", },
-		{"妮┦к┦糤", },
+		{"火屬性怪物增加傷害", },
+		{"水屬性抗性增加", },
 	}
 }
 -- 788, effect\gogi.tga
@@ -4522,10 +4522,10 @@ StateIconList[EFST_IDs.EFST_CHUSEOK_THURSDAY] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"眏て妮┦", COLOR_TITLE_BUFF },
+		{"強化屬性", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"妮┦┣糤端甡", },
-		{"妮┦к┦糤", },
+		{"風屬性怪物增加傷害", },
+		{"地屬性抗性增加", },
 	}
 }
 -- 789, effect\gogi.tga
@@ -4535,10 +4535,10 @@ StateIconList[EFST_IDs.EFST_CHUSEOK_FRIDAY] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"眏て妮┦", COLOR_TITLE_BUFF },
+		{"強化屬性", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"妮┦┣糤端甡", },
-		{"妮┦к┦糤", },
+		{"水屬性怪物增加傷害", },
+		{"風屬性抗性增加", },
 	}
 }
 -- 790, effect\gogi.tga
@@ -4548,10 +4548,10 @@ StateIconList[EFST_IDs.EFST_CHUSEOK_WEEKEND] =
 	posTimeLimitStr = 2,
 	descript =
 	{
-		{"眏て妮┦", COLOR_TITLE_BUFF },
+		{"強化屬性", COLOR_TITLE_BUFF },
 		{"%s", COLOR_TIME },
-		{"礚妮┦┣糤端甡", },
-		{"礚妮┦к┦糤", },
+		{"無屬性怪物增加傷害", },
+		{"無屬性抗性增加", },
 	}
 }
 

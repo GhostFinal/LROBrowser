@@ -343,7 +343,7 @@ PetAccActNameTable_Eng = {
 }
 PetStringTable = {
 	[jobtbl.JT_PORING] = "Poring",
-	[jobtbl.JT_DROPS] = "Dropsº",
+	[jobtbl.JT_DROPS] = "Drops",
 	[jobtbl.JT_POPORING] = "Poporing",
 	[jobtbl.JT_LUNATIC] = "Lunatic",
 	[jobtbl.JT_PICKY] = "Picky",
