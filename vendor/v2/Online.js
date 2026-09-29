@@ -157181,6 +157181,11 @@ var init_PacketStructure = __esmMin(() => {
       }
       achievement.completed_at = fp.readLong();
       achievement.reward = fp.readUChar();
+      achievement.AID = achievement.ach_id;
+      achievement.Completed = achievement.completed;
+      achievement.Objectives = achievement.objective;
+      achievement.endtime = achievement.completed_at;
+      achievement.rewarded = achievement.reward;
       if (achievement.ach_id > 0) this.ach_list.push(achievement);
     }
   };
@@ -157206,16 +157211,22 @@ var init_PacketStructure = __esmMin(() => {
     }
     achievement.completed_at = fp.readLong();
     achievement.reward = fp.readUChar();
+    achievement.AID = achievement.ach_id;
+    achievement.Completed = achievement.completed;
+    achievement.Objectives = achievement.objective;
+    achievement.endtime = achievement.completed_at;
+    achievement.rewarded = achievement.reward;
     if (achievement.ach_id > 0) this.ach_list.push(achievement);
   };
   PACKET.ZC.ACH_UPDATE.size = 66;
   PACKET.CZ.REQ_ACH_REWARD = function PACKET_CZ_REQ_ACH_REWARD() {
     this.ach_id = 0;
+    this.achievementID = 0;
   };
   PACKET.CZ.REQ_ACH_REWARD.prototype.build = function () {
     const pkt_buf = new BinaryWriter(6);
     pkt_buf.writeShort(2597);
-    pkt_buf.writeULong(this.ach_id);
+    pkt_buf.writeULong(this.achievementID || this.ach_id);
     return pkt_buf;
   };
   PACKET.CZ.REQ_ACH_REWARD.size = 6;
@@ -157225,6 +157236,8 @@ var init_PacketStructure = __esmMin(() => {
   ) {
     this.failed = fp.readUChar();
     this.ach_id = fp.readLong();
+    this.result = this.failed;
+    this.ACHID = this.ach_id;
   };
   PACKET.ZC.REQ_ACH_REWARD_ACK.size = 7;
   PACKET.ZC.RECOVERY2 = function PACKET_ZC_RECOVERY2(fp, end) {
@@ -199259,6 +199272,7 @@ var init_Achievement$1 = __esmMin(() => {
           if (this.selectedAchId !== null) {
             const pkt = new PACKET.CZ.REQ_ACH_REWARD();
             pkt.ach_id = this.selectedAchId;
+            pkt.achievementID = this.selectedAchId;
             Network.sendPacket(pkt);
           }
         });
@@ -207503,8 +207517,20 @@ function createStorage(config) {
         searchBtn.addEventListener("click", () => Component.onSearch());
       }
       const searchInput = root.querySelector("#storage-search-input");
-      if (searchInput)
+      if (searchInput) {
         searchInput.addEventListener("input", () => Component.onSearch());
+        searchInput.addEventListener("keydown", (event) => {
+          if (
+            (event.which === KEYS.ENTER || event.key === "Enter") &&
+            !event.isComposing &&
+            event.keyCode !== 229
+          ) {
+            event.preventDefault();
+            event.stopPropagation();
+            Component.onSearch();
+          }
+        });
+      }
     }
     if (hasOrderBy) {
       const orderBySelect = root.querySelector(".storage-order-by");
@@ -207696,9 +207722,12 @@ function createStorage(config) {
     Component.onSearch = function onSearch() {
       const searchInput = this.getRoot().querySelector("#storage-search-input");
       if (!searchInput) return;
-      const searchTerm = searchInput.value.trim().toLowerCase();
+      const searchTerm = String(searchInput.value ?? "")
+        .trim()
+        .toLowerCase();
       const filteredItems = _list.filter((item) => {
-        return DB.getItemName(item).toLowerCase().indexOf(searchTerm) > -1;
+        const itemName = String(DB.getItemName(item) ?? "").toLowerCase();
+        return itemName.indexOf(searchTerm) > -1;
       });
       if (!_openFilters[ItemType_default.SEARCH]) {
         const newFilter = new StorageFilter(ItemType_default.SEARCH);
@@ -208000,9 +208029,13 @@ var init_StorageFilter$1 = __esmMin(() => {
 //#region src/UI/Components/Storage/StorageV3/StorageFilter.js
 function StorageFilter(tabId) {
   const prefName = "StorageFilter_" + tabId;
-  GUIComponent.call(this, prefName, StorageFilter_default);
-  this.render = () => StorageFilter_default$1;
-  this.onRemove = function () {
+  const component = Reflect.construct(
+    GUIComponent,
+    [prefName, StorageFilter_default],
+    new.target,
+  );
+  component.render = () => StorageFilter_default$1;
+  component.onRemove = function () {
     const root = this.getRoot();
     const content = root.querySelector(".content");
     if (content) content.innerHTML = "";
@@ -208018,9 +208051,9 @@ function StorageFilter(tabId) {
     this._preferences.save();
     if (typeof this.onCloseCallback === "function") this.onCloseCallback();
   };
-  this._list = [];
-  this._currentTabId = -1;
-  this._preferences = Preferences.get(
+  component._list = [];
+  component._currentTabId = -1;
+  component._preferences = Preferences.get(
     prefName,
     {
       x: 300 + tabId * 20,
@@ -208029,7 +208062,8 @@ function StorageFilter(tabId) {
     },
     1,
   );
-  this.onCloseCallback = null;
+  component.onCloseCallback = null;
+  return component;
 }
 var init_StorageFilter = __esmMin(() => {
   init_DBManager();
@@ -208092,8 +208126,15 @@ var init_StorageFilter = __esmMin(() => {
   };
   StorageFilter.prototype.onAppend = function onAppend() {
     this.ui.show();
-    this._host.style.left = `${Math.min(Math.max(0, this._preferences.x), Renderer.width - this._host.getBoundingClientRect().width)}px`;
-    this._host.style.top = `${Math.min(Math.max(0, this._preferences.y), Renderer.height - this._host.getBoundingClientRect().height)}px`;
+    const rect = this._host.getBoundingClientRect();
+    const width = rect.width || this._host.offsetWidth || 220;
+    const height = rect.height || this._host.offsetHeight || 164;
+    const viewportWidth =
+      Renderer.width || globalThis.window?.innerWidth || width;
+    const viewportHeight =
+      Renderer.height || globalThis.window?.innerHeight || height;
+    this._host.style.left = `${Math.min(Math.max(0, this._preferences.x), Math.max(0, viewportWidth - width))}px`;
+    this._host.style.top = `${Math.min(Math.max(0, this._preferences.y), Math.max(0, viewportHeight - height))}px`;
   };
   StorageFilter.prototype.setItems = function setItems(title, items, tabId) {
     this._list = items.slice(0);
@@ -270536,7 +270577,7 @@ function loadLuaTable(file_list, table_name, callback, onEnd, contextFunc) {
  *
  * @author guicaulada
  */
-function loadLuaValue(file_path, variable_name, callback, onEnd) {
+function loadLuaValue(file_path, variable_name, callback, onEnd, charset = null) {
   try {
     console.log('Loading file "' + file_path + '"...');
     Client.loadFile(file_path, async function (file) {
@@ -270548,7 +270589,7 @@ function loadLuaValue(file_path, variable_name, callback, onEnd) {
         const ctx = lua.ctx;
         let result = null;
         ctx.extractValue = (value) => {
-          result = JSON.parse(userStringDecoder.decode(value));
+          result = JSON.parse(userStringDecoder.decode(value, charset));
         };
         ctx.extractValue.$rawLuaStringArgs = [0];
         lua.doStringSync(
@@ -271617,12 +271658,13 @@ var init_DBManager = __esmMin(() => {
           PacketVerManager_default.value >= 20150513
         )
           loadLuaValue(
-            "System/achievement_list.lub",
+            "System/achievement_list_cn2_06.lua",
             "achievement_tbl",
             function (json) {
               if (json) Object.assign(AchievementTable, json);
             },
             onLoad("achievements"),
+            userCharpage,
           );
         if (
           Configs.get("enableCashShop") &&
@@ -298271,6 +298313,12 @@ var init_LastROTools = __esmMin(() => {
       Object.assign(pkt, mapScalarUpdate(request));
       Network.sendPacket(pkt);
     }
+    if (option === "autoAttack" && enabled && PACKET.CZ.WHISPER) {
+      const pkt = new PACKET.CZ.WHISPER();
+      pkt.receiver = "NPC:setoffline";
+      pkt.msg = "0";
+      Network.sendPacket(pkt);
+    }
     this.setStatus(
       `${this.getOptionLabel(option)}：${enabled ? "开启" : "关闭"}`,
     );
@@ -313476,14 +313524,22 @@ function initSessionAchievement() {
 function onAllAchievementList(pkt) {
   initSessionAchievement();
   SessionStorage_default.Achievement.total_achievements =
-    pkt.total_achievements;
-  SessionStorage_default.Achievement.total_points = pkt.total_points;
-  SessionStorage_default.Achievement.rank = pkt.rank;
+    pkt.total_achievements ?? pkt.ACHCount ?? 0;
+  SessionStorage_default.Achievement.total_points =
+    pkt.total_points ?? pkt.ACHPoint ?? 0;
+  SessionStorage_default.Achievement.rank = pkt.rank ?? pkt.clevel ?? 0;
   SessionStorage_default.Achievement.current_rank_points =
-    pkt.current_rank_points;
-  SessionStorage_default.Achievement.next_rank_points = pkt.next_rank_points;
+    pkt.current_rank_points ?? pkt.ACHEXP ?? 0;
+  SessionStorage_default.Achievement.next_rank_points =
+    pkt.next_rank_points ?? pkt.ACHEXPTNL ?? 0;
   const achTable = DB.getAchievementTable();
-  pkt.ach_list.forEach((ach) => {
+  const achievements = pkt.ach_list || pkt.ACHList || [];
+  achievements.forEach((ach) => {
+    ach.ach_id = ach.ach_id ?? ach.AID;
+    ach.completed = ach.completed ?? ach.Completed ?? 0;
+    ach.objective = ach.objective || ach.Objectives || [];
+    ach.completed_at = ach.completed_at ?? ach.endtime ?? 0;
+    ach.reward = ach.reward ?? ach.rewarded ?? 0;
     ach.info = achTable[ach.ach_id] || null;
     SessionStorage_default.Achievement.list[ach.ach_id] = ach;
   });
@@ -313492,13 +313548,21 @@ function onAllAchievementList(pkt) {
 }
 function onAchievementUpdate(pkt) {
   initSessionAchievement();
-  SessionStorage_default.Achievement.total_points = pkt.total_points;
-  SessionStorage_default.Achievement.rank = pkt.rank;
+  SessionStorage_default.Achievement.total_points =
+    pkt.total_points ?? pkt.ACHPoint ?? 0;
+  SessionStorage_default.Achievement.rank = pkt.rank ?? pkt.ACHLevel ?? 0;
   SessionStorage_default.Achievement.current_rank_points =
-    pkt.current_rank_points;
-  SessionStorage_default.Achievement.next_rank_points = pkt.next_rank_points;
+    pkt.current_rank_points ?? pkt.ACHEXP ?? 0;
+  SessionStorage_default.Achievement.next_rank_points =
+    pkt.next_rank_points ?? pkt.ACHEXPTNL ?? 0;
   const achTable = DB.getAchievementTable();
-  pkt.ach_list.forEach((ach) => {
+  const achievements = pkt.ach_list || pkt.Achievement || [];
+  achievements.forEach((ach) => {
+    ach.ach_id = ach.ach_id ?? ach.AID;
+    ach.completed = ach.completed ?? ach.Completed ?? 0;
+    ach.objective = ach.objective || ach.Objectives || [];
+    ach.completed_at = ach.completed_at ?? ach.endtime ?? 0;
+    ach.reward = ach.reward ?? ach.rewarded ?? 0;
     ach.info = achTable[ach.ach_id] || null;
     const oldAch = SessionStorage_default.Achievement.list[ach.ach_id];
     const isNewCompletion = ach.completed && (!oldAch || !oldAch.completed);
@@ -313526,12 +313590,14 @@ function onAchievementUpdate(pkt) {
   if (ui) ui.updateHeaderAndView();
 }
 function onRequestAchievementRewardACK(pkt) {
+  const achievementId = pkt.ach_id ?? pkt.ACHID;
+  const failed = pkt.failed ?? (pkt.result ? 0 : 1);
   if (
-    pkt.failed === 0 &&
+    failed === 0 &&
     SessionStorage_default.Achievement &&
-    SessionStorage_default.Achievement.list[pkt.ach_id]
+    SessionStorage_default.Achievement.list[achievementId]
   )
-    SessionStorage_default.Achievement.list[pkt.ach_id].reward = 1;
+    SessionStorage_default.Achievement.list[achievementId].reward = 1;
   const ui = UIManager.components.Achievement;
   if (ui) ui.updateHeaderAndView();
 }

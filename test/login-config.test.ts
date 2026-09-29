@@ -18,6 +18,7 @@ describe('native login startup configuration', () => {
     vm.runInContext('Configs.setServer(window.ROConfig.servers[0]);', context);
     expect(vm.runInContext('Configs.get("renewal", false)', context)).toBe(true);
     expect(vm.runInContext('Configs.get("packetver")', context)).toBe(20211103);
+    expect(vm.runInContext('Configs.get("enableAchievements")', context)).toBe(true);
     expect(config.autoLogin).toBeNull();
     expect(vm.runInContext('Configs.get("disableKorean")', context)).toBe(true);
     expect(vm.runInContext('Configs.get("forceUseAddress")', context)).toBe(true);

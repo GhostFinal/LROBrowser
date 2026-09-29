@@ -140,6 +140,16 @@ worldtable_main = {
     "110"
   },
   {
+    2,
+    "mag_dun03.rsw",
+    465,
+    45,
+    533,
+    79,
+    WORLD_MSGID.MSI_2_MAG_DUN03,
+    "110"
+  },
+  {
     3,
     "ice_dun01.rsw",
     380,
@@ -247,6 +257,16 @@ worldtable_main = {
     1024,
     44,
     WORLD_MSGID.MSI_5_ABYSS_03,
+    "130"
+  },
+  {
+    5,
+    "abyss_04.rsw",
+    945,
+    10,
+    1024,
+    44,
+    WORLD_MSGID.MSI_5_ABYSS_04,
     "130"
   },
   {
@@ -440,6 +460,16 @@ worldtable_main = {
     "100"
   },
   {
+    9,
+    "ein_dun03.rsw",
+    579,
+    360,
+    645,
+    394,
+    WORLD_MSGID.MSI_9_EIN_DUN03,
+    "100"
+  },
+  {
     10,
     "mjo_dun01.rsw",
     495,
@@ -502,30 +532,30 @@ worldtable_main = {
   {
     12,
     "thor_v01.rsw",
-    95,
-    370,
-    161,
-    404,
+    33,
+    421,
+    99,
+    455,
     WORLD_MSGID.MSI_12_THOR_V01,
     "130"
   },
   {
     12,
     "thor_v02.rsw",
-    95,
-    370,
-    161,
-    404,
+    33,
+    421,
+    99,
+    455,
     WORLD_MSGID.MSI_12_THOR_V02,
     "135"
   },
   {
     12,
     "thor_v03.rsw",
-    95,
-    370,
-    161,
-    404,
+    33,
+    421,
+    99,
+    455,
     WORLD_MSGID.MSI_12_THOR_V03,
     "140"
   },
@@ -727,6 +757,46 @@ worldtable_main = {
     500,
     683,
     WORLD_MSGID.MSI_15_GEF_DUN03,
+    "120"
+  },
+  {
+    15,
+    "gefenia01.rsw",
+    410,
+    649,
+    500,
+    683,
+    WORLD_MSGID.MSI_15_GEFENIA01,
+    "120"
+  },
+  {
+    15,
+    "gefenia02.rsw",
+    410,
+    649,
+    500,
+    683,
+    WORLD_MSGID.MSI_15_GEFENIA02,
+    "120"
+  },
+  {
+    15,
+    "gefenia03.rsw",
+    410,
+    649,
+    500,
+    683,
+    WORLD_MSGID.MSI_15_GEFENIA03,
+    "120"
+  },
+  {
+    15,
+    "gefenia04.rsw",
+    410,
+    649,
+    500,
+    683,
+    WORLD_MSGID.MSI_15_GEFENIA04,
     "120"
   },
   {
@@ -1183,9 +1253,9 @@ worldtable_main = {
     30,
     "prt_maze01.rsw",
     960,
-    597,
+    460,
     1050,
-    633,
+    493,
     WORLD_MSGID.MSI_30_PRT_MAZE01,
     "60"
   },
@@ -1193,9 +1263,9 @@ worldtable_main = {
     30,
     "prt_maze02.rsw",
     960,
-    597,
+    460,
     1050,
-    633,
+    493,
     WORLD_MSGID.MSI_30_PRT_MAZE02,
     "70"
   },
@@ -1203,11 +1273,61 @@ worldtable_main = {
     30,
     "prt_maze03.rsw",
     960,
-    597,
+    460,
     1050,
-    633,
+    493,
     WORLD_MSGID.MSI_30_PRT_MAZE03,
     "80"
+  },
+  {
+    43,
+    "mal_dun01.rsw",
+    1144,
+    512,
+    1234,
+    548,
+    WORLD_MSGID.MSI_43_MAL_DUN01,
+    "90"
+  },
+  {
+    45,
+    "odin_past.rsw",
+    1146,
+    109,
+    1236,
+    145,
+    WORLD_MSGID.MSI_45_ODIN_PAST,
+    "180"
+  },
+  {
+    46,
+    "oz_dun01.rsw",
+    53,
+    232,
+    130,
+    268,
+    WORLD_MSGID.MSI_46_OZ_DUN01,
+    "170"
+  },
+  {
+    46,
+    "oz_dun02.rsw",
+    53,
+    232,
+    130,
+    268,
+    WORLD_MSGID.MSI_46_OZ_DUN02,
+    "200"
+  },
+  {
+    47,
+    "prt_mk.rsw",
+    942,
+    589,
+    1002,
+    610,
+    WORLD_MSGID.MSI_47_PRONTERA_MARKET_STREET,
+    ""
   },
   {
     100,
@@ -1401,6 +1521,26 @@ worldtable_main = {
   },
   {
     101,
+    "ra_fild10.rsw",
+    107,
+    292,
+    163,
+    351,
+    WORLD_MSGID.MSI_101_RA_FILD10,
+    "165"
+  },
+  {
+    101,
+    "ra_fild11.rsw",
+    164,
+    292,
+    223,
+    351,
+    WORLD_MSGID.MSI_101_RA_FILD11,
+    "168"
+  },
+  {
+    101,
     "ra_fild12.rsw",
     283,
     292,
@@ -1408,6 +1548,26 @@ worldtable_main = {
     351,
     WORLD_MSGID.MSI_101_RA_FILD12,
     "95"
+  },
+  {
+    101,
+    "gw_fild01.rsw",
+    50,
+    292,
+    106,
+    351,
+    WORLD_MSGID.MSI_101_GW_FILD01,
+    "185"
+  },
+  {
+    105,
+    "gw_fild02.rsw",
+    50,
+    352,
+    106,
+    409,
+    WORLD_MSGID.MSI_101_GW_FILD02,
+    "185"
   },
   {
     102,
@@ -1467,7 +1627,7 @@ worldtable_main = {
     517,
     234,
     WORLD_MSGID.MSI_102_EIN_FILD03,
-    "81"
+    "91"
   },
   {
     102,
@@ -1517,7 +1677,7 @@ worldtable_main = {
     575,
     351,
     WORLD_MSGID.MSI_102_EIN_FILD08,
-    "92"
+    "81"
   },
   {
     102,
@@ -2588,6 +2748,46 @@ worldtable_main = {
     1004,
     WORLD_MSGID.MSI_111_TUR_DUN01,
     "88"
+  },
+  {
+    112,
+    "malangdo.rsw",
+    1158,
+    587,
+    1216,
+    642,
+    WORLD_MSGID.MSI_112_MALANGDO,
+    ""
+  },
+  {
+    5,
+    "abyss_04.rsw",
+    945,
+    10,
+    1024,
+    44,
+    WORLD_MSGID.MSI_5_ABYSS_04,
+    "130"
+  },
+  {
+    9,
+    "ein_dun03.rsw",
+    579,
+    360,
+    645,
+    394,
+    WORLD_MSGID.MSI_9_EIN_DUN03,
+    "100"
+  },
+  {
+    45,
+    "odin_past.rsw",
+    1146,
+    109,
+    1236,
+    145,
+    WORLD_MSGID.MSI_45_ODIN_PAST,
+    "180"
   }
 }
 worldtable_main_Dun = {
@@ -2595,8 +2795,8 @@ worldtable_main_Dun = {
     1,
     725,
     17,
-    735,
-    27,
+    745,
+    37,
     WORLD_MSGID.MSI_DUN1,
     "110~130"
   },
@@ -2604,8 +2804,8 @@ worldtable_main_Dun = {
     2,
     704,
     141,
-    714,
-    151,
+    724,
+    161,
     WORLD_MSGID.MSI_DUN2,
     "100~110"
   },
@@ -2613,8 +2813,8 @@ worldtable_main_Dun = {
     3,
     312,
     134,
-    322,
-    144,
+    332,
+    154,
     WORLD_MSGID.MSI_DUN3,
     "100~110"
   },
@@ -2622,8 +2822,8 @@ worldtable_main_Dun = {
     4,
     254,
     268,
-    264,
-    278,
+    274,
+    288,
     WORLD_MSGID.MSI_DUN4,
     "120~130"
   },
@@ -2631,8 +2831,8 @@ worldtable_main_Dun = {
     5,
     842,
     76,
-    852,
-    86,
+    862,
+    96,
     WORLD_MSGID.MSI_DUN5,
     "120~130"
   },
@@ -2640,8 +2840,8 @@ worldtable_main_Dun = {
     6,
     723,
     193,
-    733,
-    203,
+    743,
+    213,
     WORLD_MSGID.MSI_DUN6,
     "110~120"
   },
@@ -2649,8 +2849,8 @@ worldtable_main_Dun = {
     7,
     775,
     194,
-    785,
-    204,
+    795,
+    214,
     WORLD_MSGID.MSI_DUN7,
     "110~120"
   },
@@ -2658,8 +2858,8 @@ worldtable_main_Dun = {
     8,
     843,
     320,
-    853,
-    330,
+    863,
+    340,
     WORLD_MSGID.MSI_DUN8,
     "80~90"
   },
@@ -2667,8 +2867,8 @@ worldtable_main_Dun = {
     9,
     607,
     247,
-    617,
-    257,
+    627,
+    267,
     WORLD_MSGID.MSI_DUN9,
     "90~100"
   },
@@ -2676,8 +2876,8 @@ worldtable_main_Dun = {
     10,
     647,
     413,
-    657,
-    423,
+    667,
+    433,
     WORLD_MSGID.MSI_DUN10,
     "40~50"
   },
@@ -2685,8 +2885,8 @@ worldtable_main_Dun = {
     11,
     415,
     310,
-    425,
-    320,
+    435,
+    330,
     WORLD_MSGID.MSI_DUN11,
     "130~140"
   },
@@ -2694,8 +2894,8 @@ worldtable_main_Dun = {
     12,
     126,
     429,
-    136,
-    439,
+    146,
+    449,
     WORLD_MSGID.MSI_DUN12,
     "130~140"
   },
@@ -2703,8 +2903,8 @@ worldtable_main_Dun = {
     13,
     434,
     496,
-    444,
-    506,
+    454,
+    516,
     WORLD_MSGID.MSI_DUN13,
     "70~130"
   },
@@ -2712,8 +2912,8 @@ worldtable_main_Dun = {
     14,
     607,
     554,
-    617,
-    564,
+    627,
+    574,
     WORLD_MSGID.MSI_DUN14,
     "60~70"
   },
@@ -2721,17 +2921,17 @@ worldtable_main_Dun = {
     15,
     606,
     568,
-    616,
-    578,
+    626,
+    588,
     WORLD_MSGID.MSI_DUN15,
-    "120~130"
+    "110~130"
   },
   {
     16,
     322,
     668,
-    332,
-    678,
+    342,
+    688,
     WORLD_MSGID.MSI_DUN16,
     "100~110"
   },
@@ -2739,8 +2939,8 @@ worldtable_main_Dun = {
     17,
     589,
     667,
-    599,
-    677,
+    609,
+    687,
     WORLD_MSGID.MSI_DUN17,
     "50~60"
   },
@@ -2748,8 +2948,8 @@ worldtable_main_Dun = {
     18,
     578,
     824,
-    588,
-    834,
+    598,
+    844,
     WORLD_MSGID.MSI_DUN18,
     "50~60"
   },
@@ -2757,8 +2957,8 @@ worldtable_main_Dun = {
     19,
     578,
     865,
-    588,
-    875,
+    598,
+    885,
     WORLD_MSGID.MSI_DUN19,
     "70~80"
   },
@@ -2766,8 +2966,8 @@ worldtable_main_Dun = {
     20,
     764,
     625,
-    774,
-    635,
+    784,
+    645,
     WORLD_MSGID.MSI_DUN20,
     "20~30"
   },
@@ -2775,8 +2975,8 @@ worldtable_main_Dun = {
     21,
     939,
     653,
-    949,
-    663,
+    959,
+    673,
     WORLD_MSGID.MSI_DUN21,
     "50~60"
   },
@@ -2784,8 +2984,8 @@ worldtable_main_Dun = {
     22,
     999,
     702,
-    1009,
-    712,
+    1019,
+    722,
     WORLD_MSGID.MSI_DUN22,
     "60~70"
   },
@@ -2793,8 +2993,8 @@ worldtable_main_Dun = {
     23,
     1128,
     928,
-    1138,
-    938,
+    1148,
+    948,
     WORLD_MSGID.MSI_DUN23,
     "40~50"
   },
@@ -2802,8 +3002,8 @@ worldtable_main_Dun = {
     24,
     1180,
     987,
-    1190,
-    997,
+    1200,
+    1007,
     WORLD_MSGID.MSI_DUN24,
     "90~100"
   },
@@ -2811,8 +3011,8 @@ worldtable_main_Dun = {
     25,
     303,
     864,
-    313,
-    874,
+    323,
+    884,
     WORLD_MSGID.MSI_DUN25,
     "100~110"
   },
@@ -2820,8 +3020,8 @@ worldtable_main_Dun = {
     26,
     326,
     844,
-    336,
-    854,
+    346,
+    864,
     WORLD_MSGID.MSI_DUN26,
     "60~70"
   },
@@ -2829,8 +3029,8 @@ worldtable_main_Dun = {
     27,
     347,
     864,
-    357,
-    874,
+    367,
+    884,
     WORLD_MSGID.MSI_DUN27,
     "30~40"
   },
@@ -2838,8 +3038,8 @@ worldtable_main_Dun = {
     28,
     589,
     904,
-    599,
-    914,
+    609,
+    924,
     WORLD_MSGID.MSI_DUN28,
     "30~40"
   },
@@ -2847,8 +3047,8 @@ worldtable_main_Dun = {
     29,
     124,
     727,
-    134,
-    737,
+    144,
+    747,
     WORLD_MSGID.MSI_DUN29,
     "120~130"
   },
@@ -2856,10 +3056,46 @@ worldtable_main_Dun = {
     30,
     837,
     531,
-    847,
-    541,
+    857,
+    551,
     WORLD_MSGID.MSI_DUN30,
     "60~80"
+  },
+  {
+    43,
+    1178,
+    599,
+    1198,
+    619,
+    WORLD_MSGID.MSI_DUN43,
+    "90"
+  },
+  {
+    45,
+    1083,
+    136,
+    1103,
+    156,
+    WORLD_MSGID.MSI_DUN45,
+    "180"
+  },
+  {
+    46,
+    97,
+    321,
+    117,
+    341,
+    WORLD_MSGID.MSI_DUN46,
+    "170~200"
+  },
+  {
+    47,
+    836,
+    605,
+    846,
+    615,
+    WORLD_MSGID.MSI_DUN47_MARKET,
+    ""
   }
 }
 worldtable_dimensions = {
@@ -3129,8 +3365,8 @@ worldtable_dimensions_Dun = {
     1,
     429,
     323,
-    439,
-    333,
+    449,
+    343,
     WORLD_MSGID.MSI_DUN38,
     "145~155"
   },
@@ -3138,8 +3374,8 @@ worldtable_dimensions_Dun = {
     2,
     822,
     696,
-    832,
-    706,
+    842,
+    716,
     WORLD_MSGID.MSI_DUN39,
     "120~130"
   },
@@ -3147,8 +3383,8 @@ worldtable_dimensions_Dun = {
     3,
     426,
     426,
-    436,
-    436,
+    446,
+    446,
     WORLD_MSGID.MSI_DUN40,
     ""
   },
@@ -3156,8 +3392,8 @@ worldtable_dimensions_Dun = {
     4,
     436,
     232,
-    446,
-    242,
+    456,
+    252,
     WORLD_MSGID.MSI_DUN41,
     "150~160"
   }
@@ -3207,9 +3443,9 @@ worldtable_localizing1 = {
     3,
     "gon_dun03.rsw",
     1149,
-    67,
+    217,
     1243,
-    101,
+    251,
     WORLD_MSGID.MSI_3_GON_DUN03,
     "100"
   },
@@ -3271,7 +3507,7 @@ worldtable_localizing1 = {
     417,
     251,
     WORLD_MSGID.MSI_100_AMA_FILD01,
-    "75"
+    "72"
   },
   {
     101,
@@ -3291,7 +3527,7 @@ worldtable_localizing1 = {
     996,
     353,
     WORLD_MSGID.MSI_101_GON_FILD01,
-    "65"
+    "60"
   },
   {
     101,
@@ -3301,7 +3537,7 @@ worldtable_localizing1 = {
     1115,
     185,
     WORLD_MSGID.MSI_101_GON_DUN02,
-    "95"
+    "92"
   },
   {
     102,
@@ -3321,7 +3557,7 @@ worldtable_localizing1 = {
     361,
     854,
     WORLD_MSGID.MSI_102_LOU_FILD01,
-    "80"
+    "83"
   },
   {
     102,
@@ -3351,7 +3587,7 @@ worldtable_localizing1 = {
     1005,
     820,
     WORLD_MSGID.MSI_103_AYO_FILD01,
-    "35"
+    "38"
   }
 }
 worldtable_localizing1_Dun = {
@@ -3359,8 +3595,8 @@ worldtable_localizing1_Dun = {
     1,
     310,
     303,
-    320,
-    313,
+    330,
+    323,
     WORLD_MSGID.MSI_DUN31,
     "90~100"
   },
@@ -3368,8 +3604,8 @@ worldtable_localizing1_Dun = {
     2,
     948,
     217,
-    958,
-    227,
+    968,
+    237,
     WORLD_MSGID.MSI_DUN32,
     "85~95"
   },
@@ -3377,8 +3613,8 @@ worldtable_localizing1_Dun = {
     3,
     1087,
     126,
-    1097,
-    136,
+    1107,
+    146,
     WORLD_MSGID.MSI_DUN32,
     "95~105"
   },
@@ -3386,8 +3622,8 @@ worldtable_localizing1_Dun = {
     4,
     191,
     718,
-    201,
-    728,
+    211,
+    738,
     WORLD_MSGID.MSI_DUN33,
     "80~90"
   },
@@ -3395,8 +3631,8 @@ worldtable_localizing1_Dun = {
     5,
     943,
     783,
-    953,
-    793,
+    963,
+    803,
     WORLD_MSGID.MSI_DUN34,
     "60~70"
   }
@@ -3406,9 +3642,9 @@ worldtable_localizing2 = {
     1,
     "bra_dun01.rsw",
     1115,
-    63,
+    263,
     1220,
-    97,
+    297,
     WORLD_MSGID.MSI_1_BRA_DUN01,
     "70"
   },
@@ -3416,9 +3652,9 @@ worldtable_localizing2 = {
     1,
     "bra_dun02.rsw",
     1115,
-    63,
+    263,
     1220,
-    97,
+    297,
     WORLD_MSGID.MSI_1_BRA_DUN02,
     "80"
   },
@@ -3470,7 +3706,7 @@ worldtable_localizing2 = {
     270,
     293,
     WORLD_MSGID.MSI_100_MOSK_DUN01,
-    "80"
+    "81"
   },
   {
     100,
@@ -3480,7 +3716,7 @@ worldtable_localizing2 = {
     292,
     197,
     WORLD_MSGID.MSI_100_MOSK_DUN02,
-    "85"
+    "82"
   },
   {
     100,
@@ -3490,7 +3726,7 @@ worldtable_localizing2 = {
     391,
     212,
     WORLD_MSGID.MSI_100_MOSK_DUN03,
-    "85"
+    "87"
   },
   {
     101,
@@ -3510,7 +3746,7 @@ worldtable_localizing2 = {
     1084,
     197,
     WORLD_MSGID.MSI_101_BRA_FILD01,
-    "75"
+    "70"
   },
   {
     102,
@@ -3540,7 +3776,7 @@ worldtable_localizing2 = {
     422,
     923,
     WORLD_MSGID.MSI_102_DEW_DUN01,
-    "80"
+    "81"
   },
   {
     103,
@@ -3560,7 +3796,7 @@ worldtable_localizing2 = {
     1041,
     897,
     WORLD_MSGID.MSI_103_MA_FILD01,
-    "110"
+    "105"
   },
   {
     103,
@@ -3570,7 +3806,7 @@ worldtable_localizing2 = {
     1032,
     799,
     WORLD_MSGID.MSI_103_MA_FILD02,
-    "120"
+    "121"
   },
   {
     103,
@@ -3588,8 +3824,8 @@ worldtable_localizing2_Dun = {
     1,
     1043,
     135,
-    1053,
-    145,
+    1063,
+    155,
     WORLD_MSGID.MSI_DUN35,
     "70~80"
   },
@@ -3597,8 +3833,8 @@ worldtable_localizing2_Dun = {
     2,
     58,
     734,
-    68,
-    744,
+    78,
+    754,
     WORLD_MSGID.MSI_DUN36,
     "80~90"
   },
@@ -3606,9 +3842,261 @@ worldtable_localizing2_Dun = {
     3,
     870,
     954,
-    880,
-    964,
+    890,
+    974,
     WORLD_MSGID.MSI_DUN37,
     "105~115"
   }
 }
+worldtable_Crack_of_Dimension1 = {
+  {
+    100,
+    "dali.rsw",
+    276,
+    553,
+    437,
+    710,
+    WORLD_MSGID.MSI_100_DALI,
+    ""
+  },
+  {
+    100,
+    "dali02.rsw",
+    525,
+    771,
+    685,
+    927,
+    WORLD_MSGID.MSI_100_DALI02,
+    ""
+  }
+}
+worldtable_Crack_of_Dimension1_Dun = {}
+worldtable_north = {
+  {
+    1,
+    "xmas_dun01.rsw",
+    873,
+    872,
+    1000,
+    906,
+    WORLD_MSGID.MSI_1_XMAS_DUN01,
+    "35"
+  },
+  {
+    1,
+    "xmas_dun02.rsw",
+    873,
+    872,
+    1000,
+    906,
+    WORLD_MSGID.MSI_1_XMAS_DUN02,
+    "40"
+  },
+  {
+    100,
+    "xmas_fild01.rsw",
+    795,
+    963,
+    854,
+    1018,
+    WORLD_MSGID.MSI_100_XMAS_FILD01,
+    "37"
+  },
+  {
+    100,
+    "xmas.rsw",
+    795,
+    904,
+    854,
+    963,
+    WORLD_MSGID.MSI_100_XMAS,
+    ""
+  }
+}
+worldtable_north_Dun = {
+  {
+    1,
+    818,
+    909,
+    838,
+    929,
+    WORLD_MSGID.MSI_DUN44,
+    "35~40"
+  }
+}
+worldtable_Doram = {
+  {
+    1,
+    "lasa_dun01.rsw",
+    971,
+    728,
+    1076,
+    762,
+    WORLD_MSGID.MSI_1_LASA_DUN01,
+    "15"
+  },
+  {
+    1,
+    "lasa_dun02.rsw",
+    971,
+    728,
+    1076,
+    762,
+    WORLD_MSGID.MSI_1_LASA_DUN02,
+    "140"
+  },
+  {
+    1,
+    "lasa_dun03.rsw",
+    971,
+    728,
+    1076,
+    762,
+    WORLD_MSGID.MSI_1_LASA_DUN03,
+    "150"
+  },
+  {
+    100,
+    "lasagna.rsw",
+    401,
+    375,
+    576,
+    547,
+    WORLD_MSGID.MSI_100_LASAGNA,
+    ""
+  },
+  {
+    100,
+    "lasa_fild01.rsw",
+    404,
+    704,
+    580,
+    875,
+    WORLD_MSGID.MSI_100_LASA_FILD01,
+    "1"
+  },
+  {
+    100,
+    "lasa_fild02.rsw",
+    1027,
+    437,
+    1202,
+    609,
+    WORLD_MSGID.MSI_100_LASA_FILD02,
+    "14"
+  }
+}
+worldtable_Doram_Dun = {
+  {
+    1,
+    1107,
+    543,
+    1112,
+    547,
+    WORLD_MSGID.MSI_DUN42,
+    "15~150"
+  }
+}
+worldtable_Isgard = {
+  {
+    100,
+    "icecastle.rsw",
+    998,
+    789,
+    1114,
+    905,
+    WORLD_MSGID.MSI_100_ICECASTLE,
+    ""
+  },
+  {
+    100,
+    "jor_tail.rsw",
+    881,
+    906,
+    997,
+    1018,
+    WORLD_MSGID.MSI_100_JOR_TAIL,
+    "208"
+  },
+  {
+    100,
+    "jor_back1.rsw",
+    881,
+    789,
+    997,
+    905,
+    WORLD_MSGID.MSI_100_JOR_BACK1,
+    "211"
+  },
+  {
+    100,
+    "jor_back2.rsw",
+    881,
+    672,
+    997,
+    788,
+    WORLD_MSGID.MSI_100_JOR_BACK2,
+    "212"
+  },
+  {
+    100,
+    "jor_back3.rsw",
+    764,
+    672,
+    880,
+    788,
+    WORLD_MSGID.MSI_100_JOR_BACK3,
+    "213"
+  },
+  {
+    100,
+    "jor_back4.rsw",
+    764,
+    556,
+    880,
+    670,
+    WORLD_MSGID.MSI_100_JOR_BACK4,
+    "220"
+  },
+  {
+    100,
+    "jor_back5.rsw",
+    647,
+    438,
+    763,
+    554,
+    WORLD_MSGID.MSI_100_JOR_BACK5,
+    "220"
+  },
+  {
+    100,
+    "jor_back6.rsw",
+    530,
+    438,
+    646,
+    554,
+    WORLD_MSGID.MSI_100_JOR_BACK6,
+    "244"
+  },
+  {
+    100,
+    "jor_twice.rsw",
+    530,
+    204,
+    646,
+    319,
+    WORLD_MSGID.MSI_100_JOR_TWICE,
+    "222"
+  },
+  {
+    100,
+    "jor_twig.rsw",
+    296,
+    87,
+    412,
+    203,
+    WORLD_MSGID.MSI_100_JOR_TWIG,
+    ""
+  }
+}
+worldtable_Isgard_Dun = {}

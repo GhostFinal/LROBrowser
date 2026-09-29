@@ -38,6 +38,62 @@ function receiveState(nid: number, method: string, packet: object) {
   return state;
 }
 
+function toggleAutomation(nid: number, option: string, enabled: boolean) {
+  const match = runtime.match(/LastROTools\.setAutomationOption = function setAutomationOption\(([\s\S]*?)\n\x20{2}\};/);
+  if (!match?.[0]) throw new Error("Missing runtime handler setAutomationOption");
+  const body = match[0].slice(match[0].indexOf("{") + 1, match[0].lastIndexOf("\n  };")).trim();
+  const sent: Array<Record<string, unknown>> = [];
+  class WhisperPacket {
+    receiver = "";
+    msg = "";
+  }
+  class UpdatePacket {
+    id = 0;
+    value = 0;
+  }
+  const handler = new Function(
+    "OPTION_TO_PACKET_ID", "buildAutoToggleRequest", "Configs", "PACKET", "Network", "mapScalarUpdate", "option", "enabled", body,
+  );
+  handler.call({
+    _settingState: {},
+    setStatus() {},
+    getOptionLabel: () => option,
+    renderCompactStatus() {},
+  },
+    { autoAttack: 34, autoLoot: 35, autoPots: 36, autoFollow: 37 },
+    buildAutoToggleRequest,
+    { get: () => nid },
+    { CZ: { WHISPER: WhisperPacket, NOTIFY_UPDATEINFO: UpdatePacket } },
+    { sendPacket: (packet: Record<string, unknown>) => sent.push({ ...packet }) },
+    (packet: Record<string, unknown>) => packet,
+    option,
+    enabled,
+  );
+  return sent;
+}
+
+describe("automatic offline mode activation", () => {
+  it("sends offline mode after enabling auto battle for whisper and scalar profiles", () => {
+    expect(toggleAutomation(3, "autoAttack", true)).toEqual([
+      { receiver: "NPC:setautoattack", msg: "0" },
+      { receiver: "NPC:setoffline", msg: "0" },
+    ]);
+    expect(toggleAutomation(5, "autoAttack", true)).toEqual([
+      { kind: "update", id: 34, value: 1 },
+      { receiver: "NPC:setoffline", msg: "0" },
+    ]);
+  });
+
+  it("does not send offline mode when auto battle is disabled or another option changes", () => {
+    expect(toggleAutomation(3, "autoAttack", false)).toEqual([
+      { receiver: "NPC:setautoattack", msg: "0" },
+    ]);
+    expect(toggleAutomation(3, "autoLoot", true)).toEqual([
+      { receiver: "NPC:setautopick", msg: "0" },
+    ]);
+  });
+});
+
 describe("server auto-loot state polarity", () => {
   for (const nid of [3, 5, 6]) {
     for (const value of [0, 1]) {

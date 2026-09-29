@@ -1,26 +1,50 @@
 World_List = {
   {
-    "������½",
+    "中土大陆",
     "worldtable_main",
     "worldtable_main_Dun",
-    "worldmap.bmp"
+    "worldmap.jpg"
   },
   {
-    "��Ԫ��½",
+    "中土大陆北部",
+    "worldtable_north",
+    "worldtable_north_Dun",
+    "midgard_north.jpg"
+  },
+  {
+    "次元大陆",
     "worldtable_dimensions",
     "worldtable_dimensions_Dun",
     "worldmap_dimension.bmp"
   },
   {
-    "�ֲ���ͼ 01",
+    "次元裂隙",
+    "worldtable_Crack_of_Dimension1",
+    "worldtable_Crack_of_Dimension1_Dun",
+    "Crack_of_Dimension1.jpg"
+  },
+  {
+    "局部地图 01",
     "worldtable_localizing1",
     "worldtable_localizing1_Dun",
     "worldmap_localizing1.bmp"
   },
   {
-    "�ֲ���ͼ 02",
+    "局部地图 02",
     "worldtable_localizing2",
     "worldtable_localizing2_Dun",
     "worldmap_localizing2.bmp"
+  },
+  {
+    "多兰岛",
+    "worldtable_Doram",
+    "worldtable_Doram_Dun",
+    "pasta.jpg"
+  },
+  {
+    "伊斯加尔特",
+    "worldtable_Isgard",
+    "worldtable_Isgard_Dun",
+    "WorldMap_Isgard.jpg"
   }
 }
