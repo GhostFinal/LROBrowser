@@ -8,7 +8,7 @@ const worldMapDirectory = path.join(
 );
 const listSource = readFileSync(path.join(worldMapDirectory, 'worldviewdata_list.lub'), 'utf8');
 const tableSource = readFileSync(path.join(worldMapDirectory, 'worldviewdata_table.lub'), 'utf8');
-const languageSource = readFileSync(path.join(worldMapDirectory, 'worldviewdata_language.lub'), 'utf8');
+const languageSource = new TextDecoder('gbk').decode(readFileSync(path.join(worldMapDirectory, 'worldviewdata_language.lub')));
 const worldData = JSON.parse(readFileSync('vendor/core/data/world/world-data.json', 'utf8')) as Record<string, { name?: string }>;
 
 const categories = [...listSource.matchAll(/\{\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\}/gs)]
@@ -53,5 +53,9 @@ describe('world map Lua catalog', () => {
       const name = worldData[id]?.name ?? languageNames.get(key);
       expect(name, `${id} should have a Chinese display name`).toMatch(/[\u3400-\u9fff]/u);
     }
+  });
+
+  it('decodes GBK-encoded Lua labels using the client data charset', () => {
+    expect(languageNames.get('MSI_16_NIF_FILD01')).toBe('斯凯领顿 (尼芙菲姆 偏远村落)');
   });
 });

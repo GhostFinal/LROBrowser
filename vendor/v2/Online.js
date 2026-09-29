@@ -79917,7 +79917,7 @@ var init_Controls = __esmMin(() => {
       attackTargetMode: 0,
       joyQuick: 0,
       joyDeadline: 0.1,
-      joyDisableVirtualMouse: false,
+      joyDisableVirtualMouse: true,
       joyAutoHide: false,
       joyReverseStick: false,
       joySense: 25,
@@ -157234,9 +157234,9 @@ var init_PacketStructure = __esmMin(() => {
     fp,
     end,
   ) {
-    this.failed = fp.readUChar();
+    this.result = fp.readUChar();
     this.ach_id = fp.readLong();
-    this.result = this.failed;
+    this.failed = this.result;
     this.ACHID = this.ach_id;
   };
   PACKET.ZC.REQ_ACH_REWARD_ACK.size = 7;
@@ -188052,12 +188052,13 @@ var init_NpcMenu = __esmMin(() => {
     if (content) {
       content.addEventListener("mousedown", (e) => {
         const div = e.target.closest("div");
-        if (div && content.contains(div)) selectIndex(div);
+        if (!div?.dataset?.index || !content.contains(div)) return;
+        selectIndex(div);
         e.stopImmediatePropagation();
       });
       content.addEventListener("dblclick", (e) => {
         const div = e.target.closest("div");
-        if (div && content.contains(div)) validate();
+        if (div?.dataset?.index && content.contains(div)) validate();
       });
     }
   };
@@ -199070,7 +199071,8 @@ var init_Quest$1 = __esmMin(() => {
   publicName$8 = "Quest";
   versionInfo$8 = {
     default: QuestV1_default,
-    common: { 20180307: Quest_default },
+    // Force ALT+U to use the legacy QuestV1 panel while the renewal panel is disabled.
+    common: {},
     re: {},
     prere: {},
   };
@@ -199110,6 +199112,17 @@ var _preferences$28,
   AchievementComponent,
   Achievement,
   Achievement_default;
+function getAchievementRewardInfo(reward) {
+  return Array.isArray(reward) ? reward[0] : reward;
+}
+function hasAchievementReward(reward) {
+  const info = getAchievementRewardInfo(reward);
+  return !!(
+    info &&
+    typeof info === "object" &&
+    (info.title || info.buff || info.item)
+  );
+}
 var init_Achievement$1 = __esmMin(() => {
   init_GUIComponent();
   init_UIManager();
@@ -199250,6 +199263,7 @@ var init_Achievement$1 = __esmMin(() => {
       this.currentMajor = 0;
       this.currentMinor = -1;
       this.selectedAchId = null;
+      this.claimingAchId = null;
       this.draggable(".titlebar");
       const closeBtn = root.querySelector(".close");
       if (closeBtn) {
@@ -199269,9 +199283,24 @@ var init_Achievement$1 = __esmMin(() => {
       const claimBtn = root.querySelector(".js-d-claim");
       if (claimBtn)
         claimBtn.addEventListener("click", () => {
-          if (this.selectedAchId !== null) {
+          const allAch = DB.getAchievementTable();
+          const sessAch =
+            SessionStorage_default.Achievement &&
+            SessionStorage_default.Achievement.list
+              ? SessionStorage_default.Achievement.list
+              : {};
+          const info = allAch[this.selectedAchId];
+          const state = sessAch[this.selectedAchId];
+          const canClaim =
+            this.selectedAchId !== null &&
+            this.claimingAchId !== this.selectedAchId &&
+            hasAchievementReward(info && info.reward) &&
+            !!state &&
+            !!(state.completed || state.Completed) &&
+            !(state.reward || state.rewarded);
+          if (canClaim) {
+            this.claimingAchId = this.selectedAchId;
             const pkt = new PACKET.CZ.REQ_ACH_REWARD();
-            pkt.ach_id = this.selectedAchId;
             pkt.achievementID = this.selectedAchId;
             Network.sendPacket(pkt);
           }
@@ -199544,12 +199573,8 @@ var init_Achievement$1 = __esmMin(() => {
           let dtStr = "";
           let rewardBoxBg = "";
           const groupName = info.group ? info.group.toLowerCase() : "";
-          const hasReward =
-            info.reward &&
-            (Array.isArray(info.reward)
-              ? info.reward.length > 0
-              : Object.keys(info.reward).length > 0);
-          const isClaimed = s && s.reward;
+          const hasReward = hasAchievementReward(info.reward);
+          const isClaimed = s && (s.reward || s.rewarded);
           const d = /* @__PURE__ */ new Date(s.completed_at * 1e3);
           dtStr = `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
           if (hasReward) {
@@ -199607,7 +199632,7 @@ var init_Achievement$1 = __esmMin(() => {
         if (this.currentMinor !== -1 && info.minor !== this.currentMinor)
           return;
         const s = sessAch[achId];
-        const isCompleted = s ? s.completed : false;
+        const isCompleted = s ? s.completed || s.Completed : false;
         list.push({
           achId,
           info,
@@ -199666,13 +199691,8 @@ var init_Achievement$1 = __esmMin(() => {
         let dtStr = "";
         let rewardBoxBg = "";
         const groupName = info.group ? info.group.toLowerCase() : "";
-        const isClaimed = s && s.reward;
-        if (
-          info.reward &&
-          (Array.isArray(info.reward)
-            ? info.reward.length > 0
-            : Object.keys(info.reward).length > 0)
-        ) {
+        const isClaimed = s && (s.reward || s.rewarded);
+        if (hasAchievementReward(info.reward)) {
           if (!isCompleted)
             rewardBoxBg = "achievement_re/list_rewardbox_default.bmp";
           else if (!isClaimed)
@@ -199733,6 +199753,7 @@ var init_Achievement$1 = __esmMin(() => {
         rewardItem.style.display = "none";
         return;
       }
+      const reward = getAchievementRewardInfo(info.reward);
       root.querySelector(".js-d-title").textContent = info.title || "Unknown";
       root.querySelector(".js-d-desc").textContent =
         info.content && info.content.details ? info.content.details : "";
@@ -199762,6 +199783,8 @@ var init_Achievement$1 = __esmMin(() => {
         rewardItem.onmouseout =
         rewardItem.onmousemove =
           null;
+      root.querySelector(".d-reward-item").style.backgroundImage = "";
+      rewardItem.oncontextmenu = null;
       const bindOverlay = (el, text) => {
         el.onmouseover = () => {
           if (!text) return;
@@ -199782,16 +199805,16 @@ var init_Achievement$1 = __esmMin(() => {
           overlay.style.display = "none";
         };
       };
-      if (info.reward) {
-        rewardTitle.style.display = info.reward.title ? "block" : "none";
-        if (info.reward.title)
-          bindOverlay(rewardTitle, DB.getTitleString(info.reward.title));
-        rewardBuff.style.display = info.reward.buff ? "block" : "none";
-        if (info.reward.buff)
-          bindOverlay(rewardBuff, DB.getSkillName(info.reward.buff));
-        rewardItem.style.display = info.reward.item ? "block" : "none";
-        if (info.reward.item) {
-          const it = DB.getItemInfo(info.reward.item);
+      if (reward && hasAchievementReward(reward)) {
+        rewardTitle.style.display = reward.title ? "block" : "none";
+        if (reward.title)
+          bindOverlay(rewardTitle, DB.getTitleString(reward.title));
+        rewardBuff.style.display = reward.buff ? "block" : "none";
+        if (reward.buff)
+          bindOverlay(rewardBuff, DB.getSkillName(reward.buff));
+        rewardItem.style.display = reward.item ? "block" : "none";
+        if (reward.item) {
+          const it = DB.getItemInfo(reward.item);
           if (it && it.identifiedResourceName) {
             Client.loadFile(
               DB.INTERFACE_PATH + "item/" + it.identifiedResourceName + ".bmp",
@@ -199803,19 +199826,19 @@ var init_Achievement$1 = __esmMin(() => {
             bindOverlay(
               rewardItem,
               DB.getItemName({
-                ITID: info.reward.item,
+                ITID: reward.item,
                 IsIdentified: true,
               }),
             );
             rewardItem.oncontextmenu = (event) => {
               event.preventDefault();
               event.stopImmediatePropagation();
-              if (ItemInfo_default.uid === info.reward.item)
+              if (ItemInfo_default.uid === reward.item)
                 ItemInfo_default.remove();
               ItemInfo_default.append();
-              ItemInfo_default.uid = info.reward.item;
+              ItemInfo_default.uid = reward.item;
               ItemInfo_default.setItem({
-                ITID: info.reward.item,
+                ITID: reward.item,
                 IsIdentified: true,
                 count: 1,
               });
@@ -199829,17 +199852,12 @@ var init_Achievement$1 = __esmMin(() => {
         rewardItem.style.display = "none";
       }
       const claimBtn = root.querySelector(".js-d-claim");
-      if (
-        info.reward &&
-        (Array.isArray(info.reward)
-          ? info.reward.length > 0
-          : Object.keys(info.reward).length > 0) &&
-        s &&
-        s.completed &&
-        !s.reward
-      )
-        claimBtn.style.display = "";
-      else claimBtn.style.display = "none";
+      const canClaim = hasAchievementReward(info.reward) &&
+        !!s &&
+        !!(s.completed || s.Completed) &&
+        !(s.reward || s.rewarded);
+      claimBtn.textContent = "领取奖励";
+      claimBtn.style.display = canClaim ? "flex" : "none";
     }
   };
   Achievement = new AchievementComponent();
@@ -270992,7 +271010,11 @@ function getSkillDataFiles(basePath, useLastROSources) {
 function createLastRODataDecoder(decoder) {
   return {
     decode(value, charset = null) {
-      return decoder.decode(value, charset || "windows-1252");
+      const bytes =
+        typeof value === "string"
+          ? Uint8Array.from(value, (character) => character.charCodeAt(0) & 255)
+          : value;
+      return decoder.decode(bytes, charset || "windows-1252");
     },
   };
 }
@@ -297384,6 +297406,7 @@ var init_LastROTools = __esmMin(() => {
   init_UIManager();
   init_NetworkManager();
   init_PacketStructure();
+  init_ProcessCommand();
   init_LastROTools$2();
   init_LastROTools$1();
   patchLastROToolsTemplate();
@@ -298619,7 +298642,7 @@ var init_LastROTools = __esmMin(() => {
     if (this._quickTimer) clearTimeout(this._quickTimer);
     this._quickTimer = 0;
   };
-  function buildLastROQuickTeleportRequest(route) {
+  function buildLastROQuickNavigationCommand(route) {
     const destination = route?.outset || route?.path?.[0];
     if (
       !Array.isArray(destination) ||
@@ -298629,12 +298652,7 @@ var init_LastROTools = __esmMin(() => {
       throw new Error("route has no usable teleport destination");
     }
     // Preset routes are filtered separately; this generic builder also handles user-entered custom maps.
-    return buildPrivateAirshipRequest({
-      mapname: destination[0],
-      x: destination[1],
-      y: destination[2],
-      type: 1,
-    });
+    return `navi ${normalizeMapName(destination[0])} ${Number(destination[1]) || 0} ${Number(destination[2]) || 0}`;
   }
   LastROTools.runQuickRoute = function runQuickRoute() {
     this.stopQuickRoute();
@@ -298673,17 +298691,9 @@ var init_LastROTools = __esmMin(() => {
       } else {
         route = normalizeRouteEntry(this._quickRoutes?.[category]?.[key]);
       }
-      const first = route.path[0] || route.outset;
-      if (!first) throw new Error("route has no first destination");
-      if (PACKET.CZ.PRIVATE_AIRSHIP_REQUEST) {
-        const pkt = new PACKET.CZ.PRIVATE_AIRSHIP_REQUEST();
-        Object.assign(pkt, buildLastROQuickTeleportRequest(route));
-        Network.sendPacket(pkt);
-        if (Navigation_default?.__loaded) Navigation_default.clear();
-        this.setStatus(`已发送传送请求：${route.npc}`);
-        return;
-      }
-      throw new Error("当前客户端不支持快速传送");
+      const command = buildLastROQuickNavigationCommand(route);
+      ProcessCommand_default.processCommand(command);
+      this.setStatus(`已发送导航请求：${route.npc}`);
     } catch (error) {
       this.setStatus(`快速传送失败：${error.message}`);
     }
@@ -313537,9 +313547,11 @@ function onAllAchievementList(pkt) {
   achievements.forEach((ach) => {
     ach.ach_id = ach.ach_id ?? ach.AID;
     ach.completed = ach.completed ?? ach.Completed ?? 0;
+    ach.Completed = ach.completed;
     ach.objective = ach.objective || ach.Objectives || [];
     ach.completed_at = ach.completed_at ?? ach.endtime ?? 0;
     ach.reward = ach.reward ?? ach.rewarded ?? 0;
+    ach.rewarded = ach.rewarded ?? ach.reward;
     ach.info = achTable[ach.ach_id] || null;
     SessionStorage_default.Achievement.list[ach.ach_id] = ach;
   });
@@ -313560,9 +313572,11 @@ function onAchievementUpdate(pkt) {
   achievements.forEach((ach) => {
     ach.ach_id = ach.ach_id ?? ach.AID;
     ach.completed = ach.completed ?? ach.Completed ?? 0;
+    ach.Completed = ach.completed;
     ach.objective = ach.objective || ach.Objectives || [];
     ach.completed_at = ach.completed_at ?? ach.endtime ?? 0;
     ach.reward = ach.reward ?? ach.rewarded ?? 0;
+    ach.rewarded = ach.rewarded ?? ach.reward;
     ach.info = achTable[ach.ach_id] || null;
     const oldAch = SessionStorage_default.Achievement.list[ach.ach_id];
     const isNewCompletion = ach.completed && (!oldAch || !oldAch.completed);
@@ -313591,15 +313605,24 @@ function onAchievementUpdate(pkt) {
 }
 function onRequestAchievementRewardACK(pkt) {
   const achievementId = pkt.ach_id ?? pkt.ACHID;
-  const failed = pkt.failed ?? (pkt.result ? 0 : 1);
-  if (
-    failed === 0 &&
+  const result = pkt.result ?? (pkt.failed ? 0 : 1);
+  const achievement =
     SessionStorage_default.Achievement &&
-    SessionStorage_default.Achievement.list[achievementId]
-  )
-    SessionStorage_default.Achievement.list[achievementId].reward = 1;
+    SessionStorage_default.Achievement.list[achievementId];
+  if (result !== 0 && achievement) {
+    achievement.reward = 1;
+    achievement.rewarded = 1;
+  }
+  if (result !== 0) {
+    UIManager.showMessageBox("已领取成就奖励", "ok");
+  } else {
+    UIManager.showMessageBox("领取失败", "ok");
+  }
   const ui = UIManager.components.Achievement;
-  if (ui) ui.updateHeaderAndView();
+  if (ui) {
+    if (ui.claimingAchId === achievementId) ui.claimingAchId = null;
+    ui.updateHeaderAndView();
+  }
 }
 /**
  * Initialize

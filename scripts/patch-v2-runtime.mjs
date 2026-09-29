@@ -466,6 +466,122 @@ function patchLuaValueFailure(source) {
     }` + source.slice(end);
 }
 
+export function patchLuaJsonEscapes(source) {
+  const anchor = String.raw`return str:gsub("\\", "\\\\"):gsub("\"", "\\\"")`;
+  if (!source.includes('local function escape_str')) return source;
+  const replacement = String.raw`return str
+                  :gsub("\\", "\\\\")
+                  :gsub("\"", "\\\"")
+                  :gsub("\b", "\\b")
+                  :gsub("\f", "\\f")
+                  :gsub("\n", "\\n")
+                  :gsub("\r", "\\r")
+                  :gsub("\t", "\\t")
+                  :gsub("%c", function(char)
+                    return string.format("\\u%04x", string.byte(char))
+                  end)`;
+  return replaceOnce(source, anchor, replacement);
+}
+
+export function patchNpcMenuBlankArea(source) {
+  const mousedownAnchor = 'if (div && content.contains(div)) selectIndex(div);';
+  const dblclickAnchor = 'if (div && content.contains(div)) validate();';
+  let output = source;
+  if (output.includes(mousedownAnchor)) {
+    output = replaceOnce(output, mousedownAnchor,
+      'if (!div?.dataset?.index || !content.contains(div)) return;\n        selectIndex(div);');
+  }
+  if (output.includes(dblclickAnchor)) {
+    output = replaceOnce(output, dblclickAnchor,
+      'if (div?.dataset?.index && content.contains(div)) validate();');
+  }
+  return output;
+}
+
+export function patchAchievementClaimButton(source) {
+  const lineBreak = String.raw`\r\n`;
+  const claimMarker = 'd-claim-btn js-d-claim';
+  // Some focused patch tests use a minimal runtime fixture without the
+  // optional achievement component. Leave those fixtures untouched; when the
+  // component exists, all of its anchors remain strict below.
+  if (!source.includes(claimMarker)) return source;
+  if (count(source, claimMarker) !== 1) fail('anchor:achievement-claim-template');
+  const claimIndex = source.indexOf(claimMarker);
+  const buttonStart = source.lastIndexOf('<ui-button', claimIndex);
+  const styleIndex = source.indexOf('display: none', claimIndex);
+  const styleEnd = source.indexOf(lineBreak, styleIndex);
+  const buttonEndMarker = '</ui-button>';
+  const buttonEnd = source.indexOf(buttonEndMarker, claimIndex);
+  if (buttonStart < 0 || styleIndex < 0 || styleEnd < 0 || buttonEnd < 0 || buttonEnd < styleEnd) {
+    fail('anchor:achievement-claim-template');
+  }
+  // The HTML is embedded in a JavaScript string and contains literal escaped
+  // CR/LF sequences. Keep the existing prefix and replace only the missing
+  // asset-backed button body so this works across bundle formatting variants.
+  source = source.slice(0, buttonStart)
+    + source.slice(buttonStart, styleEnd + lineBreak.length)
+    + '\t\t>领取奖励</ui-button>'
+    + source.slice(buttonEnd + buttonEndMarker.length);
+
+  const cssMarker = '.detail-view .d-claim-btn';
+  if (count(source, cssMarker) !== 1) fail('anchor:achievement-claim-css');
+  const cssStart = source.indexOf(cssMarker);
+  const scrollbarMarker = '/* Scrollbar area */';
+  const scrollbarStart = source.indexOf(scrollbarMarker, cssStart);
+  if (scrollbarStart < 0) fail('anchor:achievement-claim-css');
+  const cssBlock = [
+    '.detail-view .d-claim-btn {',
+    '\tposition: absolute;',
+    '\tbottom: 10px;',
+    '\tleft: 90px;',
+    '\twidth: 148px;',
+    '\theight: 20px;',
+    '\tdisplay: none;',
+    '\talign-items: center;',
+    '\tjustify-content: center;',
+    '\tbox-sizing: border-box;',
+    '\tpadding: 0 8px;',
+    '\tborder: 1px solid #80652f;',
+    '\tborder-radius: 2px;',
+    '\tbackground: #e8d08c;',
+    '\tcolor: #3b2a12;',
+    '\tfont-size: 11px;',
+    '\tfont-weight: bold;',
+    '\tline-height: 18px;',
+    '\ttext-align: center;',
+    '\tcursor: pointer;',
+    '\ttext-shadow: 1px 1px 0 #fff4cf;',
+    '}',
+    '',
+    '.detail-view .d-claim-btn:hover {',
+    '\tbackground: #f3dfaa;',
+    '}',
+    '',
+    '.detail-view .d-claim-btn:active {',
+    '\tbackground: #d8bb70;',
+    '}',
+  ].join('\r\n');
+  // JSON.stringify provides the correct escaping for the surrounding JS
+  // string, including CR/LF and CSS quotes.
+  const encodedCssBlock = JSON.stringify(cssBlock).slice(1, -1);
+  source = source.slice(0, cssStart)
+    + encodedCssBlock
+    + lineBreak + lineBreak
+    + source.slice(scrollbarStart);
+
+  const displayAnchors = [
+    ['if (canClaim)\n        claimBtn.style.display = "";\n      else claimBtn.style.display = "none";',
+      'const hasReward = hasAchievementReward(info.reward);\n      const isCompleted = !!(s && (s.completed || s.Completed));\n      const isClaimed = !!(s && (s.reward || s.rewarded));\n      claimBtn.textContent = canClaim ? "领取奖励" : isClaimed ? "已领取" : isCompleted ? "领取奖励" : "未完成";\n      claimBtn.disabled = !canClaim;\n      claimBtn.style.display = hasReward ? "flex" : "none";'],
+    ['claimBtn.textContent = "领取奖励";\n      claimBtn.style.display = canClaim ? "flex" : "none";',
+      'const hasReward = hasAchievementReward(info.reward);\n      const isCompleted = !!(s && (s.completed || s.Completed));\n      const isClaimed = !!(s && (s.reward || s.rewarded));\n      claimBtn.textContent = canClaim ? "领取奖励" : isClaimed ? "已领取" : isCompleted ? "领取奖励" : "未完成";\n      claimBtn.disabled = !canClaim;\n      claimBtn.style.display = hasReward ? "flex" : "none";'],
+  ];
+  if (count(source, displayAnchors[0][0]) === 1) source = source.replace(displayAnchors[0][0], displayAnchors[0][1]);
+  else if (count(source, displayAnchors[1][0]) === 1) source = source.replace(displayAnchors[1][0], displayAnchors[1][1]);
+  else if (source.includes('claimBtn.style.display = hasReward ? "flex" : "none";')) return source;
+  else fail('anchor:achievement-claim-display');
+  return source;
+}
+
 export function patchV2Runtime(source) {
   if (!source.startsWith('import ')) fail('anchor:runtime-imports');
   const normalizedSource = source.replace(/\r\n/g, '\n');
@@ -578,6 +694,9 @@ ${normalizedSource}`;
   output = replacePathFindingWorkerCreation(output);
   output = patchLegacyScriptSinks(output);
   output = patchLuaValueFailure(output);
+  output = patchLuaJsonEscapes(output);
+  output = patchNpcMenuBlankArea(output);
+  output = patchAchievementClaimButton(output);
   for (const table of ['map', 'npc', 'link', 'linkdistance', 'npcdistance']) {
     output = replaceOnce(output, `DB.LUA_PATH + "navigation/navi_${table}_krpri.lub"`,
       `DB.LUA_PATH + "navigation/" + (Configs.get("lastroProtocol", false) ? "navi_${table}_tw.lub" : "navi_${table}_krpri.lub")`);

@@ -25,7 +25,10 @@ function harness() {
   let uid = 0;
   let ready = false;
   let advances = 0;
-  const manifest = { files: [{ path: 'System/test.lua', kind: 'lua' }] };
+  const manifest = { files: [
+    { path: 'System/test.lua', kind: 'lua' },
+    { path: 'System/achievement_list_cn2_06.lua', kind: 'lua' },
+  ] };
   const worker = vm.createContext({
     ArrayBuffer, Uint8Array, URL, Blob, TextDecoder, TextEncoder, Response, Headers, AbortController,
     indexedDB: new IDBFactory(), setTimeout, clearTimeout, console,
@@ -35,6 +38,11 @@ function harness() {
     requestFileSystem: () => { throw new Error('legacy filesystem used'); },
     fetch: async (input: string | URL) => {
       requests.push(String(input));
+      if (String(input).endsWith('/core/System/achievement_list_cn2_06.lua')) {
+        return new Response(readFileSync('generated/core/System/achievement_list_cn2_06.lua'), {
+          headers: { 'content-type': 'application/octet-stream' },
+        });
+      }
       return new Response('test#table#', { headers: { 'content-type': 'application/octet-stream' } });
     },
     TCPSocket: class {
@@ -139,5 +147,15 @@ describe('V2 native resource startup', () => {
     expect(runtime.tcpRequests).toHaveLength(1);
     expect(runtime.tcpRequests[0]).toMatchObject({ host: 'game.lastro.cn', port: 80 });
     expect(runtime.tcpRequests[0]?.request).toContain('GET /ro/client_re/data/mp3nametable.txt HTTP/1.1');
+  });
+
+  it('loads the packaged achievement Lua through the real LOAD_FILE path', async () => {
+    const runtime = harness();
+    vm.runInContext('loadFiles(() => {});', runtime.main);
+    const source = await vm.runInContext('new Promise((resolve, reject) => Client.loadFile("System/achievement_list_cn2_06.lua", resolve, reject));', runtime.main);
+    expect(source).toBeInstanceOf(Uint8Array);
+    expect((source as Uint8Array).byteLength).toBeGreaterThan(200_000);
+    expect(runtime.requests).toContain('https://iwa.invalid/core/System/achievement_list_cn2_06.lua');
+    expect(runtime.tcpRequests).toHaveLength(0);
   });
 });

@@ -139,40 +139,29 @@ test("Navigation quick-teleports only to non-dungeon maps on another map", () =>
   assert.equal(shouldQuickTeleport("prontera", "prontera"), false);
 });
 
-test("Navigation quick teleport sends the exact /navi destination", () => {
+test("Quick teleport builds the exact /navi command without a private airship packet", () => {
   const source = readFileSync(ONLINE_PATH, "utf8");
-  const marker = "function requestNavigationQuickTeleport(";
+  const marker = "function buildLastROQuickNavigationCommand(";
   const markerIndex = source.indexOf(marker);
-  assert.notEqual(markerIndex, -1, "Navigation quick teleport helper was not found");
+  assert.notEqual(markerIndex, -1, "Quick teleport command helper was not found");
   const functionIndex = source.lastIndexOf("function", markerIndex);
   const openBrace = source.indexOf("{", functionIndex);
   let depth = 0;
   for (let index = openBrace; index < source.length; ++index) {
     if (source[index] === "{") ++depth;
     if (source[index] === "}" && --depth === 0) {
-      class PrivateAirshipRequest {
-        constructor() { this.mapname = ""; this.x = 0; this.y = 0; this.type = 0; }
-      }
-      const sentPackets = [];
-      const shouldQuickTeleport = loadNavigationTeleportDecision();
       const request = new Function(
-        "getCurrentMap", "shouldQuickTeleportNavigation", "normalizeMapName", "PACKET", "buildPrivateAirshipRequest", "Network",
+        "normalizeMapName",
         `return (${source.slice(functionIndex, index + 1)});`
       )(
-        () => "prontera",
-        shouldQuickTeleport,
         (map) => String(map || "").replace(/\.gat$/i, "").toLowerCase(),
-        { CZ: { PRIVATE_AIRSHIP_REQUEST: PrivateAirshipRequest } },
-        (data) => ({ ...data, itemid: 14527 }),
-        { sendPacket: (packet) => sentPackets.push(packet) }
       );
-      assert.equal(request({ map: "geffen.gat", x: 132, y: 66 }), true);
-      assert.equal(sentPackets.length, 1);
-      assert.deepEqual({ ...sentPackets[0] }, { mapname: "geffen", x: 132, y: 66, type: 1, itemid: 14527 });
+      assert.equal(request({ outset: ["geffen.gat", 132, 66] }), "navi geffen 132 66");
+      assert.equal(request({ path: [["prontera", 10, 20]] }), "navi prontera 10 20");
       return;
     }
   }
-  throw new Error("Navigation quick teleport helper has unbalanced braces");
+  throw new Error("Quick teleport command helper has unbalanced braces");
 });
 
 test("Activity map links send the server-provided map and coordinates", () => {

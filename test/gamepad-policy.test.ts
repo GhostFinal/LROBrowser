@@ -4,12 +4,14 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 let inputSource: string;
 let loopSource: string;
+let controlsSource: string;
 beforeAll(async () => {
   // pnpm test prepares the patched runtime before Vitest starts.
   const patched = await readFile('generated/runtime/Online.js', 'utf8');
   const region = (name: string) => patched.split('//#region src/UI/Components/JoystickUI/' + name + '.js')[1]!.split('//#endregion')[0]!;
   inputSource = region('JoystickInputService');
   loopSource = region('JoystickPollingLoop');
+  controlsSource = patched.split('//#region src/Preferences/Controls.js')[1]!.split('//#endregion')[0]!;
 });
 
 function harness(navigator: object, document: object = {}) {
@@ -28,6 +30,13 @@ function harness(navigator: object, document: object = {}) {
 }
 
 describe('optional gamepad input', () => {
+  it('disables virtual mouse input by default', () => {
+    const context = vm.createContext({ __esmMin: (fn: () => void) => fn, init_Preferences$1() {},
+      Preferences: { get: (_name: string, defaults: object) => defaults } });
+    vm.runInContext(controlsSource + '\ninit_Controls();', context);
+    expect(vm.runInContext('Controls_default.joyDisableVirtualMouse', context)).toBe(true);
+  });
+
   it.each(['permissionsPolicy', 'featurePolicy'])('skips the native API when %s blocks gamepad', (key) => {
     const getGamepads = vi.fn(() => { throw new DOMException('blocked', 'SecurityError'); });
     const h = harness({ getGamepads }, { [key]: { allowsFeature: (name: string) => name !== 'gamepad' } });

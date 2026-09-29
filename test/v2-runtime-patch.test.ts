@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
-import { patchGuildEmblemRequestCallbacks, patchLegacyScriptSinks, patchTrustedTypesDomWrites, patchV2Runtime, patchWebAudioPlayback } from '../scripts/patch-v2-runtime.mjs';
+import { patchGuildEmblemRequestCallbacks, patchLegacyScriptSinks, patchLuaJsonEscapes, patchNpcMenuBlankArea, patchTrustedTypesDomWrites, patchV2Runtime, patchWebAudioPlayback } from '../scripts/patch-v2-runtime.mjs';
 import { buildClientConfig } from '../src/runtime/client-config';
 import { LASTRO_SERVER_PROFILES } from '../src/servers/server-profiles';
 
@@ -35,6 +35,36 @@ describe('V2 runtime patch', () => {
   it('keeps guild emblem callback arguments image-first', () => {
     const source = 'this.onSuccess(entry.guildId, entry.version, entry.image, entry.gif);';
     expect(patchGuildEmblemRequestCallbacks(source)).toBe('this.onSuccess(entry.guildId, entry.image, entry.gif);');
+  });
+
+  it('ignores blank-area NPC menu clicks in regenerated runtimes', () => {
+    const source = [
+      'content.addEventListener("mousedown", (e) => {',
+      '  const div = e.target.closest("div");',
+      '  if (div && content.contains(div)) selectIndex(div);',
+      '});',
+      'content.addEventListener("dblclick", (e) => {',
+      '  const div = e.target.closest("div");',
+      '  if (div && content.contains(div)) validate();',
+      '});',
+    ].join('\n');
+    const patched = patchNpcMenuBlankArea(source);
+    expect(patched).toContain('if (!div?.dataset?.index || !content.contains(div)) return;');
+    expect(patched).toContain('if (div?.dataset?.index && content.contains(div)) validate();');
+  });
+
+  it('escapes Lua control characters before converting tables to JSON', () => {
+    const source = String.raw`local function escape_str(str)
+	return str:gsub("\\", "\\\\"):gsub("\"", "\\\"")
+end`;
+    const patched = patchLuaJsonEscapes(source);
+    expect(patched).toContain(String.raw`:gsub("\b", "\\b")`);
+    expect(patched).toContain(String.raw`:gsub("\f", "\\f")`);
+    expect(patched).toContain(String.raw`:gsub("\n", "\\n")`);
+    expect(patched).toContain(String.raw`:gsub("\r", "\\r")`);
+    expect(patched).toContain(String.raw`:gsub("\t", "\\t")`);
+    expect(patched).toContain(String.raw`:gsub("%c", function(char)`);
+    expect(patched).toContain(String.raw`string.format("\\u%04x", string.byte(char))`);
   });
 
   it('removes legacy html2canvas proxy and FlashCanvas script sinks', () => {
