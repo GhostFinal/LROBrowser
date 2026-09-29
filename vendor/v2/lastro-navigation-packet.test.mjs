@@ -139,7 +139,7 @@ test("Navigation quick-teleports only to non-dungeon maps on another map", () =>
   assert.equal(shouldQuickTeleport("prontera", "prontera"), false);
 });
 
-test("Quick teleport builds the exact /navi command without a private airship packet", () => {
+test("Quick teleport builds the exact /navi command for same-map destinations", () => {
   const source = readFileSync(ONLINE_PATH, "utf8");
   const marker = "function buildLastROQuickNavigationCommand(";
   const markerIndex = source.indexOf(marker);
@@ -151,9 +151,10 @@ test("Quick teleport builds the exact /navi command without a private airship pa
     if (source[index] === "{") ++depth;
     if (source[index] === "}" && --depth === 0) {
       const request = new Function(
-        "normalizeMapName",
+        "getLastROQuickDestination", "normalizeMapName",
         `return (${source.slice(functionIndex, index + 1)});`
       )(
+        (route) => route?.outset || route?.path?.[0],
         (map) => String(map || "").replace(/\.gat$/i, "").toLowerCase(),
       );
       assert.equal(request({ outset: ["geffen.gat", 132, 66] }), "navi geffen 132 66");
@@ -162,6 +163,65 @@ test("Quick teleport builds the exact /navi command without a private airship pa
     }
   }
   throw new Error("Quick teleport command helper has unbalanced braces");
+});
+
+test("Quick routes use /navi on the current map and private airship across maps", () => {
+  const source = readFileSync(ONLINE_PATH, "utf8");
+  const marker = "function requestLastROQuickRoute(";
+  const markerIndex = source.indexOf(marker);
+  assert.notEqual(markerIndex, -1, "Quick route request helper was not found");
+  const functionIndex = source.lastIndexOf("function", markerIndex);
+  const openBrace = source.indexOf("{", functionIndex);
+  let depth = 0;
+  for (let index = openBrace; index < source.length; ++index) {
+    if (source[index] === "{") ++depth;
+    if (source[index] === "}" && --depth === 0) {
+      class PrivateAirshipRequest {
+        constructor() { this.mapname = ""; this.x = 0; this.y = 0; this.type = 0; }
+      }
+      const navigationCommands = [];
+      const sentPackets = [];
+      const cleared = [];
+      const request = (currentMap) => new Function(
+        "getCurrentMap", "normalizeMapName", "getLastROQuickDestination",
+        "buildLastROQuickNavigationCommand",
+        "buildLastROQuickTeleportRequest", "PACKET", "ProcessCommand_default",
+        "Network", "Navigation_default",
+        `return (${source.slice(functionIndex, index + 1)});`
+      )(
+        () => currentMap,
+        (map) => String(map || "").replace(/\.gat$/i, "").toLowerCase(),
+        (route) => route?.outset || route?.path?.[0],
+        (route) => {
+          const [map, x, y] = route.outset;
+          return `navi ${map} ${x} ${y}`;
+        },
+        (route) => {
+          const [map, x, y] = route.outset;
+          return { mapname: map, x, y, type: 1, itemid: 14527 };
+        },
+        { CZ: { PRIVATE_AIRSHIP_REQUEST: PrivateAirshipRequest } },
+        { processCommand: (command) => navigationCommands.push(command) },
+        { sendPacket: (packet) => sentPackets.push(packet) },
+        { __loaded: true, clear: () => cleared.push(true) },
+      );
+
+      const route = { outset: ["prontera", 132, 66] };
+      assert.equal(request("prontera")(route), "navigation");
+      assert.deepEqual(navigationCommands, ["navi prontera 132 66"]);
+      assert.equal(sentPackets.length, 0);
+
+      assert.equal(request("geffen")(route), "teleport");
+      assert.equal(navigationCommands.length, 1);
+      assert.equal(sentPackets.length, 1);
+      assert.deepEqual({ ...sentPackets[0] }, {
+        mapname: "prontera", x: 132, y: 66, type: 1, itemid: 14527,
+      });
+      assert.deepEqual(cleared, [true]);
+      return;
+    }
+  }
+  throw new Error("Quick route request helper has unbalanced braces");
 });
 
 test("Activity map links send the server-provided map and coordinates", () => {

@@ -298642,7 +298642,7 @@ var init_LastROTools = __esmMin(() => {
     if (this._quickTimer) clearTimeout(this._quickTimer);
     this._quickTimer = 0;
   };
-  function buildLastROQuickNavigationCommand(route) {
+  function getLastROQuickDestination(route) {
     const destination = route?.outset || route?.path?.[0];
     if (
       !Array.isArray(destination) ||
@@ -298651,8 +298651,38 @@ var init_LastROTools = __esmMin(() => {
     ) {
       throw new Error("route has no usable teleport destination");
     }
+    return destination;
+  }
+  function buildLastROQuickNavigationCommand(route) {
+    const destination = getLastROQuickDestination(route);
     // Preset routes are filtered separately; this generic builder also handles user-entered custom maps.
     return `navi ${normalizeMapName(destination[0])} ${Number(destination[1]) || 0} ${Number(destination[2]) || 0}`;
+  }
+  function buildLastROQuickTeleportRequest(route) {
+    const destination = getLastROQuickDestination(route);
+    return buildPrivateAirshipRequest({
+      mapname: normalizeMapName(destination[0]),
+      x: destination[1],
+      y: destination[2],
+      type: 1,
+    });
+  }
+  function requestLastROQuickRoute(route) {
+    const destination = getLastROQuickDestination(route);
+    const targetMap = normalizeMapName(destination[0]);
+    if (normalizeMapName(getCurrentMap()) === targetMap) {
+      ProcessCommand_default.processCommand(
+        buildLastROQuickNavigationCommand(route),
+      );
+      return "navigation";
+    }
+    if (!PACKET?.CZ?.PRIVATE_AIRSHIP_REQUEST)
+      throw new Error("当前客户端不支持跨地图快速传送");
+    const packet = new PACKET.CZ.PRIVATE_AIRSHIP_REQUEST();
+    Object.assign(packet, buildLastROQuickTeleportRequest(route));
+    Network.sendPacket(packet);
+    if (Navigation_default?.__loaded) Navigation_default.clear();
+    return "teleport";
   }
   LastROTools.runQuickRoute = function runQuickRoute() {
     this.stopQuickRoute();
@@ -298691,9 +298721,8 @@ var init_LastROTools = __esmMin(() => {
       } else {
         route = normalizeRouteEntry(this._quickRoutes?.[category]?.[key]);
       }
-      const command = buildLastROQuickNavigationCommand(route);
-      ProcessCommand_default.processCommand(command);
-      this.setStatus(`已发送导航请求：${route.npc}`);
+      const mode = requestLastROQuickRoute(route);
+      this.setStatus(`${mode === "teleport" ? "已发送传送请求" : "已发送导航请求"}：${route.npc}`);
     } catch (error) {
       this.setStatus(`快速传送失败：${error.message}`);
     }
