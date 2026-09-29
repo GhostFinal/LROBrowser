@@ -91,6 +91,7 @@ function createSearchHandler(query, itemNames) {
       results.splice(0, results.length, ...items);
     }
   };
+  const visibleItems = [];
   const component = {
     getRoot() {
       return { querySelector: () => input };
@@ -102,17 +103,19 @@ function createSearchHandler(query, itemNames) {
     "StorageFilter",
     "_list",
     "_openFilters",
+    "requestFilter",
     `return (${extractAssignedFunction(SOURCE, "Component.onSearch =")});`
   )(
     { getItemName: item => item.name },
     { SEARCH: 99 },
     function StorageFilter() { return storageFilter; },
     itemNames.map((name, index) => ({ index, name })),
-    {}
+    {},
+    items => visibleItems.splice(0, visibleItems.length, ...items),
   );
 
   onSearch.call(component);
-  return results.map(item => item.name);
+  return visibleItems.map(item => item.name);
 }
 
 test("storage search trims whitespace and matches complete Chinese item names", () => {
@@ -153,6 +156,11 @@ test("storage search refreshes while typing and on Enter", () => {
     SOURCE,
     /searchInput\.addEventListener\("keydown",\s*\(event\)\s*=>\s*\{[\s\S]*?Component\.onSearch\(\)/,
     "the search input should handle Enter directly",
+  );
+  assert.match(
+    SOURCE,
+    /const filteredItems = _list\.filter\([\s\S]*?requestFilter\(filteredItems\)/,
+    "the search should refresh the visible storage list directly",
   );
 });
 

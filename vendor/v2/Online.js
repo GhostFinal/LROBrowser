@@ -207729,6 +207729,7 @@ function createStorage(config) {
         const itemName = String(DB.getItemName(item) ?? "").toLowerCase();
         return itemName.indexOf(searchTerm) > -1;
       });
+      requestFilter(filteredItems);
       if (!_openFilters[ItemType_default.SEARCH]) {
         const newFilter = new StorageFilter(ItemType_default.SEARCH);
         _openFilters[ItemType_default.SEARCH] = newFilter;
@@ -207740,13 +207741,12 @@ function createStorage(config) {
           Component.transferItemToOtherUI(item);
         };
         newFilter.append();
-        newFilter.setItems("Search", filteredItems, ItemType_default.SEARCH);
-      } else
-        _openFilters[ItemType_default.SEARCH].setItems(
-          "Search",
-          filteredItems,
-          ItemType_default.SEARCH,
-        );
+      }
+      _openFilters[ItemType_default.SEARCH].setItems(
+        "Search",
+        filteredItems,
+        ItemType_default.SEARCH,
+      );
     };
   if (hasSearch) Component.onEnterPressed = Component.onSearch;
   function onResize() {
@@ -207813,11 +207813,11 @@ function createStorage(config) {
     else Component.reqAddItem(item.index, 1);
     return false;
   }
-  function requestFilter() {
+  function requestFilter(items = null) {
     const root = Component.getRoot();
     const content = root.querySelector(".container .content");
     if (content) content.innerHTML = "";
-    let list = _list;
+    let list = items === null ? _list : items;
     if (hasOrderBy) {
       const orderBySelect = root.querySelector(".storage-order-by");
       const orderBy = orderBySelect ? orderBySelect.value : "BASE";

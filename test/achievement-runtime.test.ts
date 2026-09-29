@@ -1,11 +1,25 @@
 import { readFile } from 'node:fs/promises';
-import { describe, expect, it } from 'vitest';
+import vm from 'node:vm';
+import { describe, expect, it, vi } from 'vitest';
 
 async function runtimeSource() {
   return readFile('generated/runtime/Online.js', 'utf8');
 }
 
 describe('achievement runtime integration', () => {
+  it('decodes raw Lua strings before passing them to CodepageManager', async () => {
+    const source = await runtimeSource();
+    const start = source.indexOf('function createLastRODataDecoder(');
+    const end = source.indexOf('\nfunction getItemCountUnit', start);
+    const context = vm.createContext({
+      Uint8Array,
+      decoder: { decode: vi.fn((value: Uint8Array, charset: string) => `${value[0]}:${charset}`) },
+    });
+    vm.runInContext(`${source.slice(start, end)}\nresult = createLastRODataDecoder(decoder).decode("\\xB3\\xC9", "gbk");`, context);
+
+    expect(context.result).toBe('179,gbk');
+  });
+
   it('loads the packaged LastRO achievement table with the configured data charset', async () => {
     const source = await runtimeSource();
     expect(source).toContain('"System/achievement_list_cn2_06.lua"');
