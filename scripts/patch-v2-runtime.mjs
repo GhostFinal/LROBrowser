@@ -57,6 +57,106 @@ function replaceFunctionBody(source, name, body) {
   return source.slice(0, start) + body + source.slice(node.body.end);
 }
 
+function patchLocalMessageTable(source) {
+  const loaderAnchor = 'function loadCSV(filename, targetTable, keyIndex, valueIndex, onEnd) {';
+  if (!source.includes(loaderAnchor)) return source;
+
+  source = replaceFunctionBody(source, 'loadCSV', `{
+  const parseCsvRow = (line) => {
+    const fields = [];
+    let field = "";
+    let quoted = false;
+    for (let index = 0; index < line.length; index++) {
+      const character = line[index];
+      if (quoted) {
+        if (character === '"' && line[index + 1] === '"') {
+          field += '"';
+          index++;
+        } else if (character === '"') {
+          quoted = false;
+        } else {
+          field += character;
+        }
+      } else if (character === '"' && field.length === 0) {
+        quoted = true;
+      } else if (character === ',') {
+        fields.push(field);
+        field = "";
+      } else {
+        field += character;
+      }
+    }
+    fields.push(field);
+    return fields;
+  };
+  const isMessageCsv = filename === "data/msgstringtable.csv";
+  Client.loadFile(
+    filename,
+    function (data) {
+      console.log('Loading file "' + filename + '"...');
+      const bytes = data instanceof ArrayBuffer ? new Uint8Array(data) : data;
+      let text = "";
+      let isBase64 = !isMessageCsv;
+      if (isMessageCsv) {
+        text = CodepageManager.decode(bytes, "utf-8").replace(/^\\uFEFF/, "");
+      } else {
+        for (let i = 0, count = bytes.length; i < count; i++)
+          text += String.fromCharCode(bytes[i]);
+        if (!text.trimEnd().endsWith("=")) {
+          text = CodepageManager.decode(bytes, "utf-8");
+          isBase64 = false;
+        }
+      }
+      const lines = text.split(/\\r?\\n/);
+      let index = 0;
+      for (let i = 0; i < lines.length; i++) {
+        const rawLine = lines[i];
+        const line = isMessageCsv ? rawLine : rawLine.trim();
+        if (!line || line.trimStart().startsWith("//")) continue;
+        const parts = isMessageCsv
+          ? parseCsvRow(line)
+          : isBase64
+            ? line.split(",")
+            : line.split("\\t");
+        if (parts.length <= Math.max(keyIndex, valueIndex)) continue;
+        try {
+          const value = isMessageCsv
+            ? parts[valueIndex]
+            : isBase64
+              ? base64DecodeUtf8(parts[valueIndex].trim())
+              : parts[valueIndex].trim();
+          targetTable[isMessageCsv ? i : index] = value;
+          if (!isMessageCsv) index++;
+        } catch (error) {
+          console.error("CSV decode failed on line", i + 1, ":", line, error);
+        }
+      }
+      if (typeof onEnd === "function") onEnd();
+    },
+    onEnd,
+  );
+}`);
+
+  const messageTableBlock = `      const loadmsg = onLoad();
+      loadTable(
+        "data/msgstringtable.txt",
+        "#",
+        1,
+        (_index, val) => {
+          MsgStringTable[_index] = val;
+        },
+        () => loadCSV("data/msgstringtable.csv", MsgStringTable, 0, 1, loadmsg),
+        true,
+      );`;
+  if (count(source, messageTableBlock) === 1) {
+    source = source.replace(messageTableBlock,
+      '      loadCSV("data/msgstringtable.csv", MsgStringTable, 0, 1, onLoad());');
+  } else if (!source.includes('loadCSV("data/msgstringtable.csv", MsgStringTable, 0, 1, onLoad())')) {
+    fail('anchor:msgstringtable-init');
+  }
+  return source;
+}
+
 function patchLoginRegistrationHook(source) {
   const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
   const matches = [];
@@ -725,6 +825,7 @@ ${normalizedSource}`;
     output = replaceOnce(output, `DB.LUA_PATH + "navigation/navi_${table}_krpri.lub"`,
       `DB.LUA_PATH + "navigation/" + (Configs.get("lastroProtocol", false) ? "navi_${table}_tw.lub" : "navi_${table}_krpri.lub")`);
   }
+  output = patchLocalMessageTable(output);
   output = replaceFunctionBody(output, 'loadXMLFile', `{
   Client.loadFile(filename, function(file) {
     try {
