@@ -1,0 +1,1758 @@
+{
+  "sourceUrl": "https://game.lastro.cn/ro/Online.js?71.9",
+  "sha256": "8c04205200de36d355b6a8349ce6395f076f134566c9ad54837ff5f335cb11ed",
+  "regions": [
+    {
+      "name": "中土大陆",
+      "background": "worldmap_n.jpg",
+      "columns": 23,
+      "rows": 18,
+      "cells": [
+        {
+          "id": null,
+          "image": "cave.png",
+          "x": 10,
+          "y": 0,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "hu_fild01",
+          "image": "hu_fild01.png",
+          "x": 12,
+          "y": 0,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "hu_fild02",
+          "image": "hu_fild02.png",
+          "x": 13,
+          "y": 0,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "hu_fild03",
+          "image": "hu_fild03.png",
+          "x": 14,
+          "y": 0,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "hugel",
+          "image": "hugel.png",
+          "x": 15,
+          "y": 0,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "sch_gld",
+          "image": "sch_gld.png",
+          "x": 7,
+          "y": 1,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno",
+          "image": "yuno.png",
+          "x": 8,
+          "y": 1,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ein_fild01",
+          "image": "ein_fild01.png",
+          "x": 10,
+          "y": 1,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild05",
+          "image": "yuno_fild05.png",
+          "x": 11,
+          "y": 1,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild06",
+          "image": "yuno_fild06.png",
+          "x": 12,
+          "y": 1,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "hu_fild04",
+          "image": "hu_fild04.png",
+          "x": 13,
+          "y": 1,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "hu_fild05",
+          "image": "hu_fild05.png",
+          "x": 14,
+          "y": 1,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "hu_fild06",
+          "image": "hu_fild06.png",
+          "x": 15,
+          "y": 1,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ra_fild01",
+          "image": "ra_fild01.png",
+          "x": 5,
+          "y": 2,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "ein_fild02",
+          "image": "ein_fild02.png",
+          "x": 10,
+          "y": 2,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild04",
+          "image": "yuno_fild04.png",
+          "x": 11,
+          "y": 2,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild03",
+          "image": "yuno_fild03.png",
+          "x": 12,
+          "y": 2,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild02",
+          "image": "yuno_fild02.png",
+          "x": 13,
+          "y": 2,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "hu_fild07",
+          "image": "hu_fild07.png",
+          "x": 14,
+          "y": 2,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "odin_tem03",
+          "image": "odin_tem03.png",
+          "x": 18,
+          "y": 2,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "ra_fild02",
+          "image": "ra_fild02.png",
+          "x": 3,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ra_fild03",
+          "image": "ra_fild03.png",
+          "x": 4,
+          "y": 3,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "ra_fild04",
+          "image": "ra_fild04.png",
+          "x": 5,
+          "y": 3,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "ra_fild05",
+          "image": "ra_fild05.png",
+          "x": 6,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ra_fild06",
+          "image": "ra_fild06.png",
+          "x": 7,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ein_fild03",
+          "image": "ein_fild03.png",
+          "x": 8,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ein_fild04",
+          "image": "ein_fild04.png",
+          "x": 9,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ein_fild05",
+          "image": "ein_fild05.png",
+          "x": 10,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ein_fild06",
+          "image": "ein_fild06.png",
+          "x": 11,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild07",
+          "image": "yuno_fild07.png",
+          "x": 12,
+          "y": 3,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "yuno_fild08",
+          "image": "yuno_fild08.png",
+          "x": 13,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild09",
+          "image": "yuno_fild09.png",
+          "x": 14,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild10",
+          "image": "yuno_fild10.png",
+          "x": 15,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "odin_tem01",
+          "image": "odin_tem01.png",
+          "x": 17,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "odin_tem02",
+          "image": "odin_tem02.png",
+          "x": 18,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ra_fild07",
+          "image": "ra_fild07.png",
+          "x": 3,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ra_temple",
+          "image": "ra_temple.png",
+          "x": 4,
+          "y": 4,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "ra_fild08",
+          "image": "ra_fild08.png",
+          "x": 5,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ra_fild09",
+          "image": "ra_fild09.png",
+          "x": 6,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "lhz_fild01",
+          "image": "lhz_fild01.png",
+          "x": 7,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "lhz_fild02",
+          "image": "lhz_fild02.png",
+          "x": 8,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "einbroch",
+          "image": "einbroch.png",
+          "x": 9,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "einbech",
+          "image": "einbech.png",
+          "x": 10,
+          "y": 4,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "ein_fild07",
+          "image": "ein_fild07.png",
+          "x": 11,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild11",
+          "image": "yuno_fild11.png",
+          "x": 12,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild12",
+          "image": "yuno_fild12.png",
+          "x": 13,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "yuno_fild01",
+          "image": "yuno_fild01.png",
+          "x": 14,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "xmas",
+          "image": "xmas.png",
+          "x": 17,
+          "y": 4,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "ra_fild10",
+          "image": "ra_fild10.png",
+          "x": 2,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ra_fild11",
+          "image": "ra_fild11.png",
+          "x": 3,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "rachel",
+          "image": "rachel.png",
+          "x": 4,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ra_fild12",
+          "image": "ra_fild12.png",
+          "x": 5,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "lighthalzen",
+          "image": "lighthalzen.png",
+          "x": 7,
+          "y": 5,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "lhz_fild03",
+          "image": "lhz_fild03.png",
+          "x": 8,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ein_fild08",
+          "image": "ein_fild08.png",
+          "x": 9,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ein_fild09",
+          "image": "ein_fild09.png",
+          "x": 10,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ein_fild10",
+          "image": "ein_fild10.png",
+          "x": 11,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "alde_gld",
+          "image": "alde_gld.png",
+          "x": 13,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "aldebaran",
+          "image": "aldebaran.png",
+          "x": 14,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "xmas_fild01",
+          "image": "xmas_fild01.png",
+          "x": 17,
+          "y": 5,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "malangdo",
+          "image": "malangdo.png",
+          "x": 19,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "thor_camp",
+          "image": "thor_camp.png",
+          "x": 2,
+          "y": 6,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ve_fild01",
+          "image": "ve_fild01.png",
+          "x": 3,
+          "y": 6,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ve_fild02",
+          "image": "ve_fild02.png",
+          "x": 4,
+          "y": 6,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "ra_fild13",
+          "image": "ra_fild13.png",
+          "x": 5,
+          "y": 6,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_12",
+          "image": "mjolnir_12.png",
+          "x": 14,
+          "y": 6,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ve_fild03",
+          "image": "ve_fild03.png",
+          "x": 2,
+          "y": 7,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "ve_fild04",
+          "image": "ve_fild04.png",
+          "x": 3,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_01",
+          "image": "mjolnir_01.png",
+          "x": 10,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_02",
+          "image": "mjolnir_02.png",
+          "x": 11,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_03",
+          "image": "mjolnir_03.png",
+          "x": 12,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_04",
+          "image": "mjolnir_04.png",
+          "x": 13,
+          "y": 7,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "mjolnir_05",
+          "image": "mjolnir_05.png",
+          "x": 14,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "lasagna",
+          "image": "lasagna.png",
+          "x": 19,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "lasa_fild02",
+          "image": "lasa_fild02.png",
+          "x": 20,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ve_fild05",
+          "image": "ve_fild05.png",
+          "x": 2,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ve_fild06",
+          "image": "ve_fild06.png",
+          "x": 3,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "glast_01",
+          "image": "glast_01.png",
+          "x": 7,
+          "y": 8,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "gef_fild06",
+          "image": "gef_fild06.png",
+          "x": 8,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild05",
+          "image": "gef_fild05.png",
+          "x": 9,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild04",
+          "image": "gef_fild04.png",
+          "x": 10,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_06",
+          "image": "mjolnir_06.png",
+          "x": 11,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_07",
+          "image": "mjolnir_07.png",
+          "x": 12,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_08",
+          "image": "mjolnir_08.png",
+          "x": 13,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_10",
+          "image": "mjolnir_10.png",
+          "x": 14,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_11",
+          "image": "mjolnir_11.png",
+          "x": 15,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "lasa_fild01",
+          "image": "lasa_fild01.png",
+          "x": 18,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "veins",
+          "image": "veins.png",
+          "x": 3,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild08",
+          "image": "gef_fild08.png",
+          "x": 8,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild07",
+          "image": "gef_fild07.png",
+          "x": 9,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "geffen",
+          "image": "geffen.png",
+          "x": 10,
+          "y": 9,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "gef_fild00",
+          "image": "gef_fild00.png",
+          "x": 11,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild00",
+          "image": "prt_fild00.png",
+          "x": 12,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mjolnir_09",
+          "image": "mjolnir_09.png",
+          "x": 13,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild01",
+          "image": "prt_fild01.png",
+          "x": 14,
+          "y": 9,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "prt_fild02",
+          "image": "prt_fild02.png",
+          "x": 15,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild03",
+          "image": "prt_fild03.png",
+          "x": 16,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_monk",
+          "image": "prt_monk.png",
+          "x": 17,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ve_fild07",
+          "image": "ve_fild07.png",
+          "x": 3,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild12",
+          "image": "gef_fild12.png",
+          "x": 8,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild13",
+          "image": "gef_fild13.png",
+          "x": 9,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild09",
+          "image": "gef_fild09.png",
+          "x": 10,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild01",
+          "image": "gef_fild01.png",
+          "x": 11,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild04",
+          "image": "prt_fild04.png",
+          "x": 12,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild05",
+          "image": "prt_fild05.png",
+          "x": 13,
+          "y": 10,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "prontera",
+          "image": "prontera.png",
+          "x": 14,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild06",
+          "image": "prt_fild06.png",
+          "x": 15,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "jawaii",
+          "image": "jawaii.png",
+          "x": 19,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "umbala",
+          "image": "umbala.png",
+          "x": 5,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild14",
+          "image": "gef_fild14.png",
+          "x": 9,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild10",
+          "image": "gef_fild10.png",
+          "x": 10,
+          "y": 11,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "gef_fild03",
+          "image": "gef_fild03.png",
+          "x": 11,
+          "y": 11,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "gef_fild02",
+          "image": "gef_fild02.png",
+          "x": 12,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild07",
+          "image": "prt_fild07.png",
+          "x": 13,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild08",
+          "image": "prt_fild08.png",
+          "x": 14,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "izlude",
+          "image": "izlude.png",
+          "x": 15,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "izlu2dun",
+          "image": "izlu2dun.png",
+          "x": 16,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "nameless_n",
+          "image": "nameless_n.png",
+          "x": 2,
+          "y": 12,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "um_fild04",
+          "image": "um_fild04.png",
+          "x": 5,
+          "y": 12,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gef_fild11",
+          "image": "gef_fild11.png",
+          "x": 10,
+          "y": 12,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild11",
+          "image": "prt_fild11.png",
+          "x": 11,
+          "y": 12,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild10",
+          "image": "prt_fild10.png",
+          "x": 12,
+          "y": 12,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "prt_fild09",
+          "image": "prt_fild09.png",
+          "x": 13,
+          "y": 12,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild01",
+          "image": "moc_fild01.png",
+          "x": 14,
+          "y": 12,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild04",
+          "image": "pay_fild04.png",
+          "x": 15,
+          "y": 12,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_arche",
+          "image": "pay_arche.png",
+          "x": 17,
+          "y": 12,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "um_fild01",
+          "image": "um_fild01.png",
+          "x": 4,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "um_fild02",
+          "image": "um_fild02.png",
+          "x": 5,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "um_fild03",
+          "image": "um_fild03.png",
+          "x": 6,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_ruins",
+          "image": "moc_ruins.png",
+          "x": 9,
+          "y": 13,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "moc_fild07",
+          "image": "moc_fild07.png",
+          "x": 10,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild02",
+          "image": "moc_fild02.png",
+          "x": 14,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_gld",
+          "image": "pay_gld.png",
+          "x": 15,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "payon",
+          "image": "payon.png",
+          "x": 16,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild08",
+          "image": "pay_fild08.png",
+          "x": 17,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild09",
+          "image": "pay_fild09.png",
+          "x": 18,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "comodo",
+          "image": "comodo.png",
+          "x": 5,
+          "y": 14,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "cmd_fild01",
+          "image": "cmd_fild01.png",
+          "x": 6,
+          "y": 14,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "cmd_fild03",
+          "image": "cmd_fild03.png",
+          "x": 7,
+          "y": 14,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "cmd_fild05",
+          "image": "cmd_fild05.png",
+          "x": 8,
+          "y": 14,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild19",
+          "image": "moc_fild19.png",
+          "x": 9,
+          "y": 14,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "morocc",
+          "image": "morocc.png",
+          "x": 10,
+          "y": 14,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild20",
+          "image": "moc_fild20.png",
+          "x": 12,
+          "y": 14,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild21",
+          "image": "moc_fild21.png",
+          "x": 13,
+          "y": 14,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild13",
+          "image": "moc_fild13.png",
+          "x": 14,
+          "y": 14,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild03",
+          "image": "moc_fild03.png",
+          "x": 15,
+          "y": 14,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild01",
+          "image": "pay_fild01.png",
+          "x": 16,
+          "y": 14,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild07",
+          "image": "pay_fild07.png",
+          "x": 17,
+          "y": 14,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild10",
+          "image": "pay_fild10.png",
+          "x": 18,
+          "y": 14,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "cmd_fild02",
+          "image": "cmd_fild02.png",
+          "x": 6,
+          "y": 15,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "cmd_fild04",
+          "image": "cmd_fild04.png",
+          "x": 7,
+          "y": 15,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "cmd_fild06",
+          "image": "cmd_fild06.png",
+          "x": 8,
+          "y": 15,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "cmd_fild08",
+          "image": "cmd_fild08.png",
+          "x": 9,
+          "y": 15,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "moc_fild12",
+          "image": "moc_fild12.png",
+          "x": 10,
+          "y": 15,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild11",
+          "image": "moc_fild11.png",
+          "x": 11,
+          "y": 15,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild22",
+          "image": "moc_fild22.png",
+          "x": 13,
+          "y": 15,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild11",
+          "image": "pay_fild11.png",
+          "x": 15,
+          "y": 15,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild02",
+          "image": "pay_fild02.png",
+          "x": 16,
+          "y": 15,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild03",
+          "image": "pay_fild03.png",
+          "x": 17,
+          "y": 15,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "alb2trea",
+          "image": "alb2trea.png",
+          "x": 19,
+          "y": 15,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "nif_fild01",
+          "image": "nif_fild01.png",
+          "x": 2,
+          "y": 16,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "nif_fild02",
+          "image": "nif_fild02.png",
+          "x": 3,
+          "y": 16,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "niflheim",
+          "image": "niflheim.png",
+          "x": 4,
+          "y": 16,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "cmd_fild07",
+          "image": "cmd_fild07.png",
+          "x": 8,
+          "y": 16,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "cmd_fild09",
+          "image": "cmd_fild09.png",
+          "x": 9,
+          "y": 16,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild18",
+          "image": "moc_fild18.png",
+          "x": 10,
+          "y": 16,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moc_fild17",
+          "image": "moc_fild17.png",
+          "x": 11,
+          "y": 16,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "moc_fild16",
+          "image": "moc_fild16.png",
+          "x": 12,
+          "y": 16,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild05",
+          "image": "pay_fild05.png",
+          "x": 16,
+          "y": 16,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "pay_fild06",
+          "image": "pay_fild06.png",
+          "x": 17,
+          "y": 16,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "alberta",
+          "image": "alberta.png",
+          "x": 18,
+          "y": 16,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "tur_dun01",
+          "image": "tur_dun01.png",
+          "x": 20,
+          "y": 16,
+          "span": 1,
+          "boss": true
+        }
+      ]
+    },
+    {
+      "name": "次元大陆",
+      "background": "worldmap_dimension_n.jpg",
+      "columns": 16,
+      "rows": 13,
+      "cells": [
+        {
+          "id": "eclage",
+          "image": "eclage.png",
+          "x": 5,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ecl_fild01",
+          "image": "ecl_fild01.png",
+          "x": 5,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "bif_fild02",
+          "image": "bif_fild02.png",
+          "x": 5,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "bif_fild01",
+          "image": "bif_fild01.png",
+          "x": 5,
+          "y": 6,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "spl_fild01",
+          "image": "spl_fild01.png",
+          "x": 6,
+          "y": 6,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "dicastes02",
+          "image": "dicastes02.png",
+          "x": 11,
+          "y": 6,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "splendide",
+          "image": "splendide.png",
+          "x": 5,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "spl_fild02",
+          "image": "spl_fild02.png",
+          "x": 6,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mid_camp",
+          "image": "mid_camp.png",
+          "x": 7,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "man_fild01",
+          "image": "man_fild01.png",
+          "x": 8,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "man_fild02",
+          "image": "man_fild02.png",
+          "x": 9,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "dicastes01",
+          "image": "dicastes01.png",
+          "x": 11,
+          "y": 7,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "spl_fild03",
+          "image": "spl_fild03.png",
+          "x": 6,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "man_fild03",
+          "image": "man_fild03.png",
+          "x": 8,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "manuk",
+          "image": "manuk.png",
+          "x": 9,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "dic_dun01",
+          "image": "dic_dun01.png",
+          "x": 10,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "dic_fild01",
+          "image": "dic_fild01.png",
+          "x": 11,
+          "y": 8,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "dic_fild02",
+          "image": "dic_fild02.png",
+          "x": 11,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        }
+      ]
+    },
+    {
+      "name": "局部地图01",
+      "background": "worldmap_localizing1_n.jpg",
+      "columns": 18,
+      "rows": 15,
+      "cells": [
+        {
+          "id": "gon_dun02",
+          "image": "gon_dun02.png",
+          "x": 15,
+          "y": 2,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ama_fild01",
+          "image": "ama_fild01.png",
+          "x": 5,
+          "y": 3,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "gonryun",
+          "image": "gonryun.png",
+          "x": 13,
+          "y": 3,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "amatsu",
+          "image": "amatsu.png",
+          "x": 4,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "gon_fild01",
+          "image": "gon_fild01.png",
+          "x": 13,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "lou_dun01",
+          "image": "lou_dun01.png",
+          "x": 3,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "louyang",
+          "image": "louyang.png",
+          "x": 4,
+          "y": 10,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "ayo_fild02",
+          "image": "ayo_fild02.png",
+          "x": 13,
+          "y": 10,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "lou_fild01",
+          "image": "lou_fild01.png",
+          "x": 4,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ayothaya",
+          "image": "ayothaya.png",
+          "x": 12,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ayo_fild01",
+          "image": "ayo_fild01.png",
+          "x": 13,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        }
+      ]
+    },
+    {
+      "name": "局部地图02",
+      "background": "worldmap_localizing2_n.jpg",
+      "columns": 18,
+      "rows": 15,
+      "cells": [
+        {
+          "id": "mosk_dun02",
+          "image": "mosk_dun02.png",
+          "x": 3,
+          "y": 2,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mosk_dun03",
+          "image": "mosk_dun03.png",
+          "x": 4,
+          "y": 2,
+          "span": 1,
+          "boss": true
+        },
+        {
+          "id": "bra_fild01",
+          "image": "bra_fild01.png",
+          "x": 14,
+          "y": 2,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mosk_dun01",
+          "image": "mosk_dun01.png",
+          "x": 3,
+          "y": 3,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "mosk_fild02",
+          "image": "mosk_fild02.png",
+          "x": 3,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "brasilis",
+          "image": "brasilis.png",
+          "x": 13,
+          "y": 4,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "moscovia",
+          "image": "moscovia.png",
+          "x": 6,
+          "y": 5,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ma_scene01",
+          "image": "ma_scene01.png",
+          "x": 15,
+          "y": 9,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "dew_fild01",
+          "image": "dew_fild01.png",
+          "x": 1,
+          "y": 10,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "dewata",
+          "image": "dewata.png",
+          "x": 3,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ma_fild02",
+          "image": "ma_fild02.png",
+          "x": 14,
+          "y": 11,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "ma_fild01",
+          "image": "ma_fild01.png",
+          "x": 14,
+          "y": 12,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "dew_dun01",
+          "image": "dew_dun01.png",
+          "x": 5,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        },
+        {
+          "id": "malaya",
+          "image": "malaya.png",
+          "x": 12,
+          "y": 13,
+          "span": 1,
+          "boss": false
+        }
+      ]
+    }
+  ]
+}

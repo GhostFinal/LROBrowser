@@ -6,6 +6,13 @@ import { fileURLToPath, URL } from 'node:url';
 import { parseArgs } from 'node:util';
 import process from 'node:process';
 import ts from 'typescript';
+import { JOB_NAME_OVERRIDES, MESSAGE_FALLBACKS, RUNTIME_TEXT_REPLACEMENTS } from './lastro-localization.mjs';
+import { SKILL_DESCRIPTION_OVERRIDES, SKILL_NAME_OVERRIDES } from './lastro-skill-localization.mjs';
+import { ITEM_OBTAIN_CSS } from './lastro-loot-style.mjs';
+import { installLastroLootList } from './lastro-loot-list.mjs';
+import { createWorldMapIndex, installLastroWorldMap, WORLD_MAP_HTML, WORLD_MAP_CSS } from './lastro-worldmap.mjs';
+import { createMonsterPortraitLoader } from './lastro-monster-portrait.mjs';
+import worldMapLayout from './lastro-worldmap-layout.json' with { type: 'json' };
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
 
@@ -33,6 +40,25 @@ function replaceOnceAny(source, pairs) {
     if (count(source, anchor) === 1) return source.replace(anchor, replacement);
   }
   fail(`anchor:${pairs[0][0]}`);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function decodeDoubleQuotedString(literal) {
+  const escapeMap = { '\\r': '\r', '\\n': '\n', '\\t': '\t', '\\b': '\b', '\\f': '\f', '\\v': '\v', '\\\\': '\\', '\\"': '"' };
+  return literal.slice(1, -1).replace(/\\(?:r|n|t|b|f|v|\\|")/g, (escape) => escapeMap[escape]);
+}
+
+function appendCssToStringVariable(source, variableName, cssBlock) {
+  const pattern = new RegExp(`(${escapeRegExp(variableName)}\\s*=\\s*)("(?:\\\\.|[^"\\\\])*")`, 'g');
+  const matches = [...source.matchAll(pattern)];
+  if (matches.length !== 1) fail(`anchor:${variableName}`);
+  const match = matches[0];
+  const css = decodeDoubleQuotedString(match[2]);
+  if (css.includes(cssBlock)) return source;
+  return source.replace(match[0], `${match[1]}${JSON.stringify(css + cssBlock)}`);
 }
 
 function removeRegion(source, names) {
@@ -96,27 +122,265 @@ function patchRuntimeTypography(source) {
     fail('anchor:common-css-json');
   }
   commonCss = commonCss
-    .replaceAll('font-size-adjust: 0.5186', 'font-size-adjust: none')
     .replaceAll('SCDream', 'Source Han Sans CN')
-    .replaceAll('Arial', "'Source Han Sans CN'")
     + '\r\n\r\n/* LastRO IWA bundled Chinese typography */\r\n'
     + ':host, body {\r\n'
     + '\tfont-family: \'Source Han Sans CN\', sans-serif;\r\n'
-    + '\tfont-size-adjust: none;\r\n'
+    + '\tfont-size-adjust: 0.5186;\r\n'
     + '}\r\n'
-    + 'body, .title, .ui-btn {\r\n'
-    + '\tfont-size: 13px;\r\n'
+    + 'body {\r\n'
+    + '\tfont-size: 12px;\r\n'
     + '}\r\n';
-  const escapedFont = "\\'Source Han Sans CN\\'";
   return source.replace(match[0], `${match[1]}${JSON.stringify(commonCss)}`)
-    .replaceAll('SCDream', 'Source Han Sans CN')
-    // CSS literals in the bundle use single-quoted JS strings, so their CSS
-    // font quotes must remain escaped. Ordinary double-quoted JS strings do
-    // not need that extra escaping.
-    .replaceAll("\\', Arial", `\\', ${escapedFont}`)
-    .replaceAll('font-family: Arial', `font-family: ${escapedFont}`)
-    .replaceAll('font: 13px Arial', `font: 13px ${escapedFont}`)
-    .replaceAll('Arial', "'Source Han Sans CN'");
+    .replaceAll('SCDream', 'Source Han Sans CN');
+}
+
+export function patchRuntimeJobLocalization(source) {
+  // JobNameTable, PalNameTable and WeaponJobTable contain asset basenames,
+  // not UI labels. Never translate these or bodies/weapons/palettes disappear.
+  let replacements = 0;
+  const output = source.replace(/\/\/#region src\/UI\/[^\r\n]+\r?\n[\s\S]*?\/\/#endregion/g, region =>
+    region.replace(/MonsterTable_default\[([^\]\r\n]+)\]/g, (_match, id) => {
+      replacements++; return `lastroJobDisplayName(${id})`;
+    }));
+  if (replacements !== 9) fail('anchor:job-display-lookups');
+  return `/* LASTRO Chinese job-name overlay: display only, never resource paths. */
+const lastroJobLabels = ${JSON.stringify(JOB_NAME_OVERRIDES)};
+let lastroJobLabelsById;
+function lastroJobDisplayName(id) {
+  if (!lastroJobLabelsById) {
+    init_JobConst();
+    lastroJobLabelsById = Object.create(null);
+    for (const [key, label] of Object.entries(lastroJobLabels)) {
+      const job = JobConst_default[key];
+      if (Number.isFinite(job)) lastroJobLabelsById[job] = label;
+    }
+  }
+  return lastroJobLabelsById[id] ?? MonsterTable_default[id];
+}
+` + output;
+}
+
+function patchRuntimeLocalization(source) {
+  let output = source;
+  const hasLocalizationAnchors = output.includes('JobNameTable')
+    || output.includes('function loadSkillInfoList(filename')
+    || RUNTIME_TEXT_REPLACEMENTS.some(([from, to]) => output.includes(from) || output.includes(to))
+    || /DB\.getMessage\(\s*\d+\s*,\s*"/.test(output);
+  if (!hasLocalizationAnchors) return output;
+
+  if (output.includes('JobNameTable')) output = patchRuntimeJobLocalization(output);
+
+  for (const [from, to] of RUNTIME_TEXT_REPLACEMENTS) {
+    const occurrences = count(output, from);
+    if (occurrences > 0) output = output.replaceAll(from, to);
+  }
+
+  output = output.replace(/DB\.getMessage\(\s*(\d+)\s*,\s*"[^"]*"/g, (match, messageId) => {
+    const fallback = MESSAGE_FALLBACKS[messageId];
+    return fallback === undefined ? match : `DB.getMessage(${messageId}, ${JSON.stringify(fallback)}`;
+  });
+  // ui-text calls DB.getMessage again when mounted. Translate known English
+  // table values as well as the HTML fallback, without changing Chinese data.
+  if (output.includes('static getMessage(id, defaultText)')) {
+    const labels = Object.fromEntries(RUNTIME_TEXT_REPLACEMENTS
+      .filter(([from, to]) => /^>[^<>]+<$/.test(from) && /^>[^<>]+<$/.test(to))
+      .map(([from, to]) => [from.slice(1, -1), to.slice(1, -1)]));
+    const anchor = '      return MsgStringTable[id];';
+    output = `const lastroUiMessages = ${JSON.stringify(labels)};\n` + replaceOnce(output, anchor, '      const text = MsgStringTable[id];\n      return Object.prototype.hasOwnProperty.call(lastroUiMessages, text) ? lastroUiMessages[text] : text;');
+  }
+  output = patchRuntimeSkillLocalization(output);
+  return output;
+}
+
+export function patchRuntimeSkillLocalization(source) {
+  if (!source.includes('SkillInfo')) return source;
+  if (!source.includes('function loadSkillInfoList(filename') || !source.includes('main_skillInfoList()'))
+    fail('anchor:skill-loader');
+
+  let output = source;
+  // Localize built-in fallbacks too: the Lua file may fail or omit a skill.
+  output = output.replace(/(SkillInfo\[SkillConst_default\.([A-Z0-9_]+)\]\s*=\s*\{\s*Name:\s*"[^"]*",\s*SkillName:\s*)"[^"]*"/g,
+    (match, prefix, key) => SKILL_NAME_OVERRIDES[key] ? prefix + JSON.stringify(SKILL_NAME_OVERRIDES[key]) : match);
+  const skillNameEntries = Object.entries(SKILL_NAME_OVERRIDES);
+  if (skillNameEntries.length > 0) {
+    const skillNameOverlay = [
+      '        /* LASTRO Chinese skill-name overlay */',
+      `        const lastroSkillNameOverrides = ${JSON.stringify(Object.fromEntries(skillNameEntries))};`,
+      '        for (const [skillName, localizedName] of Object.entries(lastroSkillNameOverrides)) {',
+      '          const skillId = SkillConst_default[skillName];',
+      '          if (Number.isFinite(skillId) && SkillInfo[skillId]) SkillInfo[skillId].SkillName = localizedName;',
+      '        }',
+    ].join('\n');
+    const skillNameAnchor = '      } catch (error) {\n        console.error("[loadSkillInfoList] Error: ", error);';
+    if (count(output, skillNameAnchor) !== 1) fail('anchor:skill-name-overlay');
+    output = output.replace(skillNameAnchor, `${skillNameOverlay}\n${skillNameAnchor}`);
+  }
+
+  const skillDescriptionEntries = Object.entries(SKILL_DESCRIPTION_OVERRIDES);
+  if (skillDescriptionEntries.length > 0) {
+    const skillDescriptionOverlay = [
+      '              /* LASTRO Chinese skill-description overlay */',
+      `              const lastroSkillDescriptionOverrides = ${JSON.stringify(Object.fromEntries(skillDescriptionEntries))};`,
+      '              for (const [skillName, description] of Object.entries(lastroSkillDescriptionOverrides)) {',
+      '                const skillId = SkillConst_default[skillName];',
+      '                if (Number.isFinite(skillId)) SkillDescription[skillId] = description;',
+      '              }',
+    ].join('\n');
+    const skillDescriptionAnchor = '              SkillDescription = _json;';
+    if (count(output, skillDescriptionAnchor) !== 1) fail('anchor:skill-description-overlay');
+    output = output.replace(skillDescriptionAnchor, `${skillDescriptionAnchor}\n${skillDescriptionOverlay}`);
+  }
+  // Learned skill packets may retain an English name; prefer the local DB.
+  output = output.replaceAll('skill.SkillName || info?.SkillName || info?.Name', 'info?.SkillName || skill.SkillName || info?.Name');
+  return output;
+}
+
+export function patchLuaTableCompletion(source) {
+  if (!source.includes('function loadLuaTable(')) return source;
+  const start = source.indexOf('function loadLuaTable(');
+  const script = source.slice(start).match(/lua\.doStringSync\((`[\s\S]*?`)\);/);
+  if (!script || !script[1].includes('main_table()')) fail('anchor:lua-table-parser');
+  return replaceFunctionBody(source, 'loadLuaTable', `{
+  const mounted = [];
+  const table = {};
+  const read = (filename) => new Promise((resolve, reject) => {
+    Client.loadFile(filename, resolve, () => reject(new Error("Failed to load " + filename)));
+  });
+  void (async () => {
+    try {
+      for (const filename of file_list) {
+        const file = await read(filename);
+        const buffer = file instanceof ArrayBuffer ? new Uint8Array(file) : file;
+        lua.mountFile(filename, buffer);
+        mounted.push(filename);
+        await lua.doFile(filename);
+      }
+      const valueCharset = getLuaTableValueCharset(file_list[1], userCharpage);
+      const ctx = lua.ctx;
+      ctx.addKeyAndValueToTable = (key, value) => {
+        table[key] = userStringDecoder.decode(value, valueCharset);
+        return 1;
+      };
+      ctx.addKeyAndMoreValuesToTable = (key, value) => {
+        table[key] = (table[key] || "") + userStringDecoder.decode(value, valueCharset) + "\\n";
+        return 1;
+      };
+      ctx.addKeyAndValueToTable.$rawLuaStringArgs = [1];
+      ctx.addKeyAndMoreValuesToTable.$rawLuaStringArgs = [1];
+      lua.doStringSync(${script[1]});
+      if (typeof contextFunc === "function") contextFunc();
+      callback.call(null, table);
+    } catch (error) {
+      console.error("[loadLuaTable]", table_name, error);
+    } finally {
+      for (const filename of mounted.reverse()) {
+        try { lua.unmountFile(filename); } catch (error) { console.error("[loadLuaTable] cleanup", error); }
+      }
+      if (typeof onEnd === "function") onEnd();
+    }
+  })();
+}`);
+}
+
+function patchRuntimeUiLayout(source) {
+  const itemObtainCss = ITEM_OBTAIN_CSS;
+  const shortcutCss = [
+    '\r\n\r\n/* LastRO shortcut typography and alignment */\r\n',
+    '#ShortCut {\r\n',
+    '\tfont-family: Arial, \'Source Han Sans CN\', sans-serif;\r\n',
+    '\tfont-size: 10px;\r\n',
+    '\tline-height: 1;\r\n',
+    '}\r\n',
+    '#ShortCut .row {\r\n',
+    '\theight: 34px;\r\n',
+    '}\r\n',
+    '#ShortCut .row .container {\r\n',
+    '\theight: 24px;\r\n',
+    '\tmargin-bottom: 5px;\r\n',
+    '}\r\n',
+    '#ShortCut .row .index {\r\n',
+    '\tfont-family: Arial, sans-serif;\r\n',
+    '\tfont-size: 10px;\r\n',
+    '\tline-height: 10px;\r\n',
+    '}\r\n',
+    '#ShortCut .icon .amount {\r\n',
+    '\tright: 1px;\r\n',
+    '\ttop: 17px;\r\n',
+    '\theight: 10px;\r\n',
+    '\tmin-width: 8px;\r\n',
+    '\tfont-family: Arial, sans-serif;\r\n',
+    '\tfont-size: 10px;\r\n',
+    '\tline-height: 10px;\r\n',
+    '}\r\n',
+    '.shortcut-tooltip {\r\n',
+    '\tfont-family: Arial, \'Source Han Sans CN\', sans-serif;\r\n',
+    '\tfont-size: 10px;\r\n',
+    '\tline-height: 12px;\r\n',
+    '}\r\n',
+  ].join('');
+
+  if (source.includes('ItemObtain_default$1')) {
+    source = appendCssToStringVariable(source, 'ItemObtain_default$1', itemObtainCss);
+    const centeredPosition = 'this._host.style.left = `${(Renderer.width - (el ? el.offsetWidth : 0)) >> 1}px`;';
+    const centeredPositionBlocks = [
+      `const el = this.getRoot().querySelector("#ItemObtain");\n    ${centeredPosition}`,
+      `const el = root.querySelector("#ItemObtain");\n    ${centeredPosition}`,
+    ];
+    const centeredPositionCount = centeredPositionBlocks.reduce((total, block) => total + count(source, block), 0);
+    if (centeredPositionCount !== 2) fail('anchor:item-obtain-center');
+    for (const block of centeredPositionBlocks)
+      source = source.replaceAll(block, 'this._host.style.left = "auto";\n    this._host.style.right = "24px";');
+    const behaviorPattern = /ItemObtain\.onRemove = function onRemove\(\) \{[\s\S]*?(?= {2}ItemObtain_default = UIManager\.addComponent\(ItemObtain\);)/g;
+    if ([...source.matchAll(behaviorPattern)].length !== 1) fail('anchor:item-obtain-list');
+    source = source.replace(behaviorPattern, () => `(${installLastroLootList.toString()})(ItemObtain, { DB, Client }, _life);\n`);
+  }
+  if (source.includes('ShortCut_default$1'))
+    source = appendCssToStringVariable(source, 'ShortCut_default$1', shortcutCss);
+  return source;
+}
+
+export function patchRuntimeWorldMap(source) {
+  const pattern = /\/\/#region src\/UI\/Components\/WorldMap\/WorldMap\.js\r?\n[\s\S]*?\/\/#endregion/g;
+  if ([...source.matchAll(pattern)].length !== 1) fail('anchor:worldmap-component');
+  return source.replace(pattern, () => `//#region src/UI/Components/WorldMap/WorldMap.js
+var WorldMap, WorldMap_default;
+var init_WorldMap = __esmMin(() => {
+  init_DBManager(); init_Client(); init_UIManager(); init_GUIComponent();
+  init_MonsterTable();
+  init_NetworkManager(); init_PacketStructure(); init_SessionStorage(); init_MapRenderer(); init_Navigation();
+  WorldMap = new GUIComponent("WorldMap", ${JSON.stringify(WORLD_MAP_CSS)});
+  WorldMap.render = () => ${JSON.stringify(WORLD_MAP_HTML)};
+  (${installLastroWorldMap.toString()})(WorldMap, {
+    DB, Client,
+    monsterPortrait: (${createMonsterPortraitLoader.toString()})(Client, id => MonsterTable_default[id] ? DB.getBodyPath(id, 0) : null, document),
+    itemTable: () => ItemTable_default,
+    currentMap: () => MapRenderer.currentMap,
+    accountId: () => SessionStorage_default.AID,
+    loadData: async () => {
+      const values = await Promise.all(["world-data", "mob-data"].map(async name => {
+        const response = await fetch(new URL("../core/data/world/" + name + ".json", import.meta.url));
+        if (!response.ok) throw new Error("World map data HTTP " + response.status);
+        return response.json();
+      }));
+      return { worldData: values[0], mobData: values[1] };
+    },
+    navigate: mapname => {
+      const position = SessionStorage_default.Entity?.position || [0, 0];
+      Navigation_default.show();
+      Navigation_default.navigateTo({ startMap: MapRenderer.currentMap, startX: position[0] | 0, startY: position[1] | 0, endMap: mapname, endX: 0, endY: 0, displayName: mapname });
+    },
+    teleport: mapname => {
+      if (!PACKET.CZ.PRIVATE_AIRSHIP_REQUEST) return;
+      const pkt = new PACKET.CZ.PRIVATE_AIRSHIP_REQUEST();
+      Object.assign(pkt, buildPrivateAirshipRequest({ mapname }));
+      Network.sendPacket(pkt);
+    }
+  }, ${JSON.stringify(worldMapLayout.regions)}, ${createWorldMapIndex.toString()});
+  WorldMap.mouseMode = GUIComponent.MouseMode.STOP;
+  WorldMap_default = UIManager.addComponent(WorldMap);
+});
+//#endregion`);
 }
 
 function replaceWorkerCreation(source) {
@@ -814,6 +1078,10 @@ ${normalizedSource}`;
       '\t\tconst pass = _inputPassword.value;\n\t\tconst beforeConnect = globalThis.LastROLoginBeforeConnect;\n\t\tif (typeof beforeConnect === "function" && beforeConnect(user, pass) === false) return false;\n\t\tapplyDebugLoginFields();'],
   ]);
   output = patchRuntimeTypography(output);
+  output = patchRuntimeLocalization(output);
+  output = patchLuaTableCompletion(output);
+  output = patchRuntimeUiLayout(output);
+  output = patchRuntimeWorldMap(output);
   if (/new WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i.test(output)) fail('legacy-transport');
   return patchTrustedTypesDomWrites(output);
 }

@@ -1,0 +1,1 @@
+export function extractWorldMapFixture(source: string): { installLastroWorldMap: string; createWorldMapIndex: string; createMonsterPortraitLoader: string; html: string; css: string; regions: Array<{ name: string; background: string; columns: number; rows: number; cells: Array<{ id: string | null; image: string; x: number; y: number; span: number; boss: boolean }> }> };

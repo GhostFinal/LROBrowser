@@ -191,6 +191,18 @@ describe('passive resource resolver', () => {
     vi.unstubAllGlobals();
   });
 
+  it.each(['data/texture/item/potion.bmp', 'data/sprite/poring.spr', 'data/sprite/poring.act'])('reuses persistent world-map resource %s without another server fetch', async path => {
+    vi.stubGlobal('indexedDB', new IDBFactory());
+    try {
+      const databaseName = `worldmap-persistent-${path}-${Math.random()}`;
+      const fetch = vi.fn(async () => response(200, new Uint8Array([4, 5]).buffer, 'application/octet-stream'));
+      await resolvePassiveResource(path, { cache: new IndexedDbResourceCache(databaseName), fetch: fetch as typeof globalThis.fetch });
+      expect(fetch).toHaveBeenCalledTimes(1); fetch.mockClear();
+      await expect(resolvePassiveResource(path, { cache: new IndexedDbResourceCache(databaseName), fetch: fetch as typeof globalThis.fetch })).resolves.toEqual(new Uint8Array([4, 5]).buffer);
+      expect(fetch).not.toHaveBeenCalled();
+    } finally { vi.unstubAllGlobals(); }
+  });
+
   it('rejects HTML and reports structured failures after both roots fail', async () => {
     const fetch = async () => response(200, new Uint8Array([60, 104, 116, 109, 108]).buffer, 'text/html');
     await expect(resolvePassiveResource('data/map/prt.gat', { cache: new MemoryResourceCache(), fetch: fetch as typeof globalThis.fetch })).rejects.toMatchObject({
