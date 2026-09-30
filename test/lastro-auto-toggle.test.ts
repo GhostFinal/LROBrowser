@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 // @ts-expect-error The vendored runtime module intentionally has no declaration file.
-import { buildAutoToggleRequest } from "../vendor/v2/lastro-v1-migration.mjs";
+import { buildAutoToggleRequest, mapScalarUpdate } from "../vendor/v2/lastro-v1-migration.mjs";
 
 describe("auto toggle packet selection", () => {
   it("uses the official whisper commands for 3x", () => {
@@ -65,22 +65,23 @@ function toggleAutomation(nid: number, option: string, enabled: boolean) {
     { get: () => nid },
     { CZ: { WHISPER: WhisperPacket, NOTIFY_UPDATEINFO: UpdatePacket } },
     { sendPacket: (packet: Record<string, unknown>) => sent.push({ ...packet }) },
-    (packet: Record<string, unknown>) => packet,
+    mapScalarUpdate,
     option,
     enabled,
   );
   return sent;
 }
 
-describe("automatic offline mode activation", () => {
-  it("sends offline mode after enabling auto battle for whisper and scalar profiles", () => {
+describe("automatic battle toggle", () => {
+  it("keeps nid=3 online and sends only the auto-attack whisper", () => {
     expect(toggleAutomation(3, "autoAttack", true)).toEqual([
       { receiver: "NPC:setautoattack", msg: "0" },
-      { receiver: "NPC:setoffline", msg: "0" },
     ]);
-    expect(toggleAutomation(5, "autoAttack", true)).toEqual([
-      { kind: "update", id: 34, value: 1 },
-      { receiver: "NPC:setoffline", msg: "0" },
+  });
+
+  it.each([5, 6])("uses only the scalar auto-attack packet for nid=%s", (nid) => {
+    expect(toggleAutomation(nid, "autoAttack", true)).toEqual([
+      { id: 34, value: 1 },
     ]);
   });
 
@@ -91,6 +92,29 @@ describe("automatic offline mode activation", () => {
     expect(toggleAutomation(3, "autoLoot", true)).toEqual([
       { receiver: "NPC:setautopick", msg: "0" },
     ]);
+  });
+});
+
+describe("nid=3 ESC offline battle entry", () => {
+  it("adds a manual offline battle button gated to nid=3", () => {
+    expect(runtime).toContain('class="setoffline"');
+    expect(runtime).toContain('Number(Configs.get("lastroNid", 0)) === 3');
+  });
+
+  it("sends NPC:setoffline only through the manual Escape callback", () => {
+    const match = runtime.match(/function onSetofflineRequest\$2\(\) \{([\s\S]*?)\n\}/);
+    if (!match?.[1]) throw new Error("Missing manual offline callback");
+    const sent: Array<Record<string, unknown>> = [];
+    class WhisperPacket {
+      receiver = "";
+      msg = "";
+    }
+    const handler = new Function("PACKET", "Network", match[1]);
+    handler(
+      { CZ: { WHISPER: WhisperPacket } },
+      { sendPacket: (packet: Record<string, unknown>) => sent.push({ ...packet }) },
+    );
+    expect(sent).toEqual([{ receiver: "NPC:setoffline", msg: "0" }]);
   });
 });
 

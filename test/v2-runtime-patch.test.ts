@@ -32,6 +32,25 @@ describe('V2 runtime patch', () => {
     expect(patched).toContain('source.loop = true');
   });
 
+  it('loads message IDs and quoted-comma values from the local CSV', async () => {
+    const source = await readFile('vendor/v2/Online.js', 'utf8');
+    const runtime = patchV2Runtime(source);
+    const csv = await readFile('vendor/core/data/msgstringtable.csv', 'utf8');
+    const start = runtime.indexOf('function loadCSV(filename, targetTable, keyIndex, valueIndex, onEnd) {');
+    const end = runtime.indexOf('\n/**', start);
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(end).toBeGreaterThan(start);
+    const client = { loadFile: (_filename: string, callback: (bytes: Uint8Array) => void) => callback(new TextEncoder().encode(csv)) };
+    const codepageManager = { decode: (bytes: Uint8Array) => new TextDecoder().decode(bytes) };
+    const loadCSV = new Function('Client', 'CodepageManager', `${runtime.slice(start, end)}; return loadCSV;`)(client, codepageManager);
+    const table: Record<number, string> = {};
+    loadCSV('data/msgstringtable.csv', table, 0, 1, () => undefined);
+    expect(table[3723]).toBe('※制作[%s] %d~%d个');
+    expect(table[62]).toBe('没有接收 ,拒绝悄悄话讯息的人物名单');
+    expect(runtime).not.toContain('data/msgstringtable.txt');
+    expect(runtime).toContain('loadCSV("data/msgstringtable.csv", MsgStringTable, 0, 1, onLoad())');
+  }, 30000);
+
   it('keeps guild emblem callback arguments image-first', () => {
     const source = 'this.onSuccess(entry.guildId, entry.version, entry.image, entry.gif);';
     expect(patchGuildEmblemRequestCallbacks(source)).toBe('this.onSuccess(entry.guildId, entry.image, entry.gif);');
