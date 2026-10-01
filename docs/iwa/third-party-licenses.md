@@ -11,7 +11,7 @@
 | V2 主 bundle 与 Worker | `vendor/v2/Online.js`、三个 Worker 文件 | 上游版本、完整许可与再分发条件待核验 |
 | LastRO 定制模块及资源路径工具 | `vendor/v2/lastro-*.mjs`、`lastro-resource-path.js` | 作者、授权范围与继承许可待核验 |
 | 世界地图和怪物数据 | `vendor/core/data/world/*.json` | 数据来源与独立再分发证据待核验 |
-| 世界地图图片 | `public/worldmap/*.png` | 220 张图片的下载来源及 SHA-256 记录于 `public/worldmap/sources.json`；独立再分发证据待核验 |
+| 世界地图图片 | `public/worldmap/` | 220 张图片的下载来源及 SHA-256 记录于 `public/worldmap/sources.json`；独立再分发证据待核验 |
 | 游戏 Lua/LUB | `vendor/core/System` 和 `vendor/core/data/luafiles514/lua files` | 覆盖脚本的独立再分发证据待核验 |
 | Lua/WASM 运行时 | 尚未进入 Task 7 定位步骤 | 组件、版本、许可证与打包方式均待核验 |
 | Source Han Sans CN | `vendor/core/System/Font/Source Han Sans CN{4,6}.otf` 及 `public/fonts/SourceHanSansCN-{Medium,Bold}.otf` | SIL Open Font License 1.1；许可证副本为 `vendor/core/System/Font/OFL.txt` 和 `public/fonts/OFL.txt` |
