@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, realpath, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 import { NodeCryptoSigningStrategy, SignedWebBundle, WebBundleId, parsePemKey } from 'wbn-sign';
 
 function parseArgs(args) {
@@ -52,7 +53,7 @@ export async function signBundle(inputPath, keyPath, outputPath, bundleId) {
   return metadata;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const options = parseArgs(process.argv.slice(2));
   if (!options.key) throw new Error('--key is required; use a disposable test key outside the repository');
   const input = options.input ?? await newestBundle();

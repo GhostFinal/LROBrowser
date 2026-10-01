@@ -1,16 +1,63 @@
 import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
-import { patchGuildEmblemRequestCallbacks, patchLegacyScriptSinks, patchLuaJsonEscapes, patchNpcMenuBlankArea, patchTrustedTypesDomWrites, patchV2Runtime, patchWebAudioPlayback } from '../scripts/patch-v2-runtime.mjs';
+import { patchGuildEmblemRequestCallbacks, patchLegacyScriptSinks, patchLuaJsonEscapes, patchNpcMenuBlankArea, patchTrustedTypesDomWrites, patchV2Runtime, patchWebAudioPlayback, patchRuntimeWorldMap, patchRuntimeChatMapLinks, patchRuntimeToolsPanels } from '../scripts/patch-v2-runtime.mjs';
 import { buildClientConfig } from '../src/runtime/client-config';
 import { LASTRO_SERVER_PROFILES } from '../src/servers/server-profiles';
+import { createLastroUiMessages } from '../scripts/lastro-ui-messages.mjs';
 
 const profile = LASTRO_SERVER_PROFILES[0];
 if (!profile || profile.availability !== 'available') throw new Error('missing fixture profile');
 
+async function nativeCacheRegions() {
+  const native = await readFile(new URL('../vendor/v2/Online.js', import.meta.url), 'utf8');
+  return ['src/Core/MemoryItem.js', 'src/Core/MemoryManager.js'].map(name => {
+    const start = native.indexOf('//#region ' + name), end = native.indexOf('//#endregion', start);
+    if (start < 0 || end < start) throw new Error('Missing native cache region: ' + name);
+    return native.slice(start, end + '//#endregion'.length);
+  });
+}
+
 describe('V2 runtime patch', () => {
-  it('routes BGM and sound effects through decoded Web Audio buffers', () => {
+  it.each([
+    'function cleanGameUI() {}',
+    'UIManager.addComponent(LastROTools); function cleanGameUI() {}',
+    'UIManager.addComponent(LastROTools); var MapRenderer = class MapRenderer { static setMap() { UIManager.removeComponents(); } };',
+    'UIManager.addComponent(LastROTools); UIManager.addComponent(LastROTools); var MapRenderer = class MapRenderer { static setMap() { UIManager.removeComponents(); } }; function cleanGameUI() {}',
+  ])('rejects missing or ambiguous tools/map lifecycle anchors', source => {
+    expect(() => patchRuntimeToolsPanels(source)).toThrow('anchor:lastro-tools-panels');
+  });
+  it('installs native tools and preserves navigation across map UI teardown in the pinned runtime', async () => {
+    const source = await readFile(new URL('../vendor/v2/Online.js', import.meta.url), 'utf8');
+    const patched = patchRuntimeToolsPanels(source);
+    expect(patched).toContain('getMap: () => normalizeLastROTeleportMap(MapRenderer.currentMap)');
+    expect(patched).toContain('routeMapChanged: () => lastroRouteNavigation.onMapChanged()');
+    expect(patched).toMatch(/onMapChanging\(\);\s*UIManager\.removeComponents\(\)/);
+    expect(patched).toMatch(/function cleanGameUI\(\) \{\s*if .*?\.cancelRoute\(\);/);
+    expect(patched).toContain('胖大海');
+    expect(patched).not.toContain('https://game.lastro.cn/ro/src/DB/logsTable.js');
+    const installation = patched.slice(patched.indexOf('const lastroSendRouteTeleport ='), patched.indexOf('UIManager.addComponent(LastROTools)'));
+    const ast = ts.createSourceFile('tools-install.js', installation, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+    let catalogSelector = '';
+    function findCatalog(node: ts.Node) {
+      if (ts.isPropertyAssignment(node) && node.name.getText(ast) === 'getPresetRoutes') catalogSelector = node.initializer.getText(ast);
+      ts.forEachChild(node, findCatalog);
+    }
+    findCatalog(ast);
+    const presets = JSON.parse(await readFile(new URL('../scripts/lastro-teleport-routes.json', import.meta.url), 'utf8'));
+    const appCatalog = new Function('Configs', 'LastROTeleportPresets', `return (${catalogSelector})();`)({ get: (name: string) => name === 'clientVer' ? 5 : 6 }, presets);
+    const kafra = Object.values(appCatalog.npc).find((row: unknown) => (row as { npc: string }).npc.startsWith('卡普拉'));
+    expect(kafra).toMatchObject({ outset: ['prontera', 116, 72], path: [['prontera', 149, 89]] });
+  }, 20000);
+  it('requires unambiguous chat-map integration anchors on upstream updates', () => {
+    expect(() => patchRuntimeChatMapLinks('function requestChatMapTeleport(link) { return false; }')).toThrow('anchor:chat-map-links');
+  });
+  it('requires an unambiguous world-map anchor on upstream updates', () => {
+    expect(() => patchRuntimeWorldMap('unrecognized upstream source')).toThrow('anchor:worldmap-component');
+  });
+  it('routes BGM and sound effects through decoded Web Audio buffers', async () => {
     const source = [
+      ...await nativeCacheRegions(),
       'var BGM = class BGM {',
       '  static audio = document.createElement("audio");',
       '  static load(url) { BGM.audio.src = url; BGM.audio.play(); }',
@@ -33,8 +80,7 @@ describe('V2 runtime patch', () => {
   });
 
   it('loads message IDs and quoted-comma values from the local CSV', async () => {
-    const source = await readFile('vendor/v2/Online.js', 'utf8');
-    const runtime = patchV2Runtime(source);
+    const runtime = await readFile('generated/runtime/Online.js', 'utf8');
     const csv = await readFile('vendor/core/data/msgstringtable.csv', 'utf8');
     const start = runtime.indexOf('function loadCSV(filename, targetTable, keyIndex, valueIndex, onEnd) {');
     const end = runtime.indexOf('\n/**', start);
@@ -42,13 +88,13 @@ describe('V2 runtime patch', () => {
     expect(end).toBeGreaterThan(start);
     const client = { loadFile: (_filename: string, callback: (bytes: Uint8Array) => void) => callback(new TextEncoder().encode(csv)) };
     const codepageManager = { decode: (bytes: Uint8Array) => new TextDecoder().decode(bytes) };
-    const loadCSV = new Function('Client', 'CodepageManager', `${runtime.slice(start, end)}; return loadCSV;`)(client, codepageManager);
+    const loadCSV = new Function('Client', 'CodepageManager', 'LastROUiMessages', `${runtime.slice(start, end)}; return loadCSV;`)(client, codepageManager, createLastroUiMessages());
     const table: Record<number, string> = {};
     loadCSV('data/msgstringtable.csv', table, 0, 1, () => undefined);
     expect(table[3723]).toBe('※制作[%s] %d~%d个');
     expect(table[62]).toBe('没有接收 ,拒绝悄悄话讯息的人物名单');
-    expect(runtime).not.toContain('data/msgstringtable.txt');
-    expect(runtime).toContain('loadCSV("data/msgstringtable.csv", MsgStringTable, 0, 1, onLoad())');
+    expect(runtime).toContain('data/msgstringtable.txt');
+    expect(runtime).toContain('() => loadCSV("data/msgstringtable.csv", MsgStringTable, 0, 1, loadmsg)');
   }, 30000);
 
   it('keeps guild emblem callback arguments image-first', () => {
@@ -129,9 +175,10 @@ end`;
     expect(patched).not.toContain('node.innerHTML +=');
   });
 
-  it('replaces the factory and removes legacy initialization regions', () => {
+  it('replaces the factory and removes legacy initialization regions', async () => {
     const fixture = [
       'import { existing } from "./existing.mjs?build=fixture-1";',
+      ...await nativeCacheRegions(),
       'var root = freeGlobal || freeSelf || Function("return this")();',
       'var Common_default$1 = "body {\\r\\n\\tfont-size: 12px;\\r\\n\\tfont-family: \'SCDream\', Arial, sans-serif;\\r\\n\\tfont-size-adjust: 0.5186;\\r\\n}\\r\\n:host {\\r\\n\\ttouch-action: manipulation;\\r\\n}";',
       'function drawLabel(ctx) { ctx.font = "10px Arial"; }',
@@ -146,22 +193,57 @@ end`;
       '/** Earlier runtime documentation */\nconst retainedRuntime = 1;',
       '//#region src/Network/SocketHelpers/WebSocket.js\nfunction Socket$1() {}\n//#endregion',
       '//#region src/Network/SocketHelpers/NodeSocket.js\nvar Socket;\n//#endregion',
+      '//#region src/UI/Components/WorldMap/WorldMap.js\nvar WorldMap;\n//#endregion',
       'function defaultSocketFactory(host, port) { return new Socket(host, port); }',
+      'function requestChatMapTeleport(link) { return false; }',
+      'function flushMessageBuffer() { messages.forEach(msg => { const div = document.createElement("div"); if (!msg.override) div.textContent = msg.text; else div.innerHTML = msg.text; }); }',
+      'ChatBox.addText = function addText(text, override) { text = text.replace(/<ITEMLINK>.*?<\\/ITEMLINK>/gi, function(match) { return match; }); if (!override && /mapname/.test(text)) override = true; };',
+      'function onMapClick(event, mapLink) { if (requestChatMapTeleport(mapLink)) { event.preventDefault(); event.stopImmediatePropagation(); } }',
+      'UIManager.addComponent(LastROTools);',
+      'Navigation.waitForMapData = function waitForMapData(callback) { setTimeout(() => Navigation.waitForMapData(callback), 100); };',
+      'Navigation.navigateTo = function navigateTo(options) { _finalTargetData = {map: options.endMap}; this.waitForMapData(function () { this.findPath(); }); };',
+      'var MapRenderer = class MapRenderer { static setMap(mapname) { UIManager.removeComponents(); } };',
+      'function onMapComplete(success,error) { if (!success) { UIManager.showErrorBox(error).ui.css("zIndex", 1e3); return; } }',
+      'function cleanGameUI() {}',
+      'function onGlobalAnnounce(pkt) { Announce_default.set(pkt.msg, "#FFFF00"); }',
+      'function onPlayerMessage(pkt) { ChatBox_default.addText(pkt.msg); }',
+      'function onEntityTalkColor(pkt) { ChatBox_default.addText(pkt.msg); }',
       'function onConnectionRequest(username, password) {',
-      '\tNetwork.connect(_server.address, _server.port, (success) => {',
-      '\t\tif (!success) return;',
-      '\t\tlet pkt;',
-      '\t\tfunction sendLogin() {',
-      '\t\t\tif (Configs.get("loginMode") == "han") {',
-      '\t\t\t\tpkt = new PACKET.CA.LOGIN_HAN();',
-      '\t\t\t\tNetwork.sendPacket(pkt);',
-      '\t\t\t} else {',
-      '\t\t\t\tpkt = new PACKET.CA.LOGIN();',
-      '\t\t\t\tNetwork.sendPacket(pkt);',
-      '\t\t\t}',
-      '\t\t}',
-      '\t});',
+      '  SoundManager.play("fixture-login.wav");',
+      '  Network.connect(_server.address, _server.port, (success) => {',
+      '    if (!success) {',
+      '      return;',
+      '    }',
+      '    let pkt;',
+      '    function sendLogin() {',
+      '      if (Configs.get("loginMode") == "han") {',
+      '        pkt = new PACKET.CA.LOGIN_HAN();',
+      '        Network.sendPacket(pkt);',
+      '      } else {',
+      '        pkt = new PACKET.CA.LOGIN();',
+      '        Network.sendPacket(pkt);',
+      '      }',
+      '    }',
+      '  });',
       '}',
+      'function initializeLoginConfig() {',
+      '      const autoLogin = Configs.get("autoLogin");',
+      '      if (autoLogin instanceof Array && autoLogin[0] && autoLogin[1]) {',
+      '        onConnectionRequest.apply(null, autoLogin);',
+      '        Configs.set("autoLogin", null);',
+      '      }',
+      '}',
+      'function initializeNetworkDebug() {',
+      '  packetDump = Configs.get("packetDump", false);',
+      '}',
+      'Plugins.init = function initPlugins() { this.list = Configs.get("plugins", []); };',
+      '//#region src/UI/Components/Storage/Fixture.js',
+      'function renderStorageListFixture() { nameSpan.innerHTML = DB.getItemName(item); }',
+      'function renderStorageGridFixture() { nameSpan.innerHTML = DB.getItemName(item); }',
+      'function renderStorageListOverlayFixture() { overlay.innerHTML = `${DB.getItemName(item)} ${item.count || 1}${getItemCountUnit()}`; }',
+      'function renderStorageGridOverlayFixture() { overlay.innerHTML = `${DB.getItemName(item)} ${item.count || 1}${getItemCountUnit()}`; }',
+      '//#endregion',
+      'function renderCharacterFixture() { charCanvases[i].querySelector(".name").innerHTML = _slots[i] ? _slots[i].name : ""; }',
       'function init_NetworkManager() { init_WebSocket(); init_NodeSocket(); }',
       'function init() {\n\troInitSpinner.add();\n\tPlugins.init();\n\tGameEngine.init();\n}',
       'function initThread() {\n\tif (!_source) _source = new Worker(new URL(\n\t\t/* @vite-ignore */\n\t\t"" + new URL("LastROThreadEventHandler.js", import.meta.url).href,\n\t\t"" + import.meta.url\n\t), { type: "classic" });\n\tif (_source instanceof Worker) _source.addEventListener("message", Thread.receive, false);\n}',
@@ -191,11 +273,12 @@ end`;
     });
     expect(transpiled.diagnostics ?? []).toEqual([]);
     expect(patched).toContain('globalThis.LastRODirectSocketFactory(host, port)');
-    expect(patched).toContain("font-family: 'Source Han Sans CN', sans-serif");
-    expect(patched).toContain('font-size: 13px');
+    expect(patched).toContain("font-family: Arial, 'Microsoft YaHei', 'MiSans', 'Source Han Sans CN', sans-serif");
+    expect(patched).toContain("font-family: 'MiSans', Arial, sans-serif");
+    expect(patched).toContain('font-size: 12px');
     expect(patched).toContain('font-size-adjust: none');
-    expect(patched).toContain('ctx.font = "10px \'Source Han Sans CN\'"');
-    expect(patched).not.toContain('Arial');
+    expect(patched).toContain('ctx.font = "10px Arial"');
+    expect(patched).toContain('Arial');
     expect(patched).toContain('function installLastROAudioUnlock()');
     expect(patched).toContain('installLastROAudioUnlock();\nimport { existing }');
     expect(patched).toContain('LastROWebAudio.playBgm');
@@ -207,9 +290,14 @@ end`;
     expect(patched).toContain('const resumeAudioContexts = () => {');
     expect(patched).toContain('lastro-account-login.mjs');
     expect(patched).toContain('installLastROLogin({ root, component: Component, configs: Configs })');
-    expect(patched).toContain('LastROLoginBeforeConnect');
-    expect(patched).toContain('LastROLoginAfterPassword');
-    expect(patched).toContain('Network.sendPacket(pkt);\n\t\t\t\tif (typeof globalThis.LastROLoginAfterPassword');
+    expect(patched).toContain('beforeLastROLoginConnect(user, pass)');
+    expect(patched).toContain('Network.sendPacket(pkt);\n        afterLastROLoginPassword(username, password);');
+    expect(patched).not.toContain('globalThis.LastROLoginBeforeConnect');
+    expect(patched).not.toContain('globalThis.LastROLoginAfterPassword');
+    expect(patched).toContain('finally { autoLogin = null; }');
+    expect(patched).toContain('packetDump = false;');
+    expect(patched).not.toContain('Configs.get("plugins", [])');
+    expect(patched).toContain('nameSpan.textContent = DB.getItemName(item)');
     expect(patched).toContain('globalThis;');
     expect(patched).toContain('Dynamic templates are disabled in the IWA runtime');
     expect(patched).toContain('trustedTypes.createPolicy("lastro-iwa-worker"');
@@ -256,10 +344,47 @@ end`;
 
   it('applies bundled Chinese typography to the generated runtime', async () => {
     const runtime = await readFile('generated/runtime/Online.js', 'utf8');
-    expect(runtime).toContain("font-family: 'Source Han Sans CN'");
-    expect(runtime).toContain('font-size: 13px');
+    expect(runtime).toContain("font-family: 'MiSans'");
+    expect(runtime).toContain('font-size: 12px');
+    expect(runtime).toContain('font-size-adjust: none');
     expect(runtime).not.toContain('SCDream');
-    expect(runtime).not.toContain('Arial');
+    expect(runtime).toContain('Arial');
+  });
+
+  it('moves item obtain notices right and stabilizes shortcut number metrics', async () => {
+    const runtime = await readFile('generated/runtime/Online.js', 'utf8');
+    expect(runtime).toContain('LastRO item-obtain placement and typography');
+    expect(runtime).toContain('top: var(--loot-top, 0px)');
+    expect(runtime).toContain('function installLastroLootList');
+    expect(runtime).toContain('left: var(--loot-left, 0px) !important');
+    expect(runtime).toContain('right: auto !important');
+    expect(runtime).toContain('this._host.style.right = "24px"');
+    expect(runtime).toContain('LastRO shortcut typography and alignment');
+    expect(runtime).toContain('font-family: Arial, sans-serif');
+    expect(runtime).toContain('font-size: 10px');
+    expect(runtime).toContain('top: 17px');
+  });
+
+  it('applies the maintainable LASTRO localization overlay', async () => {
+    const runtime = await readFile('generated/runtime/Online.js', 'utf8');
+    expect(runtime).toContain('LASTRO Chinese job-name overlay');
+    expect(runtime).toContain('"NOVICE":"初心者"');
+    expect(runtime).toContain('"DRAGON_KNIGHT":"龙骑士"');
+    expect(runtime).not.toContain('JobNameTable[JobConst_default.NOVICE] = "初心者"');
+    expect(runtime).toContain('lastroJobDisplayName(info.job)');
+    expect(runtime).toContain('>创建聊天室<');
+    expect(runtime).toContain('>领取奖励<');
+    expect(runtime).toContain('正在监测非法软件。');
+    expect(runtime).toContain('DB.getMessage(126, "更改房间设置")');
+    expect(runtime).toContain('DB.getMessage(1808, "秒")');
+    expect(runtime).toContain('LASTRO Chinese skill-name overlay');
+    expect(runtime).toContain('"SM_SWORD":"剑术修炼"');
+    expect(runtime).toContain('"MG_FIREBOLT":"火箭术"');
+    expect(runtime).toContain('"AL_HEAL":"治愈术"');
+    expect(runtime).toContain('>成就<');
+    expect(runtime).toContain('>公会助手<');
+    expect(runtime).toContain('>任务列表（Alt + U）<');
+    expect(runtime).toContain('>价格上限：%s Zeny<');
   });
 
   it('registers Web Audio contexts in the generated runtime for activation resume', async () => {

@@ -79,7 +79,9 @@ describe('Direct HTTP resource transport', () => {
     const h = harness({ response: split });
     h.opened.resolve({ readable: h.readable, writable: h.writable });
 
-    const result = await h.fetch('https://game.lastro.cn/ro/client_re/data/test.gat');
+    const result = await h.fetch('https://game.lastro.cn/ro/client_re/data/test.gat', {
+      credentials: 'include', headers: { Authorization: 'fixture-secret', Cookie: 'fixture-secret' },
+    });
 
     expect(result.status).toBe(200);
     expect(result.headers.get('etag')).toBe('"fixture"');
@@ -90,6 +92,9 @@ describe('Direct HTTP resource transport', () => {
     expect(request).toContain('Host: game.lastro.cn\r\n');
     expect(request).toContain('Accept-Encoding: identity\r\n');
     expect(request).toContain('Connection: close\r\n');
+    expect(request).not.toContain('Authorization:');
+    expect(request).not.toContain('Cookie:');
+    expect(request).not.toContain('fixture-secret');
   });
 
   it('returns a content-length response without waiting for TCP EOF', async () => {
@@ -119,12 +124,16 @@ describe('Direct HTTP resource transport', () => {
     });
     const h = harness({ nativeFetch });
 
-    const result = await h.fetch('https://rodata.ltsd.ro/ro/client_re/data/fallback.gat');
+    const result = await h.fetch('https://rodata.ltsd.ro/ro/client_re/data/fallback.gat', {
+      credentials: 'include', headers: { Authorization: 'fixture-secret', Cookie: 'fixture-secret' },
+    });
 
     expect(result.status).toBe(200);
     expect(new Uint8Array(await result.arrayBuffer())).toEqual(new Uint8Array(body));
     expect(nativeFetch).toHaveBeenCalledOnce();
     expect(String(nativeFetch.mock.calls[0]?.[0])).toBe('https://rodata.ltsd.ro/ro/client_re/data/fallback.gat');
+    expect(nativeFetch.mock.calls[0]?.[1]).toMatchObject({ method: 'GET', credentials: 'omit', redirect: 'error' });
+    expect(nativeFetch.mock.calls[0]?.[1]).not.toHaveProperty('headers');
     expect(h.constructorArgs).toEqual([]);
   });
 
@@ -203,6 +212,13 @@ describe('Direct HTTP resource transport', () => {
     const h = harness({ response: [] });
 
     await expect(h.fetch('https://example.invalid/ro/client_re/data/test.gat')).rejects.toThrow(/approved resource origin/i);
+    expect(h.constructorArgs).toEqual([]);
+  });
+
+  it('rejects URL credentials and non-GET resource requests before opening a socket', async () => {
+    const h = harness({ response: [] });
+    await expect(h.fetch('https://user:password@game.lastro.cn/ro/client_re/data/test.gat')).rejects.toThrow('credentials');
+    await expect(h.fetch('https://game.lastro.cn/ro/client_re/data/test.gat', { method: 'POST', body: 'fixture' })).rejects.toThrow('GET');
     expect(h.constructorArgs).toEqual([]);
   });
 });

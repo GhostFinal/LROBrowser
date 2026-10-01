@@ -1,0 +1,1102 @@
+[
+  {
+    "file": "alb2trea.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/alb2trea.png",
+    "sha256": "bb6b8e9f4880cbcb537010b2690b700295aa8aeeb7ab5ba3d725aecefa1104be"
+  },
+  {
+    "file": "alberta.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/alberta.png",
+    "sha256": "502e21e3ab53fbb88b7e8bb51edab512c7f313199ad2446ab3821e3593ac387e"
+  },
+  {
+    "file": "alde_gld.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/alde_gld.png",
+    "sha256": "c3fff95347092f380d670e2a23cf4b062f6765c39be8c8fe5c13ea03a9cb066f"
+  },
+  {
+    "file": "aldebaran.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/aldebaran.png",
+    "sha256": "fd3ceb0b9542ff4e6f3ea6c9811bbd9ab95a23b10a15d61f2588a22372ea71a4"
+  },
+  {
+    "file": "ama_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ama_fild01.png",
+    "sha256": "8e39daf6b38fbf43c2f7b077eebf12aebdd6e5c2c6fc53a732d15b7657d7609f"
+  },
+  {
+    "file": "amatsu.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/amatsu.png",
+    "sha256": "3572395f0802db765a81c6e37c0d2bb48ba9ceeed6eede1411bdbfabafa216ce"
+  },
+  {
+    "file": "ayo_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ayo_fild01.png",
+    "sha256": "9557156a31903debc13cb89f52cbb1426a84efde65fe7fecc8ef3f0a06b31cb9"
+  },
+  {
+    "file": "ayo_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ayo_fild02.png",
+    "sha256": "3de5c80e456d7f2c3e61830bf363b8f31f7a11d306247c3ccc9598480ceb2647"
+  },
+  {
+    "file": "ayothaya.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ayothaya.png",
+    "sha256": "719ae83740e62b43b4153136c4810b73566a30c1758b093a5d5c2b51c8d1cb13"
+  },
+  {
+    "file": "bif_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/bif_fild01.png",
+    "sha256": "adf73c0a53dfd011d346cd02e82a4c447e8490e227d5296db2eeaa44b98fc61e"
+  },
+  {
+    "file": "bif_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/bif_fild02.png",
+    "sha256": "e68b6bd12cd51320ebdacb4d0a68497b72bedac85a3638f12b281de3a384b9a6"
+  },
+  {
+    "file": "boss_1.bmp",
+    "source": "https://game.lastro.cn/ro/client_re/data/texture/%E8%9C%A1%E5%8E%86%E7%89%A2%E7%A3%90%E5%85%B6%E6%8D%9E%E8%83%B6/minimap/boss_1.bmp",
+    "sha256": "e361e007a400a57cdc4fb62b6ef5fd419b34399c40b8f35c0254666059a82c16"
+  },
+  {
+    "file": "bra_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/bra_fild01.png",
+    "sha256": "870b741e9f054ef7570e1bbacc13a0304d83f0c5b8962d7c75287d1cafb8fa23"
+  },
+  {
+    "file": "brasilis.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/brasilis.png",
+    "sha256": "39cf3886903198aa8c60498a048dafddb841932cef120a1ad393ec6acfae9bb5"
+  },
+  {
+    "file": "cave.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/cave.png",
+    "sha256": "856b4db8751e41fc6c1b478d71fe10afdffb968b88d7b906a7cb84cd7f78e104"
+  },
+  {
+    "file": "cmd_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/cmd_fild01.png",
+    "sha256": "ad3bce8c0a4eb5dae9fb4d645a54107216176c06d22e0937ca126f6ad001c03e"
+  },
+  {
+    "file": "cmd_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/cmd_fild02.png",
+    "sha256": "c438d25b02cecd0e65dc5faa48b1b82f60b1fc0e1fe25bcb95abca5aecffcadb"
+  },
+  {
+    "file": "cmd_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/cmd_fild03.png",
+    "sha256": "4daa38eba67f162a599039725fd45bbf32bfe505f8146876c37f7bd58f55e22c"
+  },
+  {
+    "file": "cmd_fild04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/cmd_fild04.png",
+    "sha256": "7238e087029eda6acf41ab06a4df3dab3f157142a5aac48e2fb3a74bc9696596"
+  },
+  {
+    "file": "cmd_fild05.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/cmd_fild05.png",
+    "sha256": "49715cf3d26377f0b4fde45bc1444d8c0b082905978fa5420e52116d5c9caf64"
+  },
+  {
+    "file": "cmd_fild06.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/cmd_fild06.png",
+    "sha256": "f034d5d2715b79f047c555e0d2eec7714f10684c20685ae34c685d5758acc8d0"
+  },
+  {
+    "file": "cmd_fild07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/cmd_fild07.png",
+    "sha256": "60334968da14b51466b7c60bd62e0c9f9f8af0ed8922c243dea5838daabe80dc"
+  },
+  {
+    "file": "cmd_fild08.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/cmd_fild08.png",
+    "sha256": "a9f9c8125e94fbb1a730e1b241bc7f8482c8db3211854ef8c8d0eda033076031"
+  },
+  {
+    "file": "cmd_fild09.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/cmd_fild09.png",
+    "sha256": "166220f62021d72c120f91f1246bd0508fac4e7961a47d03800b69df4bad50b2"
+  },
+  {
+    "file": "comodo.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/comodo.png",
+    "sha256": "a2b34f4f64c125f8e05fc93d3bf869bbe892b47173a213c1d4f406e7dde339c0"
+  },
+  {
+    "file": "dew_dun01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/dew_dun01.png",
+    "sha256": "49b5b339e11eeecb5405e1d76ee6b28d4146ef0cb18dd0d9b79171a533290b5f"
+  },
+  {
+    "file": "dew_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/dew_fild01.png",
+    "sha256": "debe0b168e36d14c8b568aa5f8c32aa0dd691423b61ceedba57deffd67c7b897"
+  },
+  {
+    "file": "dewata.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/dewata.png",
+    "sha256": "50c1a23296b1d1e59a63cc699b93a9affbb5dcc7d83c6bb403a5d4ba6956d92e"
+  },
+  {
+    "file": "dic_dun01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/dic_dun01.png",
+    "sha256": "8294e0de26459ddbb1a5c3f5afeec73ba437a6aef36527a6e1b13b7a3be3b701"
+  },
+  {
+    "file": "dic_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/dic_fild01.png",
+    "sha256": "48ad8445eaf0250fb543285df2415a1323e9e9bef49fdbe0ab77091aa90c1406"
+  },
+  {
+    "file": "dic_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/dic_fild02.png",
+    "sha256": "e77a2c1db1dd9e52b7b3472be8e728a2ca78573beef620c0fae8bd2647cd0797"
+  },
+  {
+    "file": "dicastes01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/dicastes01.png",
+    "sha256": "33120d36469f0420fb1babbcb56cb450fa57183d46b66fe5230ffcc5d52383c5"
+  },
+  {
+    "file": "dicastes02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/dicastes02.png",
+    "sha256": "656ee67d529d9c7924e78da7a5860109a66361dd530c9c17fcc7b52a12642a9b"
+  },
+  {
+    "file": "ecl_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ecl_fild01.png",
+    "sha256": "9304fe2e114c7662fe3adc1f5046e5fe39737c5e50c27c3f111c5488573eef78"
+  },
+  {
+    "file": "eclage.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/eclage.png",
+    "sha256": "1bb00edcf42a562d5c8c37a4c55c4d432eba70ebb30381f070fc5a4b0b7c3208"
+  },
+  {
+    "file": "ein_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ein_fild01.png",
+    "sha256": "7cd904d855d55d4a5cdebf95ac35a89395e4620690f0cddc12efa498d8153d55"
+  },
+  {
+    "file": "ein_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ein_fild02.png",
+    "sha256": "de1100a049989e70e9bff14027b8bafaa59e08aaf1a92a95136c30b91f600b03"
+  },
+  {
+    "file": "ein_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ein_fild03.png",
+    "sha256": "e30319de9cc2e7a178cdb6c09d7a169cb1a612cf340b1df04049e7431aa3e7ff"
+  },
+  {
+    "file": "ein_fild04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ein_fild04.png",
+    "sha256": "d63fb47b8f13a899fa08f97ce3529dcef6cc2e1c7cc15be252b29f79b04ecbce"
+  },
+  {
+    "file": "ein_fild05.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ein_fild05.png",
+    "sha256": "a2e3d0ad51f1c8ac0fdeba72fb3cb4982fe1cd49824391ae44de59b7ae4d2fa3"
+  },
+  {
+    "file": "ein_fild06.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ein_fild06.png",
+    "sha256": "2fcba0f126641fb727cc27558eb1bab3d00f82832cb0cc7f47474b7fb86dd0e5"
+  },
+  {
+    "file": "ein_fild07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ein_fild07.png",
+    "sha256": "d07127544d243b27a25cd1c65061ca08fdde5901b3d04c0a73460bd88435715e"
+  },
+  {
+    "file": "ein_fild08.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ein_fild08.png",
+    "sha256": "32dafb29a48f08211d6bbbb9010ac232dc784cc2ced8f569b0ef53e99bd569bd"
+  },
+  {
+    "file": "ein_fild09.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ein_fild09.png",
+    "sha256": "2478fb13356b375377b7b3af27310a464936382a2460739d956457a30654cefd"
+  },
+  {
+    "file": "ein_fild10.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ein_fild10.png",
+    "sha256": "ee4afe63482e05df4648dc445b35c6e9f2707ad6ee19ce83667a77a87befca1f"
+  },
+  {
+    "file": "einbech.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/einbech.png",
+    "sha256": "95cc6d06e045e66bf763230bf3ec332f4a823b02d1b8365a0563203e4ce5ca9c"
+  },
+  {
+    "file": "einbroch.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/einbroch.png",
+    "sha256": "ae42e37f97e931c5aa13bc6bda9ecf5afb09b3c9878d8419fb2ab228b857f7a4"
+  },
+  {
+    "file": "gef_fild00.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild00.png",
+    "sha256": "bcc0ef53ab6d7d97903dc5381691bf893d81e5e48a74305ad269294afb247824"
+  },
+  {
+    "file": "gef_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild01.png",
+    "sha256": "ae26ffd618575ed1e5ba865006daf201088d4cdfeac6b431aec2182802f550f5"
+  },
+  {
+    "file": "gef_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild02.png",
+    "sha256": "acd519d391a51e62c117aef977f16f2da7499db12523944f82f21ecc9c0f05dc"
+  },
+  {
+    "file": "gef_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild03.png",
+    "sha256": "8b5356d1ae9c8db4a247872ba993ae2484155c13a3124d5d3c10f8492f9d908f"
+  },
+  {
+    "file": "gef_fild04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild04.png",
+    "sha256": "e06c5396a3cf6e1b2e29a274dc62329d3a8282e6a359a2693c48bf8259f3dd52"
+  },
+  {
+    "file": "gef_fild05.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild05.png",
+    "sha256": "2a672f0f6f72a47b9c10f819e399069eb420202f7c9caf06ac718e5ddf1b6de0"
+  },
+  {
+    "file": "gef_fild06.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild06.png",
+    "sha256": "61cfd42305f76b229b056361c2782f6effe45e2ffb32490f371eb2dff8a2e6fe"
+  },
+  {
+    "file": "gef_fild07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild07.png",
+    "sha256": "4c2676a1e9031f8b7980bbe4eab788cf0d830ef8088904f39e510ffad89fe4b3"
+  },
+  {
+    "file": "gef_fild08.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild08.png",
+    "sha256": "866ff64bbe1038d486dbd8f6714cf0a8e2bd1a4ad562b395186a60002ef626ff"
+  },
+  {
+    "file": "gef_fild09.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild09.png",
+    "sha256": "fe59bbbcada8fbc042756fc740c31b45f23521e0f1fb276be8fa13326a9af2c2"
+  },
+  {
+    "file": "gef_fild10.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild10.png",
+    "sha256": "2e991fbbdd5da8518a1b1870a34c99ef09e5773c99e39735c59c687da872765f"
+  },
+  {
+    "file": "gef_fild11.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild11.png",
+    "sha256": "e5b466b9ace09fdc3014666ca12ebbd80dfa6878472b7ff5b2de7d2e2e167296"
+  },
+  {
+    "file": "gef_fild12.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild12.png",
+    "sha256": "aabc2b9d8a1dc019273a77b02d3d1432c5b88944bcebf5f72aae01f022bb65d8"
+  },
+  {
+    "file": "gef_fild13.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild13.png",
+    "sha256": "9a82561232ce13268840dbeacfcbb2579ee51fc0c924b1caed34dcb239762c12"
+  },
+  {
+    "file": "gef_fild14.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gef_fild14.png",
+    "sha256": "cad8a4059cb29bd251604b60a0c87526670a287340453024f416c080453be52c"
+  },
+  {
+    "file": "geffen.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/geffen.png",
+    "sha256": "e7b27aaea386254f66aa3130f22d4df0305d42b6802980ab464a68aa6f9adf1f"
+  },
+  {
+    "file": "glast_01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/glast_01.png",
+    "sha256": "8083e9e66a1e6356495e13853c04f9ffb40095eebb9500a5d53d6a44911516db"
+  },
+  {
+    "file": "gon_dun02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gon_dun02.png",
+    "sha256": "843e6a65cf7bec2c6f087d7fa9b172a951b8e5118a312b743920421161b49342"
+  },
+  {
+    "file": "gon_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gon_fild01.png",
+    "sha256": "eb8cdf44be545123f9a6c760ab76986f8d7ec8a10dc352b09588033c000ae4ac"
+  },
+  {
+    "file": "gonryun.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/gonryun.png",
+    "sha256": "7f6fd76cf673de3a470de6a0293680d5e63e8b51729c64d1d8ce8715a1c0e804"
+  },
+  {
+    "file": "hu_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/hu_fild01.png",
+    "sha256": "2ef269d765e1ba9cc2e27a37565b7c499fa0c1a8b385fda3fb826bfb531148bf"
+  },
+  {
+    "file": "hu_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/hu_fild02.png",
+    "sha256": "f48d1360b86c04e0276e3899ad66923425e5fe91abf7cd9bdd0553f14c6d3506"
+  },
+  {
+    "file": "hu_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/hu_fild03.png",
+    "sha256": "e4813fa8e31d272dd8cce934d135633fd495daf0acddc8effe9695e1f7cd3f8c"
+  },
+  {
+    "file": "hu_fild04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/hu_fild04.png",
+    "sha256": "608590417f0cc1dc5c80b27aa8fa28e1cf93438f5f5de30ba9f36ffb683fb00b"
+  },
+  {
+    "file": "hu_fild05.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/hu_fild05.png",
+    "sha256": "467b8d23639bc4a1b8cd4c8fd1a4604041ba89355d9f8a91c740a2d21f8d4562"
+  },
+  {
+    "file": "hu_fild06.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/hu_fild06.png",
+    "sha256": "3a5b5499e4640daaf8f7dc0826710d835a8046a5f12c7c0e1b24b092c5853cd5"
+  },
+  {
+    "file": "hu_fild07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/hu_fild07.png",
+    "sha256": "c287cada4f0e6b34bf4ea11fa2e5479957d7a189c5fa027344d51180b8a4dcb7"
+  },
+  {
+    "file": "hugel.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/hugel.png",
+    "sha256": "a9212d29efb5169bf84b4bcabf4cd4ecff04504767434ecd4e83779f7dd716ee"
+  },
+  {
+    "file": "izlu2dun.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/izlu2dun.png",
+    "sha256": "0a442b50e54f2e26de02a542a2752a32d98b69d5b2a600891a29fa4ee8db0a95"
+  },
+  {
+    "file": "izlude.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/izlude.png",
+    "sha256": "df2ba26ef84bb6775b9eb07d986498a480a40d7b74cfd54bb6ba7f53c74a0b33"
+  },
+  {
+    "file": "jawaii.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/jawaii.png",
+    "sha256": "707c3421e3d4796723e17c9cfc99c484db01237d269d8180634c13a246a46254"
+  },
+  {
+    "file": "lasa_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/lasa_fild01.png",
+    "sha256": "9db4fdf06d8d01821eacfe149830694528359c284120fa5802a4fe420396bbf8"
+  },
+  {
+    "file": "lasa_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/lasa_fild02.png",
+    "sha256": "b1fb6818ab6e7bcccb5462b5ba51aa138a3c9b4863d49cda14141c47678f30cc"
+  },
+  {
+    "file": "lasagna.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/lasagna.png",
+    "sha256": "a929924e5337e3cac94ae419be5ced076dc6f1a7c23ced5af8b6851e27487964"
+  },
+  {
+    "file": "lhz_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/lhz_fild01.png",
+    "sha256": "bdc5397c9efa596afeec4cd210c295bb68a1916ef250f528f3e14ce20eb90403"
+  },
+  {
+    "file": "lhz_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/lhz_fild02.png",
+    "sha256": "597ea10e5718856f648eb0b4853656ebd0338e919a8182e7aaa4139470ed762b"
+  },
+  {
+    "file": "lhz_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/lhz_fild03.png",
+    "sha256": "18b440c88ba0786bea5b7a3cbff583bfdaad5a14ca442ff932a8c470182b8609"
+  },
+  {
+    "file": "lighthalzen.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/lighthalzen.png",
+    "sha256": "5acb9d06b846527070d052724a5dda6968c82ef2978d0e5e5d8d83d217fcd28a"
+  },
+  {
+    "file": "lou_dun01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/lou_dun01.png",
+    "sha256": "1c505d899e6d45f1056f2d7b9499fe63b80014050f6ee1cbcb41d5aa4c136e9b"
+  },
+  {
+    "file": "lou_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/lou_fild01.png",
+    "sha256": "affa254c948f9cd9710635b8886454bb58b0247c4e54aeedcd754f5386e2c37c"
+  },
+  {
+    "file": "louyang.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/louyang.png",
+    "sha256": "ce25f8ee703052b6f895beeada7c67a1fae4eaf6e4f28696385ba1ee831a71a0"
+  },
+  {
+    "file": "ma_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ma_fild01.png",
+    "sha256": "87657d638c272ed5a09bbe6d150aac6ba3aed438112b54250409de8e72da26ff"
+  },
+  {
+    "file": "ma_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ma_fild02.png",
+    "sha256": "d156877a63431846ef6a0d3e38f2053072acdabc852103f27207387aab61135d"
+  },
+  {
+    "file": "ma_scene01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ma_scene01.png",
+    "sha256": "2ca4c86e901e60eac3488e6151e135d319d8fabbebb23c5c2c7674d9c36418b0"
+  },
+  {
+    "file": "malangdo.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/malangdo.png",
+    "sha256": "8302b7e2c9d938dc41e4ffa56cb410659a8d0ae1b242acacc9d85696c1022c39"
+  },
+  {
+    "file": "malaya.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/malaya.png",
+    "sha256": "97413e597d8816151d4b8e7758f3b8651a0393f3323e4ebc899e7d423d50abea"
+  },
+  {
+    "file": "man_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/man_fild01.png",
+    "sha256": "cf90845248cf7c0ff988dbf53fa596ffe519fb24c543a01d464cd5eaadb1f874"
+  },
+  {
+    "file": "man_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/man_fild02.png",
+    "sha256": "17a511583f3117305350d9234947f9003da6210ec160b2d2a8b5189a3ebf4f0a"
+  },
+  {
+    "file": "man_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/man_fild03.png",
+    "sha256": "67a443e090703f47c23a0cf011832da271123d3cfc60ba2ef3215935c406eabc"
+  },
+  {
+    "file": "manuk.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/manuk.png",
+    "sha256": "068871966d7e0167806fadecf78cf7877974fafe21cb80b1e5700fe5d704d67d"
+  },
+  {
+    "file": "mid_camp.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mid_camp.png",
+    "sha256": "b8c5ba9f81a2c27f20bbb7a872e32d37371b1ac342937d2a4e39e168bcaec425"
+  },
+  {
+    "file": "mjolnir_01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_01.png",
+    "sha256": "8cd01f188095f9f9dbde770cc241ec47c4ea91ff1d067f7d128844f381723966"
+  },
+  {
+    "file": "mjolnir_02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_02.png",
+    "sha256": "29bda10cf6631f963eec6651341838a23b5df7209ea5a4884473e873fb837170"
+  },
+  {
+    "file": "mjolnir_03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_03.png",
+    "sha256": "01897716ef920f10cf24308f234396709594dd9c0208bccf51ab7d72777863c0"
+  },
+  {
+    "file": "mjolnir_04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_04.png",
+    "sha256": "710a86b403e560969571afc9121dc25c79f34a2069603d69906c1f659fc61ddc"
+  },
+  {
+    "file": "mjolnir_05.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_05.png",
+    "sha256": "d9dc385989572c8277add21c494028bcdf8e93aba9a450e5cfa877fa2e2d76e2"
+  },
+  {
+    "file": "mjolnir_06.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_06.png",
+    "sha256": "3ae87f1f50750d0091d5dd986a3e83e51a39d0d93f6c3e5180ecc98976b98358"
+  },
+  {
+    "file": "mjolnir_07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_07.png",
+    "sha256": "53a818162ec0379d59807cbf790d614951a52928929fa8c07f8d4015695e4bbf"
+  },
+  {
+    "file": "mjolnir_08.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_08.png",
+    "sha256": "a5b84a00326e451d41b7ddcdf76ead786901dea5d0d9910ae396c046a38042ff"
+  },
+  {
+    "file": "mjolnir_09.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_09.png",
+    "sha256": "52fb97f410a572246bf6f5a4bd44d1dcd29d079b973fdf1197293690b30e119e"
+  },
+  {
+    "file": "mjolnir_10.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_10.png",
+    "sha256": "d77e512f5771d0084d719a102505025ceb4e59d0e7f0ff6b068efa90cf334d7c"
+  },
+  {
+    "file": "mjolnir_11.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_11.png",
+    "sha256": "0bf81c0a9995594a7978b4950cef97171776ed08c225855ed1ed9d6a8f86be87"
+  },
+  {
+    "file": "mjolnir_12.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mjolnir_12.png",
+    "sha256": "b2c6bbf1fb01ab02d431772f1a1d51238526e4e9960f70336e096d9e69423ef1"
+  },
+  {
+    "file": "moc_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild01.png",
+    "sha256": "0cbd27076cb0e131abc75afcfd33dde4b19836d45b0d58f660c60541aa3b7a8c"
+  },
+  {
+    "file": "moc_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild02.png",
+    "sha256": "0a32ec4f73ca119655c9af0ba38c21dafbef18a4a8ce4807b579ce11fcb75022"
+  },
+  {
+    "file": "moc_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild03.png",
+    "sha256": "e9343e5d239d77b69a64590b22f2edcf25101c7c555fb15255300f9ec63b1c14"
+  },
+  {
+    "file": "moc_fild07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild07.png",
+    "sha256": "065ec9c0bcc70d2f079717f3ba40b7bc2a2269914249907d08150756f7529166"
+  },
+  {
+    "file": "moc_fild11.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild11.png",
+    "sha256": "344fc4647d8327bd5dbb0453f5ba2877e281fa35ad0876183309d294a0679797"
+  },
+  {
+    "file": "moc_fild12.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild12.png",
+    "sha256": "a50839d8e5f4375babb2ec5cd59045405e56ce19ba4b054a660fbbbcc7e6dcf4"
+  },
+  {
+    "file": "moc_fild13.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild13.png",
+    "sha256": "4e8dd0a3e627120ce939d60bc90114199862d6bc2c3449ee34126492096ca049"
+  },
+  {
+    "file": "moc_fild16.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild16.png",
+    "sha256": "aa532499f942b2f9cc515859d0f3ff6d455509268c4ed78e9fc67fccfd36fc26"
+  },
+  {
+    "file": "moc_fild17.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild17.png",
+    "sha256": "14ece277d6877ed6fd376ad6cb38d2e5983cff38ca9349d7cddf7a8155614737"
+  },
+  {
+    "file": "moc_fild18.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild18.png",
+    "sha256": "2a6add8f1d9bfd10c8117566dd05d048e3f297b1a097e92345060682308b0e7d"
+  },
+  {
+    "file": "moc_fild19.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild19.png",
+    "sha256": "bb313d4130b2bd1874ae0e2dcabd71411f7956f96c327ee1e6cb8d3aa2d5d4a2"
+  },
+  {
+    "file": "moc_fild20.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild20.png",
+    "sha256": "60811f9ccb4d38dac67c0dfb102ebb9511236ba7898a0e1f597d67bcced1992e"
+  },
+  {
+    "file": "moc_fild21.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild21.png",
+    "sha256": "d5fb28f42c712b1433ba9039a47b70aa1293f10dd76b9e8d5e4e59179bf9e3c3"
+  },
+  {
+    "file": "moc_fild22.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_fild22.png",
+    "sha256": "8d2de03f8287e7accb03df718a8ac0dc29743ffdc003e25c42a9cefd630612ef"
+  },
+  {
+    "file": "moc_ruins.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moc_ruins.png",
+    "sha256": "6020ead63e029cb190e31b23634769c13fb410a77a4b0a811c4b72e2c283d1b0"
+  },
+  {
+    "file": "morocc.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/morocc.png",
+    "sha256": "d5e017463b7227e0aef4af0a9bf701593268a7c8027a9dcf4728cb0665f274d0"
+  },
+  {
+    "file": "moscovia.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/moscovia.png",
+    "sha256": "e5e6f6e8adb77bb2a3e806d5a7e54bbaad0977bb4bb38d05b32ebba545c726eb"
+  },
+  {
+    "file": "mosk_dun01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mosk_dun01.png",
+    "sha256": "691f6d64258d14c9010b3e420062cc9e49512fbf8206c1b766839a614d2bcd2b"
+  },
+  {
+    "file": "mosk_dun02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mosk_dun02.png",
+    "sha256": "071809097a7c6d4ac8575124039a97cf2e530cd3a214156f1c99b53689e41757"
+  },
+  {
+    "file": "mosk_dun03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mosk_dun03.png",
+    "sha256": "4f417962e910de3ec39bf4a150a2d2d410859cf8821397ce5d48d33ea3cf9e1a"
+  },
+  {
+    "file": "mosk_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/mosk_fild02.png",
+    "sha256": "73efb7c93cd4f7a4bf2e20786912b99cb3f6d6a7c521674a77b9081ef820adf8"
+  },
+  {
+    "file": "nameless_n.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/nameless_n.png",
+    "sha256": "df4345a6035bc6620c793ca282a6fee8bbb38bd44c273d100df0cc1266d9615b"
+  },
+  {
+    "file": "nif_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/nif_fild01.png",
+    "sha256": "ae59cb774080a20834322aa22544479c1347dc56c92bcc57d30a39e296b78ebe"
+  },
+  {
+    "file": "nif_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/nif_fild02.png",
+    "sha256": "1d56913c8398aa079120190b1b074bd2d28e02e805075724ea5a6949f303b66b"
+  },
+  {
+    "file": "niflheim.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/niflheim.png",
+    "sha256": "cce912ea2557bc0c3f0e92be3a8a6b0ec042fa1cd2310827b264b045c82fa10e"
+  },
+  {
+    "file": "odin_tem01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/odin_tem01.png",
+    "sha256": "966f34611405a7a0e82a29e7cdaa0abef8835ec4a7bc43182135f686adfb41a0"
+  },
+  {
+    "file": "odin_tem02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/odin_tem02.png",
+    "sha256": "2c0e34231b1f79adc9912a9057e1cf0ed60199942a96c1e327f46548cf868f6f"
+  },
+  {
+    "file": "odin_tem03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/odin_tem03.png",
+    "sha256": "a9a9aaab2530fdf39a1b89a5d67ab99fdce24fd51c1cd9552e30f89078049eb5"
+  },
+  {
+    "file": "pay_arche.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_arche.png",
+    "sha256": "1f0f45cee601d4302d0bc06f8ca2055c48e5654793b8c9e8d5bac1c206c8d5f7"
+  },
+  {
+    "file": "pay_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild01.png",
+    "sha256": "281e68ecfd5ebd272093ede0de59bb8f0a1c2c94a58fb732d304bc4e190b1ca3"
+  },
+  {
+    "file": "pay_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild02.png",
+    "sha256": "39bf431d54130c82afa0a181c5aa82ccbfcaf509618a8704a4e6f8776b2d31a8"
+  },
+  {
+    "file": "pay_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild03.png",
+    "sha256": "7f776ca802d2fdefd866fc65175e6226247d64990d153be368cf2c0bc1cc7def"
+  },
+  {
+    "file": "pay_fild04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild04.png",
+    "sha256": "29eafca94e81e1c4d9f166ad2895bcf74b50c5774535900875340f2c370790ef"
+  },
+  {
+    "file": "pay_fild05.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild05.png",
+    "sha256": "55c20359e7d5a8f4a552016c19a6cb1142c1b973365502d8d3a94f29f734b7d9"
+  },
+  {
+    "file": "pay_fild06.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild06.png",
+    "sha256": "4fe1d555921b753684421e2f83b472b1a74bbf87de6cb8fa9611167d830befcd"
+  },
+  {
+    "file": "pay_fild07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild07.png",
+    "sha256": "47c8cbd9fa7eedb6c96fbaef3ede152eba31fc06b4d8b7bca80040d37297b79c"
+  },
+  {
+    "file": "pay_fild08.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild08.png",
+    "sha256": "704320930d5eb9da86891f3b5cd22c40d524d28d34eeb8be0ff627fc5a241b70"
+  },
+  {
+    "file": "pay_fild09.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild09.png",
+    "sha256": "ddc1996c8dc63ea51d6782a5fbf76db4ca14457cf52189a9be111f77ee3a5237"
+  },
+  {
+    "file": "pay_fild10.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild10.png",
+    "sha256": "5741930adf7ccaf1cc9905c744336d5c86b89b5ff59673bb4fb4250ed389661b"
+  },
+  {
+    "file": "pay_fild11.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_fild11.png",
+    "sha256": "e1f46a40d9c9f48c4baa451d709204f752d470c929ebaa170d02cf781feaedb1"
+  },
+  {
+    "file": "pay_gld.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/pay_gld.png",
+    "sha256": "be0d0534771aa17445813cd13c45bcb40d4d9eb033267af9c1146ac9b5f4511a"
+  },
+  {
+    "file": "payon.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/payon.png",
+    "sha256": "2234cd1f9500395b9f2355ed9560092b504149b7d009f174e37213e6582116fa"
+  },
+  {
+    "file": "prontera.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prontera.png",
+    "sha256": "814c9be8fb1d349b3a7d43e833c23ea435d8cf2230c3bca69b63293846e74206"
+  },
+  {
+    "file": "prt_fild00.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild00.png",
+    "sha256": "b158d912533ef7d981eb12adb05f91811a627eae5162897a35aa4a835e6e9757"
+  },
+  {
+    "file": "prt_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild01.png",
+    "sha256": "13614683b0438fe151f7bff9e825d53e1d97b11164c16c24ff432379a4514115"
+  },
+  {
+    "file": "prt_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild02.png",
+    "sha256": "6b1274c324416d4414455fc9ce158da990d45eb7a97e62182709020f6c9198dd"
+  },
+  {
+    "file": "prt_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild03.png",
+    "sha256": "de49c8844fdab59a963f5b58e9ac80c30fe97b74cbdfce9385f9a33154543fb3"
+  },
+  {
+    "file": "prt_fild04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild04.png",
+    "sha256": "d0ef8caed5c03b5d060d4968f9e6211202bc3d664de23f7a6fea8a105d91cf72"
+  },
+  {
+    "file": "prt_fild05.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild05.png",
+    "sha256": "1660a298b48b7b2c1f2bc6eaf3260757eebc3993c7002137a7d326e18f8f5b6e"
+  },
+  {
+    "file": "prt_fild06.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild06.png",
+    "sha256": "3a753a77c5bdcfc99d34a6f4e4f16ea10d921f24c8b08fc8fc0862e8c5ab443b"
+  },
+  {
+    "file": "prt_fild07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild07.png",
+    "sha256": "462d373eef8c0aba61b97bea09c5ac93737b6898309772451f6e4656e5957555"
+  },
+  {
+    "file": "prt_fild08.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild08.png",
+    "sha256": "709493fd3ae62a5abd3409813671578e642321751ba97ad00903622b7366a140"
+  },
+  {
+    "file": "prt_fild09.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild09.png",
+    "sha256": "b2ee587decd7f71153b363c48479658cff38868ea00872206c2dcff79db06f5c"
+  },
+  {
+    "file": "prt_fild10.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild10.png",
+    "sha256": "445e3c608e2e729ac146bb8d6a36de79250308d5af5173d4477ac6ff7543b856"
+  },
+  {
+    "file": "prt_fild11.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_fild11.png",
+    "sha256": "1945b2fe19a67666aab6b02d099312507545c36d1e227720ab88b2698b561be6"
+  },
+  {
+    "file": "prt_monk.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/prt_monk.png",
+    "sha256": "8b42e3b6dcdbe36c559f1f9001bfacc47e20d7dbfe7cfefc7f215540067ecf20"
+  },
+  {
+    "file": "ra_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild01.png",
+    "sha256": "def741ea6522fe2926b27fd93ce5ad87729f1ee2b3482ff19339d593e24cf90e"
+  },
+  {
+    "file": "ra_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild02.png",
+    "sha256": "980e2e60ec977dd14fe9653d11d71b81b67c4511f01757b8ba8c3a8065b92388"
+  },
+  {
+    "file": "ra_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild03.png",
+    "sha256": "85b354a3bd7a8905dbba4be16e80d613fb911787755400d68b5045201a530721"
+  },
+  {
+    "file": "ra_fild04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild04.png",
+    "sha256": "f86e5c0039c0036c0fa016af0ded48aaef1c04d04c31c72df41f71e7d46c836e"
+  },
+  {
+    "file": "ra_fild05.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild05.png",
+    "sha256": "c7e1b80b07379ac317f52b1ebad873271afdcbef649fb8f970ec7a48e7006d23"
+  },
+  {
+    "file": "ra_fild06.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild06.png",
+    "sha256": "3ad6374201599f9cd36e47cb35290453d8bd512b23c196c87b335f2307d79502"
+  },
+  {
+    "file": "ra_fild07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild07.png",
+    "sha256": "c9f62cb3566aeb24eb46e963e2cb7b368dc68644b49dda677a871e442ed2a799"
+  },
+  {
+    "file": "ra_fild08.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild08.png",
+    "sha256": "2f828b787acc0cbc999ec6a3157e1613669bf41d9c82add91a49096a9e1e4ac8"
+  },
+  {
+    "file": "ra_fild09.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild09.png",
+    "sha256": "fe5d5f15db3c063d800310387f05060ee12c13a7af45c7d93e4aa895575e447d"
+  },
+  {
+    "file": "ra_fild10.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild10.png",
+    "sha256": "b23f58736832741e04bb881f578c5f53198eb2d989dedc8cce05f1f9bd68cd01"
+  },
+  {
+    "file": "ra_fild11.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild11.png",
+    "sha256": "ff93790b022618a1eb77aafca176eb7949d903845aa65c3a8059c66fa83a1aad"
+  },
+  {
+    "file": "ra_fild12.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild12.png",
+    "sha256": "1ada124e8d424cd7cdb98909129dea3b60ca02398b0b0592f83d3a3ca7289824"
+  },
+  {
+    "file": "ra_fild13.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_fild13.png",
+    "sha256": "6c7ac818ce5cbc4dc22e9d9f830fd289b2d776347ccf698b3fb6531471b314e1"
+  },
+  {
+    "file": "ra_temple.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ra_temple.png",
+    "sha256": "16f33238a0875750695a3615475007f3d8c2f0d8cdf1d382998ccd500c1d2954"
+  },
+  {
+    "file": "rachel.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/rachel.png",
+    "sha256": "95555e05a9a6db7c8730ded676c3bee999981b73c00c5e6a845046ad2f3400cd"
+  },
+  {
+    "file": "sch_gld.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/sch_gld.png",
+    "sha256": "f2bd4b7a2b252d0fec227faa57a531cb4cf7e1debadd2d4e8e3e3d5d6a7a47cd"
+  },
+  {
+    "file": "spl_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/spl_fild01.png",
+    "sha256": "6071b74c559992b153274881eccb8ec1605e333826a307893a4aab3089f185b7"
+  },
+  {
+    "file": "spl_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/spl_fild02.png",
+    "sha256": "e2ad0022ebf721decd6e6798d57c584152a5a645b3a6f59091ee8c78c4c3a3a9"
+  },
+  {
+    "file": "spl_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/spl_fild03.png",
+    "sha256": "3130ec8852a3ac5a12288f97149c0001aa79226469c8b6f6e321e072113f6e46"
+  },
+  {
+    "file": "splendide.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/splendide.png",
+    "sha256": "ca6768665c7732a973981684846ddec992736b40eef6882f09bcf2dcec675b55"
+  },
+  {
+    "file": "thor_camp.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/thor_camp.png",
+    "sha256": "2835d48ab51bf919727662dd4f308bf26e449ffb74fbb02d4b6e8f4f4b892b2d"
+  },
+  {
+    "file": "tur_dun01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/tur_dun01.png",
+    "sha256": "d2fe3766bf2e392ed2fe4b09a3bdacde74d80ce7a0bbd7f4e55749f8c0190491"
+  },
+  {
+    "file": "um_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/um_fild01.png",
+    "sha256": "15b1def135070796e2da6a83f057ce528eb74fef6a3468ef67b580ad61550ee1"
+  },
+  {
+    "file": "um_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/um_fild02.png",
+    "sha256": "9cde254c00b7e7aef4c52a6894c6fc35a3888630fdda0d66973927c2fc27a0bc"
+  },
+  {
+    "file": "um_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/um_fild03.png",
+    "sha256": "a99fa801c9997a11824fc75e9f6bbb804158a287adc166c1ef2a414ec46f65cc"
+  },
+  {
+    "file": "um_fild04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/um_fild04.png",
+    "sha256": "ca4b0490c565a2a251dab579c8b94cc360f6265b9bc12418cad4f863015ea1c9"
+  },
+  {
+    "file": "umbala.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/umbala.png",
+    "sha256": "34aac3e9c3d7a19983827c9149c655ac0c68f08bafcebfcb1944de5e08467d46"
+  },
+  {
+    "file": "ve_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ve_fild01.png",
+    "sha256": "60f84c7b5b6c85d2bc6a2a4d6062ac6c5785751f8377c4d788b70c3149169dbe"
+  },
+  {
+    "file": "ve_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ve_fild02.png",
+    "sha256": "aa8a401c6061ba62dea10b990a64c23aa1bede2c24d8c24f62f572036355cb47"
+  },
+  {
+    "file": "ve_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ve_fild03.png",
+    "sha256": "80687a36f111b4e95c4f99657a95d51ad7ac4304ff658d3c20bcdcf38414b705"
+  },
+  {
+    "file": "ve_fild04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ve_fild04.png",
+    "sha256": "c19fdaefc333106ce8a74a233885719fe86600e0afad28872ef712131226fb0f"
+  },
+  {
+    "file": "ve_fild05.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ve_fild05.png",
+    "sha256": "4afa9fbcd6277a2d7afdb1499e307cd97eaf2053450f9ce72087fee44446830d"
+  },
+  {
+    "file": "ve_fild06.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ve_fild06.png",
+    "sha256": "c9275ae717975fe6eb782484612903881b7de6c64d2401fb5b8aae61e20b6941"
+  },
+  {
+    "file": "ve_fild07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/ve_fild07.png",
+    "sha256": "978efe3c34d1d3ff07a522b10602e6e2a5838d6d3b202b851ef7346ce48eb604"
+  },
+  {
+    "file": "veins.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/veins.png",
+    "sha256": "ba86025f010797cc2a469085db1c15bd7c43ab01385bc0d9ba5aacb42db01bb3"
+  },
+  {
+    "file": "worldmap_dimension_n.jpg",
+    "source": "https://game.lastro.cn/statics/imgs/worldmap_dimension_n.jpg",
+    "sha256": "b3ab0fae989ce91bd2117d6445214f3061d82970e75c779270b4c96f7bfaad7f"
+  },
+  {
+    "file": "worldmap_localizing1_n.jpg",
+    "source": "https://game.lastro.cn/statics/imgs/worldmap_localizing1_n.jpg",
+    "sha256": "44d37ca0685813f18c951dc287cada92a0be826ff8fe231a459f4565c8ad88d5"
+  },
+  {
+    "file": "worldmap_localizing2_n.jpg",
+    "source": "https://game.lastro.cn/statics/imgs/worldmap_localizing2_n.jpg",
+    "sha256": "27f0b22694bdb6029ca39ca6ab927bf262670667c3f10b3cf63ac16844e048ec"
+  },
+  {
+    "file": "worldmap_n.jpg",
+    "source": "https://game.lastro.cn/statics/imgs/worldmap_n.jpg",
+    "sha256": "01e3cd2c118f5d6f01c5b37a4f972c50c9d7882ac4c052463be406c55a07d00f"
+  },
+  {
+    "file": "xmas_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/xmas_fild01.png",
+    "sha256": "305cbb3a96ac2ccd80dd60b5ddfb4e38f6a81b47b379b8a52e5be81ab4552b8c"
+  },
+  {
+    "file": "xmas.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/xmas.png",
+    "sha256": "fbdd788adc8acd92ab10e74285cbdf344e8a01bd3b920751c2c1d606bef12dda"
+  },
+  {
+    "file": "yuno_fild01.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild01.png",
+    "sha256": "7d80055ecf0b52c072950e07ee60075b31ce623d01fbbb912a2e95ffa8814d0e"
+  },
+  {
+    "file": "yuno_fild02.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild02.png",
+    "sha256": "2a2b45ccd4675dd559036ff14ece8a0b2bcdfdd9db3ef8d485f9375e741adfb4"
+  },
+  {
+    "file": "yuno_fild03.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild03.png",
+    "sha256": "4df5bd37aaea7346d4f4d1814a4a808fa936a802bef372365aa0c03d19166bd0"
+  },
+  {
+    "file": "yuno_fild04.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild04.png",
+    "sha256": "393385d9b8f843c5cc5feffdcf4a4a6574ddc5373859a6c62aeae4bf3d4ee595"
+  },
+  {
+    "file": "yuno_fild05.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild05.png",
+    "sha256": "a6947d2f900da9680d055008e9cbe6545214f232926dd84b007d160a49202f84"
+  },
+  {
+    "file": "yuno_fild06.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild06.png",
+    "sha256": "3a8979a0686f0dd7e81ef1fa741bcfe62591a34c1b0ae3797a1cdecb3319bda4"
+  },
+  {
+    "file": "yuno_fild07.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild07.png",
+    "sha256": "18de375002ec44c09ec6382580283884af31003e722b52826ab17786e30a5352"
+  },
+  {
+    "file": "yuno_fild08.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild08.png",
+    "sha256": "a79fdd4036d2ce99a1143374c89bd5303ea5621e6c72744dc3f4b98d7e03e892"
+  },
+  {
+    "file": "yuno_fild09.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild09.png",
+    "sha256": "1ff858385ec9f63b90dd7af8283a8ddbfe3db0e4da3b82e1c8fde6308011e68f"
+  },
+  {
+    "file": "yuno_fild10.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild10.png",
+    "sha256": "700b9998fe3486f1d611b8e4813309497f6aedc01fa239ae0281dc12f1463a6b"
+  },
+  {
+    "file": "yuno_fild11.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild11.png",
+    "sha256": "b72522e7b6ac0947ef767d3969761b9788c45adfbd1a2a3f8de9f273614685d0"
+  },
+  {
+    "file": "yuno_fild12.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno_fild12.png",
+    "sha256": "25f5cf14e4c0aa390c45e85a0edbad2b5cb79a7ab3f68da467d26e0581a8adef"
+  },
+  {
+    "file": "yuno.png",
+    "source": "https://game.lastro.cn/statics/imgs/map/s/yuno.png",
+    "sha256": "e645d51b705c60c62c992ea0f600df76620c6a9a89a389f1ddfd4032e0facdfe"
+  }
+]

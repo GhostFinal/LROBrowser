@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { buildClientConfig } from '../src/runtime/client-config';
 import { getAvailableServerProfile } from '../src/servers/server-profiles';
@@ -44,11 +45,11 @@ describe('remote server handoff', () => {
   it.each(['CharEngine', 'MapEngine'])('%s uses the configured public host with the advertised port', (engine) => {
     const config = buildClientConfig(getAvailableServerProfile('lastro-2x'), { username: '', password: '' });
     const region = runtime.split(engine + ' = class ' + engine + ' {')[1]!;
-    const start = region.indexOf('static init(');
-    const indent = region.slice(0, start).match(/[ \t]*$/)![0]!;
-    const closing = `\n${indent}}`;
-    const end = region.indexOf(closing, start) + closing.length;
-    const init = region.slice(start, end).replace('static init(', 'function init(');
+    const file = ts.createSourceFile('engine.js', 'class ' + engine + ' {' + region.split('//#endregion')[0], ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+    const declaration = file.statements.find(ts.isClassDeclaration);
+    const method = declaration?.members.find(node => ts.isMethodDeclaration(node) && node.name.getText(file) === 'init');
+    if (!method) throw new Error('Missing engine initialization');
+    const init = method.getText(file).replace('static init(', 'function init(');
     const connections: unknown[] = [];
     const stop = new Error('transport reached');
     const context = vm.createContext({

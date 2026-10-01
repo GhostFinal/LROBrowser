@@ -1,6 +1,7 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 import { BundleBuilder } from 'wbn';
 import { auditDist, REQUIRED_HEADERS } from './audit-iwa-dist.mjs';
 
@@ -18,6 +19,7 @@ async function walk(root) {
   async function visit(directory) {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
       const fullPath = path.join(directory, entry.name);
+      if (entry.isSymbolicLink()) throw new Error('symlink in distribution');
       if (entry.isDirectory()) await visit(fullPath);
       else if (entry.isFile()) files.push(fullPath);
     }
@@ -58,7 +60,7 @@ export async function createBundle(distDirectory) {
   return builder.createBundle();
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const options = parseArgs(process.argv.slice(2));
   if (!options.skipAudit) await auditDist(options.dist);
   const bytes = await createBundle(options.dist);

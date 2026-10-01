@@ -3,7 +3,7 @@ export type ResourceClassification = 'packaged-executable' | 'remote-passive' | 
 
 const packagedExtensions = new Set(['js', 'mjs', 'cjs', 'wasm', 'lua', 'lub']);
 const passiveExtensions = new Set([
-  'gat', 'gnd', 'rsw', 'rsm', 'str', 'spr', 'act', 'gr2',
+  'gat', 'gnd', 'rsw', 'rsm', 'rsm2', 'str', 'spr', 'act', 'gr2',
   'bmp', 'tga', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'dds',
   'mp3', 'wav', 'ogg', 'opus', 'flac', 'pal', 'txt', 'xml', 'csv', 'bson', 'otf', 'ttf'
 ]);
