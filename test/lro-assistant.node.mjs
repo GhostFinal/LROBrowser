@@ -682,3 +682,25 @@ for(const outcome of ['sent','blocked','failed'])test('native async teleport wai
     assert.equal(status.textContent,outcome==='sent'?'已提交原生传送请求，结果以游戏提示为准。':outcome==='blocked'?'当前无法使用原生传送。':'原生传送请求失败。');
   }finally{f.cleanup();}
 });
+
+for(const source of ['ltsd','manual'])test('detail encyclopedia opens the displayed '+source+' item even after list refresh',async()=>{
+  const f=fixture();
+  try{
+    const app=createStandardAssistant({page:f.page,modules:f.members,storage:f.storage,subscribePackets:f.bus.subscribe});
+    const first={id:source+'-901',itemId:'901',itemName:'辫子',source,price:111,quantity:301,shop:'99z平价',map:'morocc.gat',x:158,y:88};
+    app.records=source==='manual'?[first]:[];
+    app.showStoredItemDetails(first);
+    // Website records are separate from local records; a refresh can replace both lists.
+    app.records=[];
+    app.shadow.querySelector('.detail-encyclopedia').click();
+    assert.equal(app.shadow.querySelector('.encyclopedia-modal').hidden,false);
+    assert.equal(app.encyclopedia.entries.find(e=>e.key===app.encyclopedia.currentKey).itemId,'901');
+    app.encyclopedia.close();
+    app.shadow.querySelector('.detail-close').click();
+    assert.equal(app.detailRecord,null);
+    const next={...first,id:source+'-902',itemId:'902',itemName:'树根'};
+    app.showStoredItemDetails(next);app.shadow.querySelector('.detail-encyclopedia').click();
+    assert.equal(app.encyclopedia.entries.find(e=>e.key===app.encyclopedia.currentKey).itemId,'902');
+    await new Promise(resolve=>f.page.setTimeout(resolve,0));
+  }finally{f.cleanup();}
+});
