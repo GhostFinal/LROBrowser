@@ -5,6 +5,7 @@ import { IDBFactory } from 'fake-indexeddb';
 import { describe, expect, it } from 'vitest';
 import { buildClientConfig } from '../src/runtime/client-config';
 import { getAvailableServerProfile } from '../src/servers/server-profiles';
+import { createHash, webcrypto } from 'node:crypto';
 
 const source = readFileSync('generated/runtime/Online.js', 'utf8');
 const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
@@ -25,14 +26,19 @@ function harness() {
   let uid = 0;
   let ready = false;
   let advances = 0;
+  const tableBytes = new TextEncoder().encode('test#table#');
   const manifest = { files: [
-    { path: 'System/test.lua', kind: 'lua' },
-    { path: 'System/achievement_list_cn2_06.lua', kind: 'lua' },
+    { path: 'System/test.lua', kind: 'lua', bytes: tableBytes.byteLength, sha256: createHash('sha256').update(tableBytes).digest('hex') },
+    { path: 'System/achievement_list_cn2_06.lua', kind: 'lua',
+      bytes: readFileSync('generated/core/System/achievement_list_cn2_06.lua').byteLength,
+      sha256: createHash('sha256').update(readFileSync('generated/core/System/achievement_list_cn2_06.lua')).digest('hex') },
   ] };
   const worker = vm.createContext({
-    ArrayBuffer, Uint8Array, URL, Blob, TextDecoder, TextEncoder, Response, Headers, AbortController,
+    ArrayBuffer, Uint8Array, URL, Blob, TextDecoder, TextEncoder, Response, Headers, AbortController, crypto: webcrypto,
     indexedDB: new IDBFactory(), setTimeout, clearTimeout, console,
-    location: { href: 'https://iwa.invalid/runtime/LastROThreadEventHandler.js' },
+    // WorkerLocation exposes protocol and host as well as href. Origin guards
+    // must see the same URL fields here as they do in the real worker.
+    location: new URL('https://iwa.invalid/runtime/LastROThreadEventHandler.js'),
     // Legacy filesystem initialization must never be required by an IWA.
     requestFileSystemSync: () => { throw new Error('legacy filesystem used'); },
     requestFileSystem: () => { throw new Error('legacy filesystem used'); },
@@ -43,7 +49,7 @@ function harness() {
           headers: { 'content-type': 'application/octet-stream' },
         });
       }
-      return new Response('test#table#', { headers: { 'content-type': 'application/octet-stream' } });
+      return new Response(tableBytes, { headers: { 'content-type': 'application/octet-stream' } });
     },
     TCPSocket: class {
       readonly opened: Promise<{ readable: ReadableStream<Uint8Array>; writable: WritableStream<Uint8Array> }>;
@@ -146,7 +152,10 @@ describe('V2 native resource startup', () => {
     expect(runtime.requests).toEqual(['https://iwa.invalid/core/System/test.lua']);
     expect(runtime.tcpRequests).toHaveLength(1);
     expect(runtime.tcpRequests[0]).toMatchObject({ host: 'game.lastro.cn', port: 80 });
-    expect(runtime.tcpRequests[0]?.request).toContain('GET /ro/client_re/data/mp3nametable.txt HTTP/1.1');
+    const request = runtime.tcpRequests[0]!.request;
+    expect(request).toContain('GET /ro/client_re/data/mp3nametable.txt HTTP/1.1\r\n');
+    expect(request).not.toMatch(/^(?:authorization|cookie):/im);
+    expect(request.endsWith('\r\n\r\n')).toBe(true);
   });
 
   it('loads the packaged achievement Lua through the real LOAD_FILE path', async () => {

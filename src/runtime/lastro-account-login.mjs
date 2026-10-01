@@ -1,96 +1,15 @@
-const DATABASE_NAME = 'lastro-iwa';
-const DATABASE_VERSION = 1;
-const ACCOUNT_STORE = 'accounts';
+import { createEncryptedAccountStorage, validateAccountCredentials } from '../accounts/account-storage.mjs';
+
 const UNAVAILABLE_REASON = 'App服协议参数尚未完成验证';
-
-function openDatabase() {
-  if (!globalThis.indexedDB) throw new Error('本地账号存储不可用');
-  return new Promise((resolve, reject) => {
-    const request = globalThis.indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
-    request.onupgradeneeded = () => {
-      const database = request.result;
-      if (!database.objectStoreNames.contains(ACCOUNT_STORE)) {
-        const store = database.createObjectStore(ACCOUNT_STORE, { keyPath: 'id' });
-        store.createIndex('serverProfileId', 'serverProfileId', { unique: false });
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error ?? new Error('本地账号存储不可用'));
-  });
+let activeLogin;
+const installed = new WeakMap();
+export function beforeLastROLoginConnect(username, password) {
+  try { validateAccountCredentials(username, password); } catch { return false; }
+  return activeLogin?.before(username, password) ?? false;
 }
-
-function requestResult(request) {
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error ?? new Error('本地账号存储失败'));
-  });
+export function afterLastROLoginPassword(username, password) {
+  activeLogin?.after(username, password);
 }
-
-async function listAccounts(serverProfileId) {
-  const database = await openDatabase();
-  try {
-    const transaction = database.transaction(ACCOUNT_STORE, 'readonly');
-    const accounts = await requestResult(transaction.objectStore(ACCOUNT_STORE).getAll());
-    return accounts
-      .filter(account => !serverProfileId || account.serverProfileId === serverProfileId)
-      .sort((left, right) => (right.lastUsedAt ?? 0) - (left.lastUsedAt ?? 0)
-        || (right.updatedAt ?? 0) - (left.updatedAt ?? 0));
-  } finally {
-    database.close();
-  }
-}
-
-async function saveAccount(account) {
-  const database = await openDatabase();
-  try {
-    const transaction = database.transaction(ACCOUNT_STORE, 'readwrite');
-    transaction.objectStore(ACCOUNT_STORE).put(account);
-    await new Promise((resolve, reject) => {
-      transaction.oncomplete = resolve;
-      transaction.onerror = () => reject(transaction.error ?? new Error('本地账号写入失败'));
-      transaction.onabort = () => reject(transaction.error ?? new Error('本地账号写入失败'));
-    });
-    return account;
-  } finally {
-    database.close();
-  }
-}
-
-async function removeAccount(id) {
-  const database = await openDatabase();
-  try {
-    const transaction = database.transaction(ACCOUNT_STORE, 'readwrite');
-    transaction.objectStore(ACCOUNT_STORE).delete(id);
-    await new Promise((resolve, reject) => {
-      transaction.oncomplete = resolve;
-      transaction.onerror = () => reject(transaction.error ?? new Error('本地账号删除失败'));
-      transaction.onabort = () => reject(transaction.error ?? new Error('本地账号删除失败'));
-    });
-  } finally {
-    database.close();
-  }
-}
-
-async function markAccountUsed(id) {
-  const database = await openDatabase();
-  try {
-    const transaction = database.transaction(ACCOUNT_STORE, 'readwrite');
-    const store = transaction.objectStore(ACCOUNT_STORE);
-    const current = await requestResult(store.get(id));
-    if (current) {
-      current.lastUsedAt = Date.now();
-      store.put(current);
-    }
-    await new Promise((resolve, reject) => {
-      transaction.oncomplete = resolve;
-      transaction.onerror = () => reject(transaction.error ?? new Error('本地账号更新失败'));
-      transaction.onabort = () => reject(transaction.error ?? new Error('本地账号更新失败'));
-    });
-  } finally {
-    database.close();
-  }
-}
-
 function removePrivateLoginPanel(htmlText) {
   const start = htmlText.indexOf('<div class="quick-login-panel">');
   if (start === -1) return htmlText;
@@ -183,14 +102,14 @@ export function decorateLastROLoginStyles(name, cssText) {
 .lastro-edit-actions { flex-wrap: wrap; }`;
 }
 
-function sendLoginRegistration(configs, phase, username, password) {
+function sendLoginRegistration(configs, sender, phase, username, password, reportFailure) {
   const setting = phase === 'check' ? 'lastroLoginCheck' : 'lastroLoginCheckin';
   const enabled = configs?.get?.(setting, phase === 'checkin');
   if (enabled !== true) return;
-  const sender = globalThis.LastROLoginRegistration;
   if (typeof sender !== 'function') return;
   const nid = Number(configs?.get?.('lastroNid', 0));
-  try { sender(phase, nid, username, password); } catch { /* best effort */ }
+  try { Promise.resolve(sender(phase, nid, username, password)).catch(reportFailure); }
+  catch { reportFailure(); }
 }
 
 function profilesFromConfig(configs) {
@@ -211,6 +130,7 @@ function formatLastUsed(timestamp) {
 export function installLastROLogin({ root, component, configs }) {
   const panel = root?.querySelector?.('[data-lastro-login-panel]');
   if (!panel) return;
+  if (installed.has(panel)) return;
   const environment = panel.querySelector('[data-lastro-login-environment]');
   const message = panel.querySelector('[data-lastro-login-message]');
   const serverList = panel.querySelector('[data-lastro-server-list]');
@@ -236,6 +156,12 @@ export function installLastROLogin({ root, component, configs }) {
   let accountsCache = [];
   let selectedAccount;
   let selectedProfileId = currentId;
+  let revision = 0;
+  let mutationBusy = false;
+  let visible = true;
+  const storage = createEncryptedAccountStorage();
+  const registration = globalThis.LastROLoginRegistration;
+  installed.set(panel, true);
 
   function setMessage(value) {
     message.textContent = value;
@@ -259,37 +185,60 @@ export function installLastROLogin({ root, component, configs }) {
   }
 
   function showListView() {
+    ++revision;
+    passwordInput.value = '';
     form.hidden = true;
     listView.hidden = false;
   }
 
-  function showEditView(account) {
+  async function showEditView(account) {
+    const requested = ++revision;
     selectedAccount = account;
     formTitle.textContent = account ? '编辑账号' : '添加账号';
     editServer.textContent = profileLabel(selectedProfileId);
     deleteButton.hidden = !account;
     labelInput.value = account?.label || '';
     usernameInput.value = account?.username || '';
-    passwordInput.value = account?.password || '';
+    passwordInput.value = '';
+    fillNativeCredentials('', '');
     listView.hidden = true;
     form.hidden = false;
     usernameInput.focus();
+    if (account) {
+      try {
+        const loaded = await storage.get(account.id);
+        if (requested !== revision || !visible || !loaded || loaded.serverProfileId !== selectedProfileId) return;
+        passwordInput.value = loaded.password;
+      } catch { if (requested === revision) setMessage('本地密码无法读取，请重新输入并保存'); }
+    }
   }
 
-  function selectAccount(account) {
+  async function selectAccount(account) {
+    const requested = ++revision;
     selectedAccount = account;
     accountList.querySelectorAll('[data-account-id]').forEach(card => {
       card.dataset.selected = String(card.dataset.accountId === account.id);
     });
-    fillNativeCredentials(account.username, account.password);
-    setMessage('已载入账号，双击卡片或点击「登录」进入游戏');
+    fillNativeCredentials(account.username, '');
+    try {
+      const loaded = await storage.get(account.id);
+      if (requested !== revision || !visible || !loaded || loaded.serverProfileId !== selectedProfileId) return;
+      fillNativeCredentials(loaded.username, loaded.password);
+      setMessage('已载入账号，双击卡片或点击「登录」进入游戏');
+    } catch { if (requested === revision) setMessage('本地密码无法读取，请编辑该账号'); }
     syncLoginButton();
   }
 
-  function loginWithAccount(account) {
+  async function loginWithAccount(account) {
+    const requested = ++revision;
     selectedAccount = account;
-    fillNativeCredentials(account.username, account.password);
-    nativeConnect?.click();
+    fillNativeCredentials(account.username, '');
+    try {
+      const loaded = await storage.get(account.id);
+      if (requested !== revision || !visible || !loaded || loaded.serverProfileId !== selectedProfileId) return;
+      fillNativeCredentials(loaded.username, loaded.password);
+      nativeConnect?.click();
+    } catch { if (requested === revision) setMessage('本地密码无法读取，请编辑该账号'); }
   }
 
   function renderAccounts(accounts) {
@@ -333,61 +282,70 @@ export function installLastROLogin({ root, component, configs }) {
   }
 
   async function refreshAccounts() {
+    const requested = ++revision;
     try {
-      renderAccounts(await listAccounts(selectedProfileId));
+      const accounts = await storage.list(selectedProfileId);
+      if (requested === revision && visible) renderAccounts(accounts);
     } catch {
       setMessage('本地账号存储不可用，仍可直接填写登录');
     }
   }
 
   async function deleteAccount(account) {
-    if (!account?.id) return;
+    if (!account?.id || mutationBusy) return;
     if (typeof globalThis.confirm === 'function'
       && !globalThis.confirm(`确定删除账号「${account.label || account.username}」？`)) return;
+    mutationBusy = true;
+    ++revision;
+    fillNativeCredentials('', '');
+    passwordInput.value = '';
     try {
-      await removeAccount(account.id);
+      await storage.remove(account.id);
       if (selectedAccount?.id === account.id) selectedAccount = undefined;
       setMessage('已删除');
       showListView();
       await refreshAccounts();
     } catch {
       setMessage('本地账号删除失败');
-    }
+    } finally { mutationBusy = false; }
   }
 
   async function saveFromForm() {
+    if (mutationBusy) return;
     const profile = currentProfile();
     if (!profile || profile.availability === 'unavailable') {
       setMessage(profile?.unavailableReason || UNAVAILABLE_REASON);
       return;
     }
-    if (!usernameInput.value || !passwordInput.value) {
-      setMessage('账号和密码不能为空');
+    try { validateAccountCredentials(usernameInput.value, passwordInput.value); }
+    catch {
+      setMessage('账号或密码格式无效');
       return;
     }
-    const now = Date.now();
+    mutationBusy = true;
+    const requested = ++revision;
     try {
-      selectedAccount = await saveAccount({
-        id: selectedAccount?.id || globalThis.crypto.randomUUID(),
+      const saved = await storage.save({
+        id: selectedAccount?.id,
         serverProfileId: profile.id,
         label: labelInput.value,
         username: usernameInput.value,
         password: passwordInput.value,
-        createdAt: selectedAccount?.createdAt || now,
-        updatedAt: now,
-        lastUsedAt: selectedAccount?.lastUsedAt,
       });
+      if (requested !== revision || !visible) return;
+      selectedAccount = saved;
       setMessage('已保存');
       showListView();
       await refreshAccounts();
     } catch {
       setMessage('本地账号存储不可用，账号仍可直接登录');
-    }
+    } finally { mutationBusy = false; }
   }
 
   function loginFromFormOnly() {
-    if (!usernameInput.value || !passwordInput.value) {
-      setMessage('账号和密码不能为空');
+    try { validateAccountCredentials(usernameInput.value, passwordInput.value); }
+    catch {
+      setMessage('账号或密码格式无效');
       return;
     }
     fillNativeCredentials(usernameInput.value, passwordInput.value);
@@ -432,45 +390,74 @@ export function installLastROLogin({ root, component, configs }) {
   form.addEventListener('submit', event => event.preventDefault());
 
   panel.addEventListener('click', event => {
+    if (mutationBusy) return;
     const actionElement = event.target.closest('[data-lastro-action]');
     if (actionElement && panel.contains(actionElement)) {
       const action = actionElement.dataset.lastroAction;
       const cardAccount = accountFromCard(actionElement.closest('[data-account-id]'));
-      if (action === 'add') showEditView(undefined);
-      else if (action === 'edit' && cardAccount) showEditView(cardAccount);
+      if (action === 'add') void showEditView(undefined);
+      else if (action === 'edit' && cardAccount) void showEditView(cardAccount);
       else if (action === 'remove' && cardAccount) void deleteAccount(cardAccount);
       else if (action === 'delete') void deleteAccount(selectedAccount);
       else if (action === 'cancel') showListView();
       else if (action === 'save') void saveFromForm();
       else if (action === 'login-only') loginFromFormOnly();
-      else if (action === 'login' && selectedAccount) loginWithAccount(selectedAccount);
+      else if (action === 'login' && selectedAccount) void loginWithAccount(selectedAccount);
       return;
     }
     const card = event.target.closest('[data-account-id]');
     const account = accountFromCard(card && accountList.contains(card) ? card : undefined);
-    if (account) selectAccount(account);
+    if (account) void selectAccount(account);
   });
 
   panel.addEventListener('dblclick', event => {
+    if (mutationBusy) return;
     if (event.target.closest('[data-lastro-action]')) return;
     const card = event.target.closest('[data-account-id]');
     const account = accountFromCard(card && accountList.contains(card) ? card : undefined);
-    if (account) loginWithAccount(account);
+    if (account) void loginWithAccount(account);
   });
 
-  globalThis.LastROLoginBeforeConnect = (username, password) => {
+  const before = (username, password) => {
+    if (!visible) return false;
     if (globalThis.LastRODirectSocketsSupported === false) {
       environment.textContent = '当前页面不是 Direct Sockets IWA。请安装 signed .swbn 后再登录。';
       return false;
     }
-    if (selectedAccount?.id) void markAccountUsed(selectedAccount.id);
-    if (nativeUsername && nativeUsername.value !== username) nativeUsername.value = username;
-    if (nativePassword && nativePassword.value !== password) nativePassword.value = password;
-    sendLoginRegistration(configs, 'check', username, password);
+    if (selectedAccount?.id && selectedAccount.username === username) void storage.markUsed(selectedAccount.id, Date.now()).catch(() => undefined);
+    ++revision;
+    passwordInput.value = '';
+    if (nativePassword) nativePassword.value = '';
+    sendLoginRegistration(configs, registration, 'check', username, password, reportRegistrationFailure);
     return true;
   };
-  globalThis.LastROLoginAfterPassword = (username, password) => {
-    sendLoginRegistration(configs, 'checkin', username, password);
+  const after = (username, password) => {
+    sendLoginRegistration(configs, registration, 'checkin', username, password, reportRegistrationFailure);
   };
+  activeLogin = { before, after };
+  function reportRegistrationFailure() {
+    setMessage('登录登记请求未完成，请检查服务器连接');
+  }
+  const originalRemove = component.onRemove;
+  component.onRemove = function (...args) {
+    visible = false;
+    ++revision;
+    passwordInput.value = '';
+    fillNativeCredentials('', '');
+    selectedAccount = undefined;
+    renderAccounts([]);
+    return originalRemove?.apply(this, args);
+  };
+  const originalAppend = component.onAppend;
+  component.onAppend = function (...args) {
+    visible = true;
+    activeLogin = { before, after };
+    const result = originalAppend?.apply(this, args);
+    void refreshAccounts();
+    return result;
+  };
+  for (const input of [nativeUsername, nativePassword, usernameInput, passwordInput]) {
+    input?.addEventListener('input', () => { ++revision; });
+  }
   void refreshAccounts();
 }

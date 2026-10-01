@@ -4,6 +4,7 @@ import { runInNewContext } from 'node:vm';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { patchRuntimeJobLocalization } from '../scripts/patch-v2-runtime.mjs';
+import { patchRuntimeEquipmentCatalog } from '../scripts/lastro-equipment-view.mjs';
 
 const original = readFileSync('vendor/v2/Online.js', 'utf8');
 const packaged = readFileSync('generated/runtime/Online.js', 'utf8');
@@ -28,7 +29,9 @@ function tables(source: string) {
     ({JobConst_default,JobNameTable,PalNameTable,WeaponJobTable});
   `);
 }
-const baseline = tables(original), fixed = tables(packaged);
+// Catalog repairs resolve existing job IDs before localization. Compare that
+// corrected catalog too, while independently preserving every valid old name.
+const upstream = tables(original), baseline = tables(patchRuntimeEquipmentCatalog(original)), fixed = tables(packaged);
 const jobDeclarations = packagedAst.statements.filter(node =>
   (ts.isFunctionDeclaration(node) && /^lastroJob/.test(node.name?.text ?? '')) ||
   (ts.isVariableStatement(node) && node.declarationList.declarations.some(d => /^lastroJob/.test(d.name.getText(packagedAst))))
@@ -84,7 +87,10 @@ function method(source: string, name: string) {
   return matches[0]!;
 }
 describe('character resource names survive Chinese UI localization', () => {
-  it.each(['JobNameTable', 'PalNameTable', 'WeaponJobTable'])('keeps every %s basename exactly equal to upstream', table => {
+  it.each(['JobNameTable', 'PalNameTable', 'WeaponJobTable'])('preserves every valid upstream %s basename and the repaired catalog through localization', table => {
+    for (const [id, resource] of Object.entries(upstream[table])) {
+      if (/^\d+$/.test(id)) expect(fixed[table][id], `${table}[${id}]`).toBe(resource);
+    }
     expect(fixed[table]).toEqual(baseline[table]);
     expect(Object.keys(fixed[table]).length).toBeGreaterThan(100);
   });

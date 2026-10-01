@@ -188,7 +188,7 @@ function nativeFixture(currentMap = 'prontera.gat') {
   };
   Object.assign(api.map, { currentMap, loading: false, fog: {}, light: {}, onLoad: () => calls.push('map-loaded') });
   const originalAnimate = animate.getMockImplementation()!;
-  animate.mockImplementation(() => { calls.push('fade-start'); return originalAnimate(); });
+  animate.mockImplementation(() => { calls.push('fade-start'); return Reflect.apply(originalAnimate, undefined, []); });
   disposers.push(api.fade.reset);
   return { ...api, context, calls, loads, nativeTransitions, player, other, draw: () => api.map.onRender(Date.now(), {}) };
 }

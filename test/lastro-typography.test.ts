@@ -7,6 +7,7 @@ import ts from 'typescript';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { patchRuntimeTypography } from '../scripts/lastro-typography.mjs';
 import { loadClientFonts } from '../src/runtime/client-fonts';
+import { installDebugAccessGuard } from '../src/runtime/debug-access';
 
 const original = readFileSync('vendor/v2/Online.js', 'utf8');
 const output = patchRuntimeTypography(original);
@@ -192,22 +193,28 @@ const bootstrapCode = ts.transpileModule(bootstrapSource, {
 }).outputText;
 function bootstrapFixture(manifest = deferred<Response>()) {
   const imported = vi.fn(async () => undefined), fetched = vi.fn(() => manifest.promise);
+  const runtimeWindow = Object.assign(new EventTarget(), { location: new URL('isolated-app://fixture/') });
+  const listeners = vi.spyOn(runtimeWindow, 'addEventListener');
   const context = vm.createContext({
-    exports: {}, document: globalThis.document, URL, fetch: fetched, recordRuntimeImport: imported,
+    exports: {}, document: globalThis.document, window: runtimeWindow,
+    URL, TextDecoder, AbortSignal, fetch: fetched, recordRuntimeImport: imported,
     require(path: string) {
       if (path.endsWith('/client-fonts')) return { loadClientFonts };
       if (path.endsWith('/socket-factory')) return { isDirectSocketsSupported: () => true, createDirectSocket: vi.fn() };
       if (path.endsWith('/lastro-login-http')) return { prepareLastROLoginSession: async () => undefined, sendLastROLoginPost: vi.fn() };
       if (path.endsWith('/client-config')) return { buildClientConfig: () => ({}) };
+      if (path.endsWith('/debug-access')) return { installDebugAccessGuard };
       throw new Error('Unexpected startup dependency: ' + path);
     },
   });
   vm.runInContext(bootstrapCode, context);
   const exports = context.exports as { bootstrapV2Client(options: unknown): Promise<void> };
-  const start = () => exports.bootstrapV2Client({ mount: {}, profile: {}, credentials: { username: '', password: '' }, runtimeUrl: '/offline-runtime-fixture.js' });
-  return { imported, fetched, manifest, start };
+  const start = () => exports.bootstrapV2Client({ mount: {}, profile: {}, credentials: { username: '', password: '' } });
+  return { imported, fetched, manifest, listeners, start };
 }
-const manifestResponse = () => new Response(JSON.stringify({ files: [] }), { headers: { 'content-type': 'application/json' } });
+const manifestResponse = () => new Response(JSON.stringify({ files: [
+  { path: 'runtime/Online.js', kind: 'runtime', bytes: 0, sha256: createHash('sha256').update('').digest('hex') },
+] }), { headers: { 'content-type': 'application/json' } });
 
 describe('native typography without changing RO layout', () => {
   const minimalCommon = 'var Common_default$1 = ' + JSON.stringify("body { font-size: 12px; font-family: 'SCDream', Arial, sans-serif; font-size-adjust: 0.5186; }") + ';';
@@ -378,10 +385,12 @@ describe('font readiness before native runtime startup', () => {
 
   it('starts the runtime only after both the font promises and executable manifest complete', async () => {
     const f = fontFixture(), boot = bootstrapFixture(); const startup = boot.start();
+    expect(boot.listeners.mock.calls.map(call => call[0])).toEqual(['keydown', 'contextmenu']);
+    expect(boot.listeners.mock.invocationCallOrder[1]!).toBeLessThan(f.load.mock.invocationCallOrder[0]!);
     boot.manifest.resolve(manifestResponse()); await Promise.resolve(); expect(boot.imported).not.toHaveBeenCalled();
     f.pending[0]!.resolve([]); f.pending[2]!.resolve([]); await Promise.resolve(); expect(boot.imported).not.toHaveBeenCalled();
     f.pending[1]!.resolve([]); await startup;
-    expect(boot.imported).toHaveBeenCalledExactlyOnceWith('/offline-runtime-fixture.js');
+    expect(boot.imported).toHaveBeenCalledExactlyOnceWith('/runtime/Online.js');
     expect(boot.fetched).toHaveBeenCalledOnce();
   });
 

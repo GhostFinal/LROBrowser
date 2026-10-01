@@ -1,3 +1,7 @@
+import ts from 'typescript';
+import { runInNewContext } from 'node:vm';
+import worldData from '../vendor/core/data/world/world-data.json' with { type: 'json' };
+
 /**
  * LASTRO's localization overlay.
  *
@@ -460,3 +464,263 @@ export const MESSAGE_FALLBACKS = {
   2059: '已收到加入队伍的邀请。',
   2686: '删除称号',
 };
+
+// Use the same packaged display names as the world map. This is synchronous at
+// runtime, so an arrival banner cannot race a JSON fetch or a later Lua load.
+export const MAP_NAME_OVERRIDES = Object.fromEntries(Object.entries(worldData)
+  .filter(([, value]) => typeof value.name === 'string' && /[\u3400-\u9fff]/u.test(value.name))
+  .map(([id, value]) => [id, value.name]));
+
+// Exact display text only. These never apply to map filenames or bitmap names.
+export const MAP_TITLE_OVERRIDES = {
+  'Prontera': '普隆德拉',
+  'Prontera Field': '普隆德拉区域',
+  'Prontera Castle': '普隆德拉城堡',
+  'Prontera Royal Palace': '普隆德拉王宫',
+  'Prontera East Library': '普隆德拉东部图书馆',
+  'Rune-Midgarts': '卢恩米德加兹',
+  'Rune-Midgarts Kingdom': '卢恩米德加兹王国',
+  'Geffen': '吉芬',
+  'Geffen Field': '吉芬区域',
+  'Payon': '斐扬',
+  'Payon Archer Village': '斐扬弓箭手村',
+  'Morroc': '梦罗克',
+  'Sograt Desert': '苏克拉特沙漠',
+  'Alberta': '艾尔贝塔',
+  'Izlude': '依斯鲁得',
+  'Baylan Island': '海底洞穴',
+  'Aldebaran': '艾尔帕兰',
+  'Clock Tower': '钟楼',
+  'Glastheim': '克雷斯特汉姆',
+  'Glastheim Castle': '克雷斯特汉姆城堡',
+  'Old Glastheim': '旧克雷斯特汉姆',
+  'Comodo': '克魔岛',
+  'Umbala': '汶巴拉',
+  'Niflheim': '尼夫海姆',
+  'Yuno': '朱诺',
+  'Lutie': '姜饼城',
+  'Rachel': '拉赫',
+  'Rachel Temple': '拉赫神殿',
+  'Gonryun': '昆仑',
+  'Moscovia': '莫斯科',
+  'Brasilis': '巴西利斯',
+  'Dewata': '德瓦塔',
+  'Port Malaya': '马来港',
+  'Malangdo': '猫岛',
+  'Lasagna': '拉萨纳',
+  'Port Town Lasagne': '拉萨纳港口',
+  'Nameless Island': '无名岛',
+  'Thanatos Tower': '达纳托斯塔',
+  'Thanatos Tower Upper Level': '达纳托斯塔上层',
+  'Thanatos Memory': '达纳托斯的记忆',
+  'Orc Village': '兽人村',
+  'Battleground': '战场',
+  'Illusion': '幻影',
+};
+
+/** Self-contained because the build embeds this resolver into the native DB. */
+export function createLastroMapLocalization(names = MAP_NAME_OVERRIDES, titles = MAP_TITLE_OVERRIDES) {
+  const remembered = Object.create(null);
+  const normalize = value => String(value ?? '').trim().toLowerCase().replace(/\.(gat|rsw)$/i, '');
+  const isChinese = value => typeof value === 'string' && /[\u3400-\u9fff]/u.test(value);
+  const title = value => typeof value === 'string' && Object.prototype.hasOwnProperty.call(titles, value.trim())
+    ? titles[value.trim()] : value;
+
+  function rememberName(mapname, value) {
+    const id = normalize(mapname);
+    if (id && isChinese(value)) remembered[id] = value;
+    return resolveName(mapname, value);
+  }
+
+  function resolveName(mapname, fallback) {
+    if (isChinese(fallback)) return fallback;
+    const id = normalize(mapname);
+    if (id && Object.prototype.hasOwnProperty.call(remembered, id)) return remembered[id];
+    if (id && Object.prototype.hasOwnProperty.call(names, id)) return names[id];
+    return title(fallback);
+  }
+
+  function localizeInfo(mapname, info, tableName) {
+    if (!info || typeof info !== 'object') return info;
+    const fallback = isChinese(info.displayName) ? info.displayName : isChinese(tableName) ? tableName : info.displayName;
+    const displayName = resolveName(mapname, fallback);
+    const signName = { ...info.signName };
+    if (!isChinese(signName.mainTitle)) signName.mainTitle = resolveName(mapname, isChinese(displayName) ? displayName : signName.mainTitle || displayName);
+    signName.subTitle = title(signName.subTitle);
+    return { ...info, displayName, signName };
+  }
+
+  return { normalize, rememberName, resolveName, localizeInfo };
+}
+
+function localizationRegion(source, path) {
+  const marker = `//#region ${path}`;
+  const start = source.indexOf(marker);
+  if (start === -1) return null;
+  const end = source.indexOf('//#endregion', start);
+  if (end === -1 || source.lastIndexOf(marker) !== start) throw new Error('anchor:map-localization-region');
+  return { start, end, text: source.slice(start, end) };
+}
+
+function replaceLocalizationAnchor(source, anchor, replacement, label) {
+  if (source.split(anchor).length !== 2) throw new Error('anchor:map-localization-' + label);
+  return source.replace(anchor, replacement);
+}
+
+/** Reapply display translations at each DB lifecycle boundary, never resources. */
+export function patchRuntimeMapLocalization(source) {
+  const region = localizationRegion(source, 'src/DB/DBManager.js');
+  if (!region) return source;
+  if (source.includes('const LastROMapLocalization =')) throw new Error('anchor:map-localization-duplicate');
+  const file = ts.createSourceFile('DBManager.js', region.text, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const declarations = new Map();
+  function visit(node) {
+    if ((ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) && node.name) {
+      const name = node.name.getText(file);
+      if (['loadMapTbl', 'updateMapTable', 'getMapName', 'getMapInfo', 'init'].includes(name)) {
+        const rows = declarations.get(name) || [];
+        rows.push(node);
+        declarations.set(name, rows);
+      }
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(file);
+  const edits = [];
+  function replaceBody(name, transform) {
+    const matches = declarations.get(name) || [];
+    if (matches.length !== 1 || !matches[0].body) throw new Error('anchor:map-localization-' + name);
+    const node = matches[0];
+    edits.push({ start: node.body.getStart(file), end: node.body.end, text: transform(node.body.getText(file)) });
+  }
+  replaceBody('init', body => replaceLocalizationAnchor(body,
+    '(MapTable[key] || (MapTable[key] = {})).name = val;',
+    '(MapTable[key] || (MapTable[key] = {})).name = LastROMapLocalization.rememberName(key, val);', 'mapname-loader'));
+  replaceBody('loadMapTbl', body => replaceLocalizationAnchor(body,
+    'lua.doStringSync("main()");',
+    'lua.doStringSync("main()");\n        if (typeof callback === "function") callback(MapInfo);', 'mapinfo-callback'));
+  replaceBody('updateMapTable', body => {
+    if (!body.includes('MapTable[key].name = MapInfo[key].displayName')) throw new Error('anchor:map-localization-update');
+    return `{
+  for (const key of Object.keys(MapInfo)) {
+    const previous = MapTable[key] || (MapTable[key] = {});
+    const info = LastROMapLocalization.localizeInfo(key, MapInfo[key], previous.name);
+    if (info && info.displayName) previous.name = info.displayName;
+  }
+}`;
+  });
+  replaceBody('getMapName', body => {
+    if (!body.includes('return MapTable[map].name;')) throw new Error('anchor:map-localization-get-name');
+    return `{
+      if (!mapname) return typeof defaultName === "undefined" ? DB.getMessage(187) : defaultName;
+      const map = LastROMapLocalization.normalize(mapname) + ".rsw";
+      const name = LastROMapLocalization.resolveName(mapname, MapTable[map]?.name);
+      return name || (typeof defaultName === "undefined" ? DB.getMessage(187) : defaultName);
+    }`;
+  });
+  replaceBody('getMapInfo', body => {
+    if (!body.includes('return MapInfo[mapname] || null;')) throw new Error('anchor:map-localization-get-info');
+    return `{
+      const map = LastROMapLocalization.normalize(mapname) + ".rsw";
+      return LastROMapLocalization.localizeInfo(map, MapInfo[map] || null, MapTable[map]?.name);
+    }`;
+  });
+  let patched = region.text;
+  for (const edit of edits.sort((a, b) => b.start - a.start)) patched = patched.slice(0, edit.start) + edit.text + patched.slice(edit.end);
+  return `/* LASTRO Chinese map-name overlay: arrival banners and DB display only. */
+const LastROMapLocalization = (${createLastroMapLocalization.toString()})(${JSON.stringify(MAP_NAME_OVERRIDES)}, ${JSON.stringify(MAP_TITLE_OVERRIDES)});
+` + source.slice(0, region.start) + patched + source.slice(region.end);
+}
+
+/** Fail the build when a later overlay drops a required localization mount. */
+export function assertRuntimeLocalizationMount(source, baseline = source) {
+  assertRuntimeItemOptionLocalization(source, baseline);
+  const hooks = [
+    ['src/DB/DBManager.js', 'LastROMapLocalization.rememberName(key, val)', 'map-text-loader'],
+    ['src/DB/DBManager.js', 'LastROMapLocalization.localizeInfo(map, MapInfo[map] || null, MapTable[map]?.name)', 'map-info-display'],
+    ['src/DB/DBManager.js', 'LastROMapLocalization.resolveName(mapname, MapTable[map]?.name)', 'map-name-display'],
+    ['src/DB/DBManager.js', 'if (typeof callback === "function") callback(MapInfo);', 'map-info-loader'],
+    ['src/DB/DBManager.js', 'LastROUiMessages.resolveMessage(id, MsgStringTable[id], defaultText)', 'message-display'],
+    ['src/DB/DBManager.js', 'LastROUiMessages.loadCsv(data, targetTable', 'message-loader'],
+    ['src/DB/DBManager.js', 'LASTRO Chinese skill-name overlay', 'skill-name-loader'],
+    ['src/DB/DBManager.js', 'SkillDescription = _json;', 'skill-description-loader'],
+    ['src/UI/Components/MapName/MapName.js', '_mapinfo = DB.getMapInfo(mapname.replace(".gat", ".rsw"))', 'arrival-map-info'],
+  ];
+  for (const [path, hook, label] of hooks) {
+    if (!localizationRegion(baseline, path)) continue;
+    const region = localizationRegion(source, path);
+    if (!region || region.text.split(hook).length !== 2) throw new Error('localization-mount:' + label);
+  }
+  if (baseline.includes('JobNameTable')) {
+    if (source.split('function lastroJobDisplayName(id)').length !== 2
+        || !source.includes('lastroJobDisplayName(info.job)')) throw new Error('localization-mount:job-display');
+    for (const path of ['src/DB/Jobs/JobNameTable.js', 'src/DB/Jobs/PalNameTable.js', 'src/DB/Jobs/WeaponJobTable.js']) {
+      const original = localizationRegion(baseline, path), current = localizationRegion(source, path);
+      if (original && (!current || current.text.replaceAll('\r\n', '\n') !== original.text.replaceAll('\r\n', '\n')))
+        throw new Error('localization-mount:resource-identifiers');
+    }
+  }
+  const nativeUi = localizationUiText(baseline), patchedUi = localizationUiText(source);
+  for (const [from, to] of RUNTIME_TEXT_REPLACEMENTS) {
+    if (!nativeUi.includes(from)) continue;
+    // Storage's reviewed sort-label overlay replaces the old generic wording.
+    const alternative = from === '>Downgrade<' ? '>名称降序<' : '';
+    if (patchedUi.includes(from) || (!patchedUi.includes(to) && (!alternative || !patchedUi.includes(alternative))))
+      throw new Error('localization-mount:ui-text:' + from);
+  }
+}
+
+/** Check the actual item-name getter after every overlay, including import/build. */
+function assertRuntimeItemOptionLocalization(source, baseline) {
+  function itemNameMethod(text) {
+    const region = localizationRegion(text, 'src/DB/DBManager.js');
+    if (!region) return null;
+    const file = ts.createSourceFile('DBManager.js', region.text, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+    const matches = [];
+    function visit(node) {
+      if (ts.isMethodDeclaration(node) && node.name.getText(file) === 'getItemName') matches.push(node);
+      ts.forEachChild(node, visit);
+    }
+    visit(file);
+    return matches.length === 1 ? matches[0].getText(file) : null;
+  }
+  if (!itemNameMethod(baseline)) return;
+  const method = itemNameMethod(source);
+  try {
+    if (!method) throw new Error('missing item-name method');
+    // No slot records: only exercise option display, with fixed synthetic data.
+    // Running the getter detects an overwritten method even if translated text
+    // remains in a comment, unused table or unrelated part of the bundle.
+    const checks = runInNewContext(`
+      const getPreferredItemDisplayName = info => info.identifiedDisplayName;
+      class DB { ${method} }
+      DB.getItemInfo = () => ({ identifiedDisplayName: '测试装备', slotCount: 0 });
+      const item = { ITID: 1, IsIdentified: true };
+      const names = [0, 1, 5].map(count => DB.getItemName({ ...item, Options: Array.from({length: count}, (_, index) => ({index: index + 1})) }));
+      const hidden = DB.getItemName({ ...item, Options: [{index: 1}] }, {showItemOptions: false});
+      const empty = DB.getItemName({ ...item, Options: [{index: 0}] });
+      const unknown = DB.getItemName({ ...item, IsIdentified: false, Options: [{index: 1}] });
+      JSON.stringify([...names, hidden, empty, unknown]);
+    `, {}, { timeout: 100, contextCodeGeneration: { strings: false, wasm: false } });
+    const expected = ['测试装备', '测试装备 [1词条]', '测试装备 [5词条]', '测试装备', '测试装备', '测试装备'];
+    if (checks !== JSON.stringify(expected)) throw new Error('incorrect item option display');
+  } catch {
+    throw new Error('localization-mount:item-options-display');
+  }
+}
+
+function localizationUiText(source) {
+  const strings = [];
+  // Decode JS literals: serialization may change quote/backslash spelling even
+  // when the rendered attribute or label has not changed. Limit the audit to UI
+  // regions so localized display words cannot change a data/resource key.
+  for (const match of source.matchAll(/\/\/#region src\/UI\/[^\r\n]+\r?\n([\s\S]*?)\/\/#endregion/g)) {
+    const file = ts.createSourceFile('localization-ui.js', match[1], ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+    function visit(node) {
+      if (ts.isStringLiteralLike(node) || [ts.SyntaxKind.TemplateHead, ts.SyntaxKind.TemplateMiddle, ts.SyntaxKind.TemplateTail].includes(node.kind)) strings.push(node.text);
+      ts.forEachChild(node, visit);
+    }
+    visit(file);
+  }
+  return strings.join('\n');
+}

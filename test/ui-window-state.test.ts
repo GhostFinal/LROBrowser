@@ -212,8 +212,8 @@ describe('native window preferences', () => {
     Object.defineProperties(f.win, { innerWidth: { configurable: true, value: 240 }, innerHeight: { configurable: true, value: 160 } });
     f.setZoom(1.5); f.win.dispatchEvent(new f.win.Event('resize'));
     const rect = f.component._host.getBoundingClientRect();
-    expect(rect.left).toBeGreaterThanOrEqual(3.99); expect(rect.top).toBeGreaterThanOrEqual(3.99);
-    expect(rect.right).toBeLessThanOrEqual(236.01); expect(rect.bottom).toBeLessThanOrEqual(156.01);
+    expect(rect.left).toBeGreaterThanOrEqual(-0.01); expect(rect.top).toBeGreaterThanOrEqual(-0.01);
+    expect(rect.right).toBeLessThanOrEqual(240.01); expect(rect.bottom).toBeLessThanOrEqual(160.01);
     f.win.dispatchEvent(new f.win.Event('pagehide'));
     expect(f.saved().x).toBe(original.x); expect(f.saved().y).toBe(original.y); expect(f.saved().width).toBe(8);
     Object.defineProperties(f.win, { innerWidth: { configurable: true, value: 1200 }, innerHeight: { configurable: true, value: 900 } });

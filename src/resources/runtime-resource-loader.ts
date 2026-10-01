@@ -3,6 +3,18 @@ import { createDirectHttpFetch } from './direct-http-resource';
 import { normalizeResourcePath } from './resource-policy';
 import { resolvePassiveResource } from './resource-resolver';
 
+export interface PackageResourceEntry { readonly path: string; }
+
+export function snapshotPackageManifest(files: unknown): readonly PackageResourceEntry[] {
+  if (!Array.isArray(files)) throw new Error('Invalid package resource manifest');
+  return Object.freeze(files.map((file: unknown) => {
+    if (!file || typeof file !== 'object' || !('path' in file) || typeof file.path !== 'string') {
+      throw new Error('Invalid package resource entry');
+    }
+    return Object.freeze({ ...file, path: file.path });
+  }));
+}
+
 interface RuntimeResourceOptions {
   packageBaseUrl: string;
   getManifest: () => readonly { path: string }[] | undefined;

@@ -1,4 +1,5 @@
-import type { AccountStore, LocalAccount } from './account-store';
+import type { AccountStore, AccountSummary } from './account-store';
+import { validateAccountCredentials } from './account-storage.mjs';
 import type { AvailableServerProfile, LastROServerProfile } from '../servers/server-profile';
 import { getAvailableServerProfile } from '../servers/server-profiles';
 
@@ -78,6 +79,7 @@ export function mountAccountManager({ root, profiles, store, onLogin }: {
     buttons.delete.disabled = busy || !storage || !accountId;
   }
   function clear() {
+    ++revision;
     accountId = undefined;
     form.reset();
     list.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', 'false'));
@@ -88,7 +90,7 @@ export function mountAccountManager({ root, profiles, store, onLogin }: {
     message.textContent = '本地账号存储不可用，仍可手动登录';
     controls();
   }
-  function render(accounts: LocalAccount[]) {
+  function render(accounts: AccountSummary[]) {
     list.replaceChildren();
     for (const account of accounts) {
       const button = document.createElement('button');
@@ -96,14 +98,20 @@ export function mountAccountManager({ root, profiles, store, onLogin }: {
       button.dataset.accountId = account.id;
       button.textContent = account.label || account.username;
       button.setAttribute('aria-pressed', String(account.id === accountId));
-      button.addEventListener('click', () => {
+      button.addEventListener('click', async () => {
         if (busy) return;
+        const requested = ++revision;
         accountId = account.id;
         inputs.label.value = account.label;
         inputs.username.value = account.username;
-        inputs.password.value = account.password;
+        inputs.password.value = '';
         list.querySelectorAll('button').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
         controls();
+        try {
+          const loaded = await store.get(account.id);
+          if (requested !== revision || !root.isConnected || !loaded || loaded.serverProfileId !== select.value) return;
+          inputs.password.value = loaded.password;
+        } catch { if (requested === revision) message.textContent = '本地密码无法读取，请重新输入并保存'; }
       });
       list.append(button);
     }
@@ -138,7 +146,8 @@ export function mountAccountManager({ root, profiles, store, onLogin }: {
       const saved = await store.save({ id: accountId, serverProfileId: profile.id,
         label: inputs.label.value, username: inputs.username.value, password: inputs.password.value });
       accountId = saved.id;
-      message.textContent = '已保存';
+      inputs.password.value = '';
+      message.textContent = '已保存，选择账号即可载入登录';
       await refresh();
     } catch { storageFailed(); }
     finally { busy = false; controls(); }
@@ -161,12 +170,17 @@ export function mountAccountManager({ root, profiles, store, onLogin }: {
     busy = true;
     controls();
     try {
-      await onLogin({ profile: getAvailableServerProfile(select.value), username: inputs.username.value,
-        password: inputs.password.value, ...(accountId ? { savedAccountId: accountId } : {}) });
+      validateAccountCredentials(inputs.username.value, inputs.password.value);
+      const request = { profile: getAvailableServerProfile(select.value), username: inputs.username.value,
+        password: inputs.password.value, ...(accountId ? { savedAccountId: accountId } : {}) };
+      inputs.password.value = '';
+      ++revision;
+      try { await onLogin(request); } finally { request.password = ''; }
       if (accountId) await store.markUsed(accountId, Date.now());
     } catch { message.textContent = '登录未完成，请检查连接状态'; }
     finally { busy = false; controls(); }
   });
+  for (const input of Object.values(inputs)) input.addEventListener('input', () => { ++revision; });
   controls();
   void refresh();
 }

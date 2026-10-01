@@ -10,8 +10,11 @@
 | 本轮补充的本地译名 | 192（非官方地区译名声明） |
 | 待翻译技能名称 | 0 |
 | 现有 GBK 技能说明条目 | 1149 |
-| 职业名称覆盖规则 | 86 |
+| 职业名称覆盖规则 | 108 |
 | 界面文字替换规则 | 355 |
+| 包内地图中文名称 | 790 |
+| 地图标题精确译名 | 43 |
+| 生成运行时挂载核对 | 未检查生成运行时（先运行 pnpm prepare:runtime） |
 
 ## 验证边界与修正
 
@@ -26,11 +29,15 @@
 - 既有实现修正：苍鹰/鸮枭名称对应修复；天使之护与天使之障壁区分；消息表已知英文同样翻译；自动战斗技能下拉框优先采用本地技能名。
 - 隔离布局预览：使用实际生成 CSS/模板，在 805×906 视口验证 36 个技能栏数字无跨行溢出，4 行高度均为 34px，掉落提示右侧边距约 24px。测试图标为方块，不代表实战纹理验证。
 - 职业汉化仅作用于显示标签；JobNameTable、PalNameTable、WeaponJobTable 保持原生资源名，避免角色身体、武器或调色板加载失败。
+- 地图中文名称与世界地图共用包内资源，传送横幅通过 DB.getMapInfo 获取汉化快照；中文 TXT 和 Lua 标题保留，异步英文地图表不再覆盖已有中文。
+- 构建结束核对实际生成文件的汉化挂载和界面文字；后续补丁删掉地图、消息、技能或职业挂载，或恢复已译控件英文时直接失败。物品名称另执行实际 DB.getItemName，核对 0、1、5 个词条显示和隐藏行为；无关位置留有中文不能通过。这些核对不能代替登录后的画面验证。
 - 本表不固化测试数量；以提交时的 PR 验证记录为准。Windows 环境需注意符号链接权限、目录排序及测试中硬编码的 /tmp 路径，不能把这些失败报告为全量通过。
 
 ## 复核命令
 
 - node scripts/audit-localization.mjs：重新生成本表，检查源表新增条目。
+- node scripts/audit-localization.mjs --check-runtime：检查两份实际生成运行时的汉化挂载，不改写本表。
+- node scripts/audit-localization.mjs --check-dist：构建后同时检查生成与发布目录中的四份运行时，不改写本表。
 - node scripts/preview-localization.mjs：生成隔离布局预览；开发服务启动后访问 /generated/localization-preview.html。
 - pnpm exec vitest run test/localization-behavior.test.ts test/v2-runtime-patch.test.ts test/manifest.test.ts：执行汉化、加载顺序与既有修改测试。
 

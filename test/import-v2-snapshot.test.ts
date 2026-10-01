@@ -38,7 +38,7 @@ describe('reviewed V2 import gate', () => {
     expect(result.status).toBe(0);
     expect(result.stderr + result.stdout).not.toMatch(/synthetic-user|synthetic-password/);
     expect(existsSync(path.join(f.output, 'v2/lastro-v2-config.js'))).toBe(false);
-    expect(await readdir(path.join(f.output, 'v2'))).toEqual(files);
+    expect((await readdir(path.join(f.output, 'v2'))).sort()).toEqual(files);
   });
 
   it('rejects an attempt to allowlist the personal config', async () => {
@@ -74,7 +74,7 @@ describe('reviewed V2 import gate', () => {
     expect(f.run().status).toBe(0);
     const first = await readFile(path.join(f.output, 'v2-manifest.json'), 'utf8');
     const manifest = JSON.parse(first);
-    expect(await readdir(path.join(f.output, 'v2'))).toEqual(files);
+    expect((await readdir(path.join(f.output, 'v2'))).sort()).toEqual(files);
     expect(manifest.files.map((entry: { path: string }) => entry.path)).toEqual(files);
     for (const entry of manifest.files) {
       const bytes = await readFile(path.join(f.source, entry.path));

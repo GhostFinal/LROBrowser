@@ -30,6 +30,7 @@ export class DirectTcpSocket implements LegacyClientSocket {
   private completed = false;
   private terminated = false;
   private openedSuccessfully = false;
+  private nativeOpened = false;
   private closeRequested = false;
   private nativeCloseRequested = false;
 
@@ -47,6 +48,7 @@ export class DirectTcpSocket implements LegacyClientSocket {
   }
 
   send(buffer: ArrayBuffer): void {
+    if (this.terminated) return;
     const copy = new Uint8Array(buffer.slice(0));
     this.writeTail = this.writeTail.then(async () => {
       if (this.terminated || !this.writer) return;
@@ -63,12 +65,16 @@ export class DirectTcpSocket implements LegacyClientSocket {
       this.terminated = true;
       this.connected = false;
       this.notifyComplete(false);
+      this.requestNativeClose();
       return;
     }
     this.terminate();
   }
 
   private async initialize(): Promise<void> {
+    // Legacy callbacks are installed before this microtask runs. A cancellation
+    // during that gap must not create an unwanted outbound connection.
+    if (this.terminated || this.closeRequested) return;
     try {
       if (!this.constructorForSocket) throw new Error('Direct TCP 不受当前环境支持');
       const native = new this.constructorForSocket(this.host, this.port, { noDelay: true, keepAliveDelay: 60_000 });
@@ -81,6 +87,7 @@ export class DirectTcpSocket implements LegacyClientSocket {
   }
 
   private handleOpened(info: { readable: ReadableStream<Uint8Array>; writable: WritableStream<Uint8Array> }): void {
+    this.nativeOpened = true;
     if (this.terminated || this.closeRequested) {
       const reader = info.readable.getReader();
       const writer = info.writable.getWriter();
@@ -136,6 +143,7 @@ export class DirectTcpSocket implements LegacyClientSocket {
     this.connected = false;
     this.notifyComplete(false);
     this.report(error);
+    this.requestNativeClose();
   }
 
   private handleNativeClosed(error?: unknown): void {
@@ -172,7 +180,9 @@ export class DirectTcpSocket implements LegacyClientSocket {
   }
 
   private requestNativeClose(): void {
-    if (this.nativeCloseRequested || !this.native) return;
+    // TCPSocket.close rejects while opened is pending. On cancellation
+    // keep the late-open handler responsible for releasing the streams first.
+    if (this.nativeCloseRequested || !this.native || !this.nativeOpened) return;
     this.nativeCloseRequested = true;
     try {
       void this.native.close().catch(error => this.report(error));

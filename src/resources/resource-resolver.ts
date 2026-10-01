@@ -221,7 +221,7 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
     for (const candidate of candidates) {
       const url = root + candidate;
       try {
-        const timeoutMs = options.timeoutMs ?? (/\.(?:gat|gnd|rsw|rsm|str)$/i.test(normalizedPath) ? MAP_RESOURCE_TIMEOUT_MS : RESOURCE_TIMEOUT_MS);
+        const timeoutMs = options.timeoutMs ?? (/\.(?:gat|gnd|rsw|rsm2?|str)$/i.test(normalizedPath) ? MAP_RESOURCE_TIMEOUT_MS : RESOURCE_TIMEOUT_MS);
         const result = await fetchResource(url, { ...options, timeoutMs }, controller.signal);
         validateMapBinary(normalizedPath, result.bytes);
         return { url, ...result };
@@ -243,7 +243,7 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
     await cache.put(normalizedPath, result.bytes, metadata).catch(() => {});
     return result.bytes;
   };
-  if (/\.(?:gat|gnd|rsw|rsm|str)$/i.test(normalizedPath)) {
+  if (/\.(?:gat|gnd|rsw|rsm2?|str)$/i.test(normalizedPath)) {
     // Each origin advances through its own path candidates independently.
     // A failed origin must not prevent the other from finding a valid variant.
     try {

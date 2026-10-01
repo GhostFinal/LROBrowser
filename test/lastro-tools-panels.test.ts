@@ -29,6 +29,10 @@ type Catalog = Record<string, Record<string, Route>>;
 const route = (name: string, map = 'prontera'): Route => ({ npc: name, desc: `${name}说明`, outset: [map, 100, 184], path: [[map, 100, 184]] });
 const defaults = (): Catalog => ({ npc: { a: route('地点甲'), b: route('地点乙'), c: route('地点丙') }, train: { t: route('练级地点', 'pay_fild01') }, boss: { boss: route('BOSS 地点', 'moc_fild17') } });
 const originalViewport = { width: window.innerWidth, height: window.innerHeight };
+// Capture the actual DOM implementation before any fixture installs a spy.
+// Vitest 4 reuses an existing spy, so binding it inside a second fixture would
+// make the replacement call itself when a saved panel is reloaded in one test.
+const originalGetComputedStyle = window.getComputedStyle.bind(window);
 const mountedTools: Array<{ remove: () => void }> = [];
 
 function fixture(options: { preferences?: unknown; storage?: Map<string, unknown>; catalogs?: Record<string, Catalog>; profile?: string; confirm?: boolean } = {}) {
@@ -150,11 +154,10 @@ function fixture(options: { preferences?: unknown; storage?: Map<string, unknown
         return { x: left, y: top, left, top, right: left + width, bottom: top + height, width, height, toJSON: () => ({}) };
       });
     }
-    const computed = window.getComputedStyle.bind(window);
     // jsdom does not resolve used max-constrained sizes or ancestor CSS zoom.
     // Model those browser measurements while exercising the actual installer.
     vi.spyOn(window, 'getComputedStyle').mockImplementation((node, pseudo) => {
-      const style = computed(node, pseudo);
+      const style = originalGetComputedStyle(node, pseudo);
       if (!hosts.has(node as HTMLDivElement)) return style;
       return new Proxy(style, {
         get(target, property) {
@@ -176,10 +179,12 @@ function fixture(options: { preferences?: unknown; storage?: Map<string, unknown
 }
 
 afterEach(() => {
-  mountedTools.splice(0).forEach(tools => tools.remove());
-  document.body.replaceChildren(); vi.restoreAllMocks();
-  Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalViewport.width });
-  Object.defineProperty(window, 'innerHeight', { configurable: true, value: originalViewport.height });
+  try { mountedTools.splice(0).forEach(tools => tools.remove()); }
+  finally {
+    document.body.replaceChildren(); vi.restoreAllMocks();
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalViewport.width });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: originalViewport.height });
+  }
 });
 
 function resizePointer(target: EventTarget, type: string, x: number, y: number, pointerId = 7, pointerType = 'mouse', button = 0) {

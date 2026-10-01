@@ -6,7 +6,12 @@ import { fileURLToPath, URL } from 'node:url';
 import { parseArgs } from 'node:util';
 import process from 'node:process';
 import ts from 'typescript';
-import { JOB_NAME_OVERRIDES, MESSAGE_FALLBACKS, RUNTIME_TEXT_REPLACEMENTS } from './lastro-localization.mjs';
+import { patchRuntimeNavigation, patchRuntimePluginLoader, patchRuntimePlainTextSinks } from './patch-csp-runtime.mjs';
+import { patchRuntimeCredentialSecurity } from './lastro-credential-security.mjs';
+import { patchRuntimeLastROItemLayouts } from './lastro-network-security.mjs';
+import { patchRuntimeLuaStartup } from './lastro-lua-startup.mjs';
+import { patchRuntimeDebugAccess } from './lastro-debug-access.mjs';
+import { JOB_NAME_OVERRIDES, MESSAGE_FALLBACKS, RUNTIME_TEXT_REPLACEMENTS, patchRuntimeMapLocalization, assertRuntimeLocalizationMount } from './lastro-localization.mjs';
 import jobNameAliases from './lastro-job-name-aliases.json' with { type: 'json' };
 import { SKILL_DESCRIPTION_OVERRIDES, SKILL_NAME_OVERRIDES } from './lastro-skill-localization.mjs';
 import { ITEM_OBTAIN_CSS } from './lastro-loot-style.mjs';
@@ -21,8 +26,11 @@ import { patchRuntimeFrameTiming } from './lastro-frame-timing.mjs';
 import { patchRuntimeAudioTiming } from './lastro-audio-timing.mjs';
 import { patchRuntimeEntitySync } from './lastro-entity-sync.mjs';
 import { patchRuntimeEntityAppearance } from './lastro-entity-appearance.mjs';
+import { patchRuntimeEquipmentAnimation } from './lastro-equipment-animation.mjs';
+import { patchRuntimeEquipmentCatalog, patchRuntimeEquipmentView } from './lastro-equipment-view.mjs';
 import { patchRuntimeTeleportFade } from './lastro-teleport-fade.mjs';
 import { patchRuntimeMovementInput } from './lastro-movement-input.mjs';
+import { patchRuntimeMovementSync } from './lastro-movement-sync.mjs';
 import { installLastroToolsPanels } from './lastro-tools-panels.mjs';
 import { LASTRO_TOOLS_CSS } from './lastro-tools-style.mjs';
 import { patchRuntimeMail } from './lastro-mail.mjs';
@@ -32,7 +40,10 @@ import { patchRuntimeUiMessages } from './lastro-ui-messages.mjs';
 import { patchRuntimeUiLayout as patchScopedUiLayout } from './lastro-ui-layout.mjs';
 import { patchRuntimeUiState } from './lastro-ui-state.mjs';
 import { patchRuntimeStoreScroll } from './lastro-store-scroll.mjs';
+import { patchRuntimeStorageCount } from './lastro-storage-count.mjs';
 import { patchRuntimeUiInput } from './lastro-ui-input.mjs';
+import { patchRuntimeItemDrag } from './lastro-item-drag.mjs';
+import { patchRuntimeItemName } from './lastro-item-name.mjs';
 import { patchRuntimeHotkeys } from './lastro-hotkeys.mjs';
 import { patchRuntimeTypography } from './lastro-typography.mjs';
 import { patchRuntimeDialogTypography } from './lastro-dialog-typography.mjs';
@@ -135,7 +146,7 @@ function patchLoginRegistrationHook(source) {
   const matched = variants.filter((v) => count(body, `${v.send}\n${v.close3} else {`) === 1);
   if (matched.length !== 1) fail('anchor:login-han-send');
   const variant = matched[0];
-  const hook = `\n${variant.indent}if (typeof globalThis.LastROLoginAfterPassword === "function") globalThis.LastROLoginAfterPassword(username, password);`;
+  const hook = `\n${variant.indent}afterLastROLoginPassword(username, password);`;
   const hanMarker = `${variant.send}\n${variant.close3} else {`;
   const normalMarker = `${variant.send}\n${variant.close3}\n${variant.close2}\n${variant.close1}\n}`;
   if (count(body, normalMarker) !== 1) fail('anchor:login-send');
@@ -1199,7 +1210,8 @@ export function patchMapLoadFailureRecovery(source) {
 export function patchV2Runtime(source) {
   if (!source.startsWith('import ')) fail('anchor:runtime-imports');
   const normalizedSource = source.replace(/\r\n/g, '\n');
-  let output = `import { decorateLastROLoginTemplate, decorateLastROLoginStyles, installLastROLogin } from "./lastro-account-login.mjs";
+  let output = `import { decorateLastROLoginTemplate, decorateLastROLoginStyles, installLastROLogin, beforeLastROLoginConnect, afterLastROLoginPassword } from "./lastro-account-login.mjs";
+let lastroWorkerPolicy;
 function createLastROWorkerScriptUrl(relativePath) {
 	if (relativePath !== "LastROThreadEventHandler.js" && relativePath !== "PathFindingWorker.js") {
 		throw new TypeError("Unexpected worker path");
@@ -1209,8 +1221,7 @@ function createLastROWorkerScriptUrl(relativePath) {
 	if (!trustedTypes) return workerUrl.href;
 	const allowedWorkerUrls = ["LastROThreadEventHandler.js", "PathFindingWorker.js"]
 		.map(path => new URL(path, import.meta.url).href);
-	const policyKey = "__lastroIwaWorkerPolicy";
-	const policy = globalThis[policyKey] ?? (globalThis[policyKey] = trustedTypes.createPolicy("lastro-iwa-worker", {
+	const policy = lastroWorkerPolicy ?? (lastroWorkerPolicy = trustedTypes.createPolicy("lastro-iwa-worker", {
 		createScriptURL: (value) => {
 			const candidate = new URL(value, import.meta.url);
 			if (!allowedWorkerUrls.includes(candidate.href)) {
@@ -1306,7 +1317,12 @@ ${normalizedSource}`;
   output = patchRuntimeFrameTiming(output);
   output = patchRuntimeEntitySync(output);
   output = patchRuntimeEntityAppearance(output);
+  output = patchRuntimeEquipmentCatalog(output);
+  output = patchRuntimeEquipmentView(output);
+  output = patchRuntimeEquipmentAnimation(output);
   output = patchRuntimeMovementInput(output);
+  output = patchRuntimeMovementSync(output);
+  output = patchRuntimeLastROItemLayouts(output);
   output = replaceOnce(output, 'init_WebSocket();', '');
   output = replaceOnce(output, 'init_NodeSocket();', '');
   output = replaceWorkerCreation(output);
@@ -1405,16 +1421,18 @@ ${normalizedSource}`;
   ]);
   output = replaceOnceAny(output, [
     ['    const pass = _inputPassword.value;\n    applyDebugLoginFields();',
-      '    const pass = _inputPassword.value;\n    const beforeConnect = globalThis.LastROLoginBeforeConnect;\n    if (typeof beforeConnect === "function" && beforeConnect(user, pass) === false) return false;\n    applyDebugLoginFields();'],
+      '    const pass = _inputPassword.value;\n    if (beforeLastROLoginConnect(user, pass) === false) return false;\n    applyDebugLoginFields();'],
     ['\t\tconst pass = _inputPassword.value;\n\t\tapplyDebugLoginFields();',
-      '\t\tconst pass = _inputPassword.value;\n\t\tconst beforeConnect = globalThis.LastROLoginBeforeConnect;\n\t\tif (typeof beforeConnect === "function" && beforeConnect(user, pass) === false) return false;\n\t\tapplyDebugLoginFields();'],
+      '\t\tconst pass = _inputPassword.value;\n\t\tif (beforeLastROLoginConnect(user, pass) === false) return false;\n\t\tapplyDebugLoginFields();'],
   ]);
   output = patchRuntimeTypography(output);
   output = patchRuntimeDialogTypography(output);
   output = patchRuntimeLocalization(output);
   output = patchRuntimeUiText(output);
   output = patchRuntimeUiMessages(output);
+  output = patchRuntimeMapLocalization(output);
   output = patchRuntimeHotkeys(output);
+  output = patchRuntimeLuaStartup(output);
   output = patchLuaTableCompletion(output);
   output = patchRuntimeUiLayout(output);
   output = patchScopedUiLayout(output);
@@ -1430,12 +1448,21 @@ ${normalizedSource}`;
   output = patchRuntimeNavigationUi(output);
   output = patchRuntimeQuests(output);
   output = patchRuntimeStoreScroll(output);
+  output = patchRuntimeStorageCount(output);
+  output = patchRuntimeItemName(output);
   output = patchRuntimeUiState(output);
   output = patchRuntimeUiInput(output);
+  output = patchRuntimeItemDrag(output);
   output = patchMapLoadFailureRecovery(output);
   output = patchRuntimeTeleportFade(output);
   if (/new WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i.test(output)) fail('legacy-transport');
-  return patchTrustedTypesDomWrites(output);
+  output = patchRuntimeCredentialSecurity(output);
+  output = patchRuntimePluginLoader(output);
+  output = patchRuntimeDebugAccess(output);
+  output = patchRuntimePlainTextSinks(output);
+  const finalOutput = patchRuntimeNavigation(patchTrustedTypesDomWrites(output));
+  assertRuntimeLocalizationMount(finalOutput, source);
+  return finalOutput;
 }
 
 async function main() {

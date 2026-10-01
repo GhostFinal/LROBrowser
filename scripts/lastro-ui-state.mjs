@@ -67,15 +67,17 @@ export function lastroUiWindowAppend(component, preferences, append, snapshot) {
         const { width, height } = dimensions(), rect = host.getBoundingClientRect();
         const ancestorScale = width > 0 && rect.width > 0 ? rect.width / width / ownScale : 1;
         const scale = Number.isFinite(ancestorScale) && ancestorScale > 0 ? ancestorScale : 1;
-        const margin = 4, vw = win.innerWidth, vh = win.innerHeight;
-        if (!(vw > margin * 2 && vh > margin * 2 && width > 0 && height > 0)) return;
+        const vw = win.innerWidth, vh = win.innerHeight;
+        if (!(vw > 0 && vh > 0 && width > 0 && height > 0)) return;
         const originX = rect.left - host.offsetLeft * scale, originY = rect.top - host.offsetTop * scale;
-        ownScale = Math.min(1, (vw - margin * 2) / (width * scale), (vh - margin * 2) / (height * scale));
+        ownScale = Math.min(1, vw / (width * scale), vh / (height * scale));
         host.style.transformOrigin = '0 0';
         host.style.scale = String(ownScale);
-        const minX = (margin - originX) / scale, minY = (margin - originY) / scale;
-        const maxX = (vw - margin - originX) / scale - width * ownScale;
-        const maxY = (vh - margin - originY) / scale - height * ownScale;
+        // Match the physical viewport edges used by native drag snapping.
+        // An inset here would move a docked window away again on release/resize.
+        const minX = -originX / scale, minY = -originY / scale;
+        const maxX = (vw - originX) / scale - width * ownScale;
+        const maxY = (vh - originY) / scale - height * ownScale;
         let left = number(geometry.left) ?? host.offsetLeft, top = number(geometry.top) ?? host.offsetTop;
         if (component.magnet?.LEFT) left = minX;
         if (component.magnet?.TOP) top = minY;

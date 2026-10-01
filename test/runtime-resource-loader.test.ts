@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createRuntimeResourceLoader } from '../src/resources/runtime-resource-loader';
+import { createRuntimeResourceLoader, snapshotPackageManifest } from '../src/resources/runtime-resource-loader';
 import { resolvePassiveResource } from '../src/resources/resource-resolver';
 
 vi.mock('../src/resources/resource-resolver', () => ({ resolvePassiveResource: vi.fn() }));
@@ -14,6 +14,19 @@ beforeEach(() => { resolver.mockReset(); });
 afterEach(() => { vi.unstubAllGlobals(); });
 
 describe('worker runtime resource in-flight sharing', () => {
+  it('copies and freezes manifest messages without introducing metadata loading gates', () => {
+    const entry = { path: 'System/a.lua', bytes: 0, sha256: 'legacy-metadata' };
+    const snapshot = snapshotPackageManifest([entry]);
+    entry.path = 'System/b.lua';
+    expect(snapshot[0]?.path).toBe('System/a.lua');
+    expect(Object.isFrozen(snapshot)).toBe(true);
+    expect(Object.isFrozen(snapshot[0])).toBe(true);
+    expect(snapshotPackageManifest([{ path: 'System/a.lua' }, { path: 'System/a.lua' }])).toHaveLength(2);
+    for (const value of [null, {}, [null], [{ path: 3 }]]) {
+      expect(() => snapshotPackageManifest(value)).toThrow();
+    }
+  });
+
   it('shares the same normalized path and charset while providing independent transferable buffers', async () => {
     let finish!: (value: ArrayBuffer) => void;
     resolver.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
@@ -103,5 +116,19 @@ describe('worker runtime resource in-flight sharing', () => {
     await expect(load('data/missing.mjs')).rejects.toThrow('package-only-resource');
     await expect(load('../outside.gat')).rejects.toThrow('forbidden-resource');
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('loads packaged resources without depending on exact byte counts or per-read digests', async () => {
+    const actual = await vi.importActual<typeof import('../src/resources/resource-resolver')>('../src/resources/resource-resolver');
+    resolver.mockImplementation(actual.resolvePassiveResource);
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => new Response(bytes()));
+    vi.stubGlobal('fetch', fetch);
+    const load = createRuntimeResourceLoader({
+      packageBaseUrl: 'https://iwa.invalid/core/', getCharset: () => 'gbk',
+      getManifest: () => snapshotPackageManifest([{ path: 'System/script.lua', bytes: 0, sha256: 'legacy-metadata' }]),
+    });
+    expect(new Uint8Array(await load('System/script.lua'))).toEqual(new Uint8Array([1, 2, 3]));
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(String(fetch.mock.calls[0]?.[0])).toBe('https://iwa.invalid/core/System/script.lua');
   });
 });

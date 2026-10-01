@@ -16,6 +16,6 @@ describe('renewal refine runtime configuration', () => {
 
     expect(vm.runInContext('Configs.get("enableRefineUI")', context)).toBe(true);
     expect(vm.runInContext('Configs.get("enableMapName")', context)).toBe(true);
-    expect(config.development).toBe(import.meta.env.DEV);
+    expect(config.development).toBe(false);
   });
 });

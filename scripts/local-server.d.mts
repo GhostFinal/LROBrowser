@@ -1,0 +1,11 @@
+import type { Logger, ViteDevServer } from 'vite';
+export const SERVER_ROOT: string;
+export const SERVER_KIND: string;
+export const SERVER_PORT: number;
+export const SERVER_STATUS_PATH: string;
+export const SERVER_DIRECTORY: string;
+export const SERVER_STATE_PATH: string;
+export const SERVER_LOG_PATH: string;
+export function runtimeReady(root?: string): boolean;
+export function runtimeNeedsPreparation(root?: string): Promise<boolean>;
+export function createLocalServer(options?: { port?: number; instanceId?: string; logger?: Logger; ready?: () => boolean }): Promise<ViteDevServer>;

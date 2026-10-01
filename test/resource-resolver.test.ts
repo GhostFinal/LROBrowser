@@ -41,6 +41,20 @@ function downloadFixture(extension: string): ArrayBuffer {
 }
 
 describe('passive resource resolver', () => {
+  it('reuses legacy resource caches without requiring new source or size metadata', async () => {
+    const cache = new MemoryResourceCache();
+    await cache.put('data/a.bmp', new Uint8Array([9]).buffer, { sourceUrl: 'http://game.lastro.cn/ro/client_re/data/a.bmp', size: 99 });
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => response(200, new Uint8Array([1]).buffer));
+    expect(new Uint8Array(await resolvePassiveResource('data/a.bmp', { cache, fetch }))).toEqual(new Uint8Array([9]));
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('loads passive binary bytes even when the resource server supplies an unexpected MIME type', async () => {
+    const cache = new MemoryResourceCache();
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => response(200, new Uint8Array([1]).buffer, 'application/javascript'));
+    expect(new Uint8Array(await resolvePassiveResource('data/a.bmp', { cache, fetch }))).toEqual(new Uint8Array([1]));
+    expect(await cache.match('data/a.bmp')).toMatchObject({ size: 1 });
+  });
   it('loads native login assets from the official GBK interface directory after HTML or 404 candidates', async () => {
     for (const [input, available] of [
       ['data/texture/유저인터페이스/login_interface/win_login.bmp', 'data/texture/蜡历牢磐其捞胶/login_interface/win_login.bmp'],
@@ -302,7 +316,7 @@ describe('passive resource resolver', () => {
 describe('resource download deadlines', () => {
   afterEach(() => { vi.useRealTimers(); });
 
-  it.each(['rsw', 'gnd', 'gat', 'rsm', 'str'])('lets a continuously arriving %s body finish after eight seconds', async extension => {
+  it.each(['rsw', 'gnd', 'gat', 'rsm', 'rsm2', 'str'])('lets a continuously arriving %s body finish after eight seconds', async extension => {
     vi.useFakeTimers();
     const cache = new MemoryResourceCache();
     const put = vi.spyOn(cache, 'put');
@@ -330,7 +344,7 @@ describe('resource download deadlines', () => {
     await expect(cache.match(path)).resolves.toMatchObject({ bytes, sourceUrl: DEFAULT_RESOURCE_ROOTS[0] + path });
   });
 
-  it.each(['rsw', 'gnd', 'gat', 'rsm', 'str'])('stops both incomplete %s bodies at sixty seconds without caching partial bytes', async extension => {
+  it.each(['rsw', 'gnd', 'gat', 'rsm', 'rsm2', 'str'])('stops both incomplete %s bodies at sixty seconds without caching partial bytes', async extension => {
     vi.useFakeTimers();
     const cache = new MemoryResourceCache();
     const put = vi.spyOn(cache, 'put');

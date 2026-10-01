@@ -118,6 +118,7 @@ describe('LastRO resource worker', () => {
     expect(patched).toContain('createLastROWorkerScriptUrl("lastro-resource-loader.js")');
     expect(patched).toContain('createLastROWorkerScriptUrl("ThreadEventHandler.js")');
     expect(patched).not.toContain('importScripts("lastro-resource-loader.js", "ThreadEventHandler.js")');
+    expect(patched).not.toContain('__lastroIwaWorkerPolicy');
   });
 
   it('races official and backup origins for map resources', async () => {

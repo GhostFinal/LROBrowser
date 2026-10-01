@@ -4,6 +4,7 @@ import { runInNewContext } from 'node:vm';
 import ts from 'typescript';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { patchRuntimeUiInput } from '../scripts/lastro-ui-input.mjs';
+import { lastroUiWindowAppend } from '../scripts/lastro-ui-state.mjs';
 
 const source = readFileSync('vendor/v2/Online.js', 'utf8');
 const patched = patchRuntimeUiInput(source);
@@ -55,6 +56,7 @@ function fixture(ancestor = 1, own = 1, origin = { x: 0, y: 0 }) {
     getRoot: () => root, ui: { is: () => true }, magnet: { TOP: false, BOTTOM: false, LEFT: false, RIGHT: false },
     manager: { components: {} as Record<string, unknown> }, onDragEnd: vi.fn(), resize: vi.fn(), resizeHeight: vi.fn(),
     gridSnap: undefined as undefined | { width: number; height: number; padX?: number; padY?: number },
+    _lastroWindowState: undefined as undefined | { fit(): void; dispose(): void },
   };
   const context = {
     window: win, document: doc, HTMLElement: win.HTMLElement, Mouse: mouse,
@@ -116,6 +118,56 @@ describe('native GUI drag in scaled UI coordinates', () => {
     f.move((desiredLeft - 40) * 1.5, 0);
     expect(f.host.getBoundingClientRect().right).toBeCloseTo(1200); expect(f.component.magnet.RIGHT).toBe(true);
     f.release();
+  });
+
+  it.each([1, 1.5].flatMap(ancestor => ['LEFT', 'RIGHT', 'TOP', 'BOTTOM'].map(edge => ({ ancestor, edge }))))(
+    'keeps $edge docking flush after release, saved-state fitting and viewport resize at $ancestor scale', async ({ ancestor, edge }) => {
+      const origin = { x: 9, y: 7 }, f = fixture(ancestor, 1, origin);
+      const preferences = { x: 40, y: 30, save: vi.fn() };
+      f.component._isDraggable = true;
+      lastroUiWindowAppend(f.component, preferences, () => {}, () => {
+        preferences.x = f.host.offsetLeft; preferences.y = f.host.offsetTop;
+      });
+      f.start();
+      const horizontal = edge === 'LEFT' || edge === 'RIGHT', leading = edge === 'LEFT' || edge === 'TOP';
+      const viewport = horizontal ? f.win.innerWidth : f.win.innerHeight;
+      const size = horizontal ? f.host.offsetWidth : f.host.offsetHeight;
+      const offset = horizontal ? origin.x : origin.y;
+      const target = (leading ? -offset : viewport - offset) / ancestor - (leading ? 0 : size);
+      const distance = (target - (horizontal ? f.host.offsetLeft : f.host.offsetTop)) * ancestor + (leading ? 3 : -3);
+      f.move(horizontal ? distance : 0, horizontal ? 0 : distance);
+      const assertEdge = () => {
+        const rect = f.host.getBoundingClientRect();
+        const actual = edge === 'LEFT' ? rect.left : edge === 'RIGHT' ? rect.right : edge === 'TOP' ? rect.top : rect.bottom;
+        expect(actual).toBeCloseTo(leading ? 0 : horizontal ? f.win.innerWidth : f.win.innerHeight);
+      };
+      expect(f.component.magnet[edge as keyof typeof f.component.magnet]).toBe(true);
+      assertEdge(); f.release(); assertEdge();
+      // Exercise the style observer's delayed fit as well as the immediate mouseup fit.
+      f.host.style.opacity = '1';
+      await new Promise(resolve => f.win.setTimeout(resolve, 100)); assertEdge();
+      Object.defineProperties(f.win, { innerWidth: { configurable: true, value: 800 }, innerHeight: { configurable: true, value: 600 } });
+      f.win.dispatchEvent(new f.win.Event('resize')); assertEdge();
+      f.component._lastroWindowState!.dispose();
+    },
+  );
+
+  it('keeps a docked corner flush while fitting and restoring an oversized window', () => {
+    const f = fixture(1.5, 1, { x: 9, y: 7 });
+    Object.defineProperties(f.win, { innerWidth: { configurable: true, value: 240 }, innerHeight: { configurable: true, value: 120 } });
+    f.component._isDraggable = true; f.component.magnet.RIGHT = f.component.magnet.BOTTOM = true;
+    lastroUiWindowAppend(f.component, { save: vi.fn() }, () => {}, () => {});
+    const assertCorner = () => {
+      const rect = f.host.getBoundingClientRect();
+      expect(rect.right).toBeCloseTo(f.win.innerWidth); expect(rect.bottom).toBeCloseTo(f.win.innerHeight);
+      expect(rect.left).toBeGreaterThanOrEqual(-0.01); expect(rect.top).toBeGreaterThanOrEqual(-0.01);
+    };
+    assertCorner(); expect(f.host.style.scale).toBe('0.8');
+    Object.defineProperties(f.win, { innerWidth: { configurable: true, value: 160 }, innerHeight: { configurable: true, value: 200 } });
+    f.win.dispatchEvent(new f.win.Event('resize')); assertCorner();
+    Object.defineProperties(f.win, { innerWidth: { configurable: true, value: 1200 }, innerHeight: { configurable: true, value: 900 } });
+    f.win.dispatchEvent(new f.win.Event('resize')); assertCorner(); expect(f.host.style.scale).toBe('1');
+    f.component._lastroWindowState!.dispose();
   });
 
   it('uses neighboring transformed window bounds while preserving native magnet snapping', () => {

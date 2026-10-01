@@ -35,6 +35,13 @@ function harness(write?: (chunk: Uint8Array) => Promise<void>, dependencies: Par
 afterEach(() => vi.unstubAllGlobals());
 
 describe('Direct TCP lifecycle', () => {
+  it('does not open a native connection when cancelled before initialization', async () => {
+    const h = harness(); h.socket.close();
+    await Promise.resolve();
+    expect(h.options).toEqual([]); expect(h.close).not.toHaveBeenCalled();
+    expect(h.socket.onComplete).toHaveBeenCalledExactlyOnceWith(false);
+  });
+
   it('yields between buffered read batches so input and render tasks can run', async () => {
     const gate = deferred<void>();
     const yieldToMain = vi.fn().mockImplementationOnce(() => gate.promise).mockResolvedValue(undefined);
@@ -159,7 +166,9 @@ describe('Direct TCP lifecycle', () => {
 
   it('closes a late open without firing a successful connection callback', async () => {
     const h = harness();
+    await Promise.resolve();
     h.socket.close();
+    expect(h.close).not.toHaveBeenCalled();
     h.opened.resolve({ readable: h.readable, writable: h.writable });
     await vi.waitFor(() => expect(h.close).toHaveBeenCalledOnce());
     expect(h.socket.onComplete).toHaveBeenCalledExactlyOnceWith(false);

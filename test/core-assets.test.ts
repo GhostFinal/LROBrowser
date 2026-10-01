@@ -55,6 +55,15 @@ describe('core executable asset importer', () => {
     await expect(importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules, output: f.output })).rejects.toThrow(/symlink/);
   });
 
+  it('omits the unused navigation debugging entry from the game package', async () => {
+    const f = await fixture();
+    await writeFile(path.join(f.modules, 'lastro-navigation-debug.mjs'), 'export const installNavigationDebug = () => {};');
+    const manifest = await importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules, output: f.output });
+    expect(manifest.files.some(file => file.path === 'runtime/lastro-navigation-debug.mjs')).toBe(false);
+    await expect(readFile(path.join(f.output, 'runtime/lastro-navigation-debug.mjs'))).rejects.toMatchObject({ code: 'ENOENT' });
+    expect(manifest.files.some(file => file.path === 'runtime/lastro-example.mjs')).toBe(true);
+  });
+
   it('rejects unsupported core assets instead of silently changing the package', async () => {
     const f = await fixture();
     await writeFile(path.join(f.core, 'data/luafiles514/lua files/sub/ignored.bmp'), 'unsupported');
@@ -83,7 +92,9 @@ describe('core executable asset importer', () => {
     await importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules,
       runtimePath: path.join(runtime, 'Online.js'), output });
     const helper = await readFile(path.join(output, 'runtime/lastro-trusted-dom.mjs'), 'utf8');
-    expect(helper).toContain('const POLICY_KEY');
+    expect(helper).toBe(await readFile('src/runtime/lastro-trusted-dom.mjs', 'utf8'));
+    expect(helper).toContain('const policies = new WeakMap();');
+    expect(helper).not.toContain('__lastroIwaHtmlPolicy');
     expect(helper).not.toContain('from "./lastro-trusted-dom.mjs"');
   });
 

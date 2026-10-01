@@ -269,6 +269,7 @@ export function buildLastROLoginRequest(
   password: string,
   session?: LastROLoginSession,
 ): LastROLoginRequest {
+  if (phase !== 'check' && phase !== 'checkin') throw new Error('Invalid LastRO login phase');
   const field = LOGIN_FIELDS[nid];
   if (!field) throw new Error(`LastRO login HTTP does not support nid ${nid}`);
   if (typeof username !== 'string' || typeof password !== 'string') {

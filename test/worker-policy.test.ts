@@ -14,7 +14,7 @@ function harness(trusted = true) {
     return { createScriptURL: (value: string) => ({ toString: () => rule(value), value: rule(value) }) };
   });
   const context = vm.createContext({ URL, trustedTypes: trusted ? { createPolicy } : undefined });
-  vm.runInContext(helper.replaceAll('import.meta.url', JSON.stringify(base)), context);
+  vm.runInContext('let lastroWorkerPolicy;\n' + helper.replaceAll('import.meta.url', JSON.stringify(base)), context);
   return { create: (name: string) => context.createLastROWorkerScriptUrl(name),
     validate: (value: string) => rule(value), createPolicy };
 }

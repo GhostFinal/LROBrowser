@@ -77,7 +77,7 @@ export function patchResourceWorker(source) {
   }
   output = replaceOnce(output,
     'case"SET_HOST":"/"!==e.data.substr(-1)&&(e.data+="/"),se.remoteClient=e.data;break;',
-    'case"SET_HOST":"/"!==e.data.substr(-1)&&(e.data+="/"),se.remoteClient=e.data;break;case"SET_EXECUTABLE_MANIFEST":se.lastroExecutableManifest=e.data.files;break;');
+    'case"SET_HOST":"/"!==e.data.substr(-1)&&(e.data+="/"),se.remoteClient=e.data;break;case"SET_EXECUTABLE_MANIFEST":se.lastroExecutableManifest=LastROResources.snapshotPackageManifest(e.data?.files);break;');
   return patchElectronRequireFallbacks(output);
 }
 
@@ -111,15 +111,14 @@ export function patchResourceHandler(source) {
       '    new URL("ThreadEventHandler.js", self.location.href).href,',
       '  ]);',
       '  const trustedTypes = globalThis.trustedTypes;',
-      '  const policyKey = "__lastroIwaWorkerPolicy";',
       '  const policy = trustedTypes',
-      '    ? (globalThis[policyKey] ?? (globalThis[policyKey] = trustedTypes.createPolicy("lastro-iwa-worker", {',
+      '    ? trustedTypes.createPolicy("lastro-iwa-worker", {',
       '        createScriptURL: (value) => {',
       '          const candidate = new URL(value, self.location.href);',
       '          if (!allowedWorkerScriptUrls.has(candidate.href)) throw new TypeError("Unexpected worker URL");',
       '          return candidate.href;',
       '        },',
-      '      })))',
+      '      })',
       '    : null;',
       '  function createLastROWorkerScriptUrl(relativePath) {',
       '    if (relativePath !== "lastro-resource-loader.js" && relativePath !== "ThreadEventHandler.js") {',

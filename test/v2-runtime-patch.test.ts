@@ -198,20 +198,41 @@ end`;
       'function onPlayerMessage(pkt) { ChatBox_default.addText(pkt.msg); }',
       'function onEntityTalkColor(pkt) { ChatBox_default.addText(pkt.msg); }',
       'function onConnectionRequest(username, password) {',
-      '\tNetwork.connect(_server.address, _server.port, (success) => {',
-      '\t\tif (!success) return;',
-      '\t\tlet pkt;',
-      '\t\tfunction sendLogin() {',
-      '\t\t\tif (Configs.get("loginMode") == "han") {',
-      '\t\t\t\tpkt = new PACKET.CA.LOGIN_HAN();',
-      '\t\t\t\tNetwork.sendPacket(pkt);',
-      '\t\t\t} else {',
-      '\t\t\t\tpkt = new PACKET.CA.LOGIN();',
-      '\t\t\t\tNetwork.sendPacket(pkt);',
-      '\t\t\t}',
-      '\t\t}',
-      '\t});',
+      '  SoundManager.play("fixture-login.wav");',
+      '  Network.connect(_server.address, _server.port, (success) => {',
+      '    if (!success) {',
+      '      return;',
+      '    }',
+      '    let pkt;',
+      '    function sendLogin() {',
+      '      if (Configs.get("loginMode") == "han") {',
+      '        pkt = new PACKET.CA.LOGIN_HAN();',
+      '        Network.sendPacket(pkt);',
+      '      } else {',
+      '        pkt = new PACKET.CA.LOGIN();',
+      '        Network.sendPacket(pkt);',
+      '      }',
+      '    }',
+      '  });',
       '}',
+      'function initializeLoginConfig() {',
+      '      const autoLogin = Configs.get("autoLogin");',
+      '      if (autoLogin instanceof Array && autoLogin[0] && autoLogin[1]) {',
+      '        onConnectionRequest.apply(null, autoLogin);',
+      '        Configs.set("autoLogin", null);',
+      '      }',
+      '}',
+      'function initializeNetworkDebug() {',
+      '  packetDump = Configs.get("packetDump", false);',
+      '}',
+      'Plugins.init = function initPlugins() { this.list = Configs.get("plugins", []); };',
+      '//#region src/UI/Components/Storage/Fixture.js',
+      'function renderStorageListFixture() { nameSpan.innerHTML = DB.getItemName(item); }',
+      'function renderStorageGridFixture() { nameSpan.innerHTML = DB.getItemName(item); }',
+      'function renderStorageListOverlayFixture() { overlay.innerHTML = `${DB.getItemName(item)} ${item.count || 1}${getItemCountUnit()}`; }',
+      'function renderStorageGridOverlayFixture() { overlay.innerHTML = `${DB.getItemName(item)} ${item.count || 1}${getItemCountUnit()}`; }',
+      '//#endregion',
+      'function renderCharacterFixture() { charCanvases[i].querySelector(".name").innerHTML = _slots[i] ? _slots[i].name : ""; }',
       'function init_NetworkManager() { init_WebSocket(); init_NodeSocket(); }',
       'function init() {\n\troInitSpinner.add();\n\tPlugins.init();\n\tGameEngine.init();\n}',
       'function initThread() {\n\tif (!_source) _source = new Worker(new URL(\n\t\t/* @vite-ignore */\n\t\t"" + new URL("LastROThreadEventHandler.js", import.meta.url).href,\n\t\t"" + import.meta.url\n\t), { type: "classic" });\n\tif (_source instanceof Worker) _source.addEventListener("message", Thread.receive, false);\n}',
@@ -258,9 +279,14 @@ end`;
     expect(patched).toContain('const resumeAudioContexts = () => {');
     expect(patched).toContain('lastro-account-login.mjs');
     expect(patched).toContain('installLastROLogin({ root, component: Component, configs: Configs })');
-    expect(patched).toContain('LastROLoginBeforeConnect');
-    expect(patched).toContain('LastROLoginAfterPassword');
-    expect(patched).toContain('Network.sendPacket(pkt);\n\t\t\t\tif (typeof globalThis.LastROLoginAfterPassword');
+    expect(patched).toContain('beforeLastROLoginConnect(user, pass)');
+    expect(patched).toContain('Network.sendPacket(pkt);\n        afterLastROLoginPassword(username, password);');
+    expect(patched).not.toContain('globalThis.LastROLoginBeforeConnect');
+    expect(patched).not.toContain('globalThis.LastROLoginAfterPassword');
+    expect(patched).toContain('finally { autoLogin = null; }');
+    expect(patched).toContain('packetDump = false;');
+    expect(patched).not.toContain('Configs.get("plugins", [])');
+    expect(patched).toContain('nameSpan.textContent = DB.getItemName(item)');
     expect(patched).toContain('globalThis;');
     expect(patched).toContain('Dynamic templates are disabled in the IWA runtime');
     expect(patched).toContain('trustedTypes.createPolicy("lastro-iwa-worker"');
