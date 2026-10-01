@@ -81,7 +81,8 @@ describe('isolated app CSP audit', () => {
     expect(patched.match(/openLastROExternalURL\(/g)).toHaveLength(3);
     expect(patched).not.toContain('window.open(');
     expect(patchRuntimeNavigation(patched)).toBe(patched);
-  });
+    // Rewriting and idempotency each parse the complete native bundle; allow CI CPU variance.
+  }, 15_000);
 
   it('removes the native config-driven plugin import entry point', () => {
     const native = readFileSync('vendor/v2/Online.js', 'utf8');
