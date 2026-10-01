@@ -32,6 +32,35 @@ export function patchResourceWorker(source) {
         if (Object.hasOwn(replacements, name)) target(name, member, replacements[name]);
       }
     }
+    if (ts.isVariableDeclaration(node) && node.name.getText(file) === 'fe' && node.initializer && ts.isClassExpression(node.initializer)) {
+      const load = node.initializer.members.find(member => member.name?.getText(file) === 'load');
+      if (!load?.body) throw new Error('worker-anchor-map-load');
+      const callbacks = [], failures = [];
+      function findCallbacks(child) {
+        if ((ts.isFunctionDeclaration(child) && ['i', 'a'].includes(child.name?.text)) || ts.isFunctionExpression(child)) callbacks.push(child);
+        if (ts.isCallExpression(child) && child.expression.getText(file) === 'e.onload' && child.arguments.length === 2) failures.push(child);
+        ts.forEachChild(child, findCallbacks);
+      }
+      findCallbacks(load.body);
+      if (callbacks.length !== 4 || failures.length !== 3 || callbacks.filter(callback => callback.parameters.length === 1).length !== 3
+        || callbacks.filter(callback => callback.parameters.length === 2).length !== 1) throw new Error('worker-anchor-map-callbacks');
+      const edits = [];
+      for (const callback of callbacks) {
+        if (callback.parameters.length === 1) edits.push({ start: callback.parameters[0].end, end: callback.parameters[0].end, text: ',lastroError' });
+        edits.push({ start: callback.body.getStart(file) + 1, end: callback.body.getStart(file) + 1, text: 'try{' });
+        edits.push({ start: callback.body.end - 1, end: callback.body.end - 1, text: '}catch(error){e.onload(false,error instanceof Error?error.message:String(error));}' });
+      }
+      for (const failure of failures) {
+        const argument = failure.arguments[1];
+        edits.push({ start: argument.getStart(file), end: argument.getStart(file), text: 'lastroError||' });
+      }
+      let text = load.getText(file);
+      const begin = load.getStart(file);
+      for (const edit of edits.sort((a, b) => b.start - a.start)) {
+        text = text.slice(0, edit.start - begin) + edit.text + text.slice(edit.end - begin);
+      }
+      target('map-load', load, text);
+    }
     if (ts.isCaseClause(node) && ts.isStringLiteral(node.expression) && node.expression.text === 'CLIENT_INIT') {
       // IWA uses IndexedDB, not the legacy filesystem or DATA.INI/GRF scan.
       target('CLIENT_INIT', node, 'case"CLIENT_INIT":se.clean();postMessage({uid:e.uid,arguments:[0,null,e.data]});break;');
@@ -39,7 +68,7 @@ export function patchResourceWorker(source) {
     ts.forEachChild(node, visit);
   }
   visit(file);
-  for (const name of [...Object.keys(replacements), 'CLIENT_INIT']) {
+  for (const name of [...Object.keys(replacements), 'CLIENT_INIT', 'map-load']) {
     if (!targets.has(name)) throw new Error('worker-anchor-missing:' + name);
   }
   let output = source;
@@ -48,7 +77,7 @@ export function patchResourceWorker(source) {
   }
   output = replaceOnce(output,
     'case"SET_HOST":"/"!==e.data.substr(-1)&&(e.data+="/"),se.remoteClient=e.data;break;',
-    'case"SET_HOST":"/"!==e.data.substr(-1)&&(e.data+="/"),se.remoteClient=e.data;break;case"SET_EXECUTABLE_MANIFEST":se.lastroExecutableManifest=e.data.files;break;');
+    'case"SET_HOST":"/"!==e.data.substr(-1)&&(e.data+="/"),se.remoteClient=e.data;break;case"SET_EXECUTABLE_MANIFEST":se.lastroExecutableManifest=LastROResources.snapshotPackageManifest(e.data?.files);break;');
   return patchElectronRequireFallbacks(output);
 }
 
@@ -82,15 +111,14 @@ export function patchResourceHandler(source) {
       '    new URL("ThreadEventHandler.js", self.location.href).href,',
       '  ]);',
       '  const trustedTypes = globalThis.trustedTypes;',
-      '  const policyKey = "__lastroIwaWorkerPolicy";',
       '  const policy = trustedTypes',
-      '    ? (globalThis[policyKey] ?? (globalThis[policyKey] = trustedTypes.createPolicy("lastro-iwa-worker", {',
+      '    ? trustedTypes.createPolicy("lastro-iwa-worker", {',
       '        createScriptURL: (value) => {',
       '          const candidate = new URL(value, self.location.href);',
       '          if (!allowedWorkerScriptUrls.has(candidate.href)) throw new TypeError("Unexpected worker URL");',
       '          return candidate.href;',
       '        },',
-      '      })))',
+      '      })',
       '    : null;',
       '  function createLastROWorkerScriptUrl(relativePath) {',
       '    if (relativePath !== "lastro-resource-loader.js" && relativePath !== "ThreadEventHandler.js") {',

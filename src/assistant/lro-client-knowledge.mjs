@@ -51,23 +51,24 @@ function mapCard(assistant,page,key,map,current,count) {
   const actions=assistant.getAmdModule('UI/WorldMapActions');
   button.disabled=typeof actions?.teleport!=='function';
   if(button.disabled)button.title='原生传送功能尚未就绪';
-  button.addEventListener('click',()=>{
+  button.addEventListener('click',async()=>{
     if(button.disabled || !current())return;
     if(!assistant.getAmdModule('Engine/SessionStorage')?.Entity){status.textContent='请先进入游戏';return;}
     button.disabled=true;
+    status.textContent='正在检查目标地图…';
     try{
-      const sent=actions.teleport(key);
-      status.textContent=sent ? '已提交原生传送请求，结果以游戏提示为准。' : '当前无法使用原生传送。';
-    }catch{status.textContent='原生传送请求失败。';}
+      const sent=await actions.teleport(key);
+      if(current())status.textContent=sent ? '已提交原生传送请求，结果以游戏提示为准。' : '当前无法使用原生传送。';
+    }catch{if(current())status.textContent='原生传送请求失败。';}
     page.setTimeout(()=>{button.disabled=false;},1000);
   });
   card.append(title,population,image,status,button);
   const client=assistant.getAmdModule('Core/Client'),db=assistant.getAmdModule('DB/DBManager');
   let finished=false;
-  const fail=()=>{if(!finished&&current()){finished=true;status.textContent='客户端未提供这张地图的图像';}};
+  const fail=()=>{if(!finished&&current()){finished=true;if(status.textContent==='正在读取地图图像…')status.textContent='客户端未提供这张地图的图像';}};
   const timeout=page.setTimeout(fail,8000);
   image.onload=()=>{if(current()){image.hidden=false;if(status.textContent==='正在读取地图图像…')status.textContent='';}};
-  image.onerror=()=>{image.hidden=true;status.textContent='地图图像加载失败';};
+  image.onerror=()=>{image.hidden=true;if(status.textContent==='正在读取地图图像…')status.textContent='地图图像加载失败';};
   try{
     if(!client?.loadFile || !db?.INTERFACE_PATH)fail();
     else client.loadFile(`${db.INTERFACE_PATH}map/${key}.bmp`,url=>{

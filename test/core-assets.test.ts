@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { describe, expect, it, afterEach } from 'vitest';
 import { importCoreAssets } from '../scripts/import-core-assets.mjs';
@@ -51,8 +51,24 @@ describe('core executable asset importer', () => {
 
   it('rejects symlinked executable inputs', async () => {
     const f = await fixture();
-    await symlink(path.join(f.root, 'outside.lua'), path.join(f.core, 'data/luafiles514/lua files/sub/outside.lua'));
+    const directory = path.join(f.root, 'outside');
+    await mkdir(directory);
+    const file = path.join(directory, 'outside.lua');
+    await writeFile(file, 'return "synthetic-linked-executable"');
+    const link = path.join(f.core, 'data/luafiles514/lua files/sub/outside.lua');
+    // Windows junctions exercise the same rejection without symlink privileges.
+    await symlink(process.platform === 'win32' ? directory : file, link, process.platform === 'win32' ? 'junction' : 'file');
+    expect((await lstat(link)).isSymbolicLink()).toBe(true);
     await expect(importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules, output: f.output })).rejects.toThrow(/symlink/);
+  });
+
+  it('omits the unused navigation debugging entry from the game package', async () => {
+    const f = await fixture();
+    await writeFile(path.join(f.modules, 'lastro-navigation-debug.mjs'), 'export const installNavigationDebug = () => {};');
+    const manifest = await importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules, output: f.output });
+    expect(manifest.files.some(file => file.path === 'runtime/lastro-navigation-debug.mjs')).toBe(false);
+    await expect(readFile(path.join(f.output, 'runtime/lastro-navigation-debug.mjs'))).rejects.toMatchObject({ code: 'ENOENT' });
+    expect(manifest.files.some(file => file.path === 'runtime/lastro-example.mjs')).toBe(true);
   });
 
   it('rejects unsupported core assets instead of silently changing the package', async () => {
@@ -83,7 +99,9 @@ describe('core executable asset importer', () => {
     await importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules,
       runtimePath: path.join(runtime, 'Online.js'), output });
     const helper = await readFile(path.join(output, 'runtime/lastro-trusted-dom.mjs'), 'utf8');
-    expect(helper).toContain('const POLICY_KEY');
+    expect(helper).toBe(await readFile('src/runtime/lastro-trusted-dom.mjs', 'utf8'));
+    expect(helper).toContain('const policies = new WeakMap();');
+    expect(helper).not.toContain('__lastroIwaHtmlPolicy');
     expect(helper).not.toContain('from "./lastro-trusted-dom.mjs"');
   });
 

@@ -1,3 +1,4 @@
+import { REQUIRED_HEADERS } from '../iwa-security.mjs';
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
@@ -13,14 +14,11 @@ const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; cha
   '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json', '.webmanifest': 'application/manifest+json',
   '.wasm': 'application/wasm', '.png': 'image/png', '.svg': 'image/svg+xml',
-  '.otf': 'font/otf', '.ttf': 'font/ttf' };
+  '.otf': 'font/otf', '.ttf': 'font/ttf', '.woff2': 'font/woff2' };
 await stat(path.join(root, 'index.html'));
 await stat(path.join(root, 'runtime/lro-assistant.mjs'));
 const server = http.createServer(async (request, response) => {
-  response.setHeader('Content-Security-Policy', "script-src 'self' 'wasm-unsafe-eval'");
-  response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  response.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-  response.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+  for (const [name, value] of Object.entries(REQUIRED_HEADERS)) response.setHeader(name, value);
   response.setHeader('Cache-Control', 'no-store');
   const route = new URL(request.url, 'http://127.0.0.1');
   if (route.pathname === '/__lro_market/search') {

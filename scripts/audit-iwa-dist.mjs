@@ -2,16 +2,13 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 import { auditRuntimeSource } from './audit-runtime-code.mjs';
+import { REQUIRED_HEADERS } from './iwa-security.mjs';
+/* eslint-disable no-control-regex -- Reject control characters in untrusted package paths. */
 
 const ALLOWED_ORIGINS = new Set(['https://game.lastro.cn', 'https://rodata.ltsd.ro', 'https://ltsd.ro']);
 const NON_RESOURCE_ORIGINS = new Set(['http://www.w3.org']);
-const REQUIRED_HEADERS = {
-  'Content-Security-Policy': "script-src 'self' 'wasm-unsafe-eval'",
-  'Cross-Origin-Opener-Policy': 'same-origin',
-  'Cross-Origin-Embedder-Policy': 'require-corp',
-  'Cross-Origin-Resource-Policy': 'same-origin',
-};
 const REMOTE_EXECUTABLE = /https?:\/\/[^\s"'`]+\.(?:js|mjs|cjs|wasm|lua|lub)(?:[?#]|$)/i;
 const PROHIBITED_TEXT = [
   ['socket-proxy', /socketProxy/i],
@@ -26,6 +23,7 @@ async function walk(root) {
   async function visit(directory) {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
       const fullPath = path.join(directory, entry.name);
+      if (entry.isSymbolicLink()) throw new Error('symlink in distribution');
       if (entry.isDirectory()) await visit(fullPath);
       else if (entry.isFile()) files.push(fullPath);
     }
@@ -42,7 +40,8 @@ function validateProtocolHandlers(manifest) {
   if (!('protocol_handlers' in manifest)) return;
   if (!Array.isArray(manifest.protocol_handlers) || manifest.protocol_handlers.some((handler) => (
     !handler || typeof handler.protocol !== 'string' || !/^web\+[a-z]+$/.test(handler.protocol)
-    || typeof handler.url !== 'string' || !handler.url.includes('%s')
+    || typeof handler.url !== 'string' || !handler.url.startsWith('/') || handler.url.startsWith('//')
+    || /[\\\x00-\x20\x7f]/.test(handler.url) || !handler.url.includes('%s')
   ))) throw new Error('invalid protocol handler');
 }
 
@@ -70,10 +69,17 @@ export async function auditDist(distDirectory, reportPath = path.resolve('releas
   if (!relativeFiles.includes(coreManifestRelative)) throw new Error('missing executable asset manifest');
   const coreManifest = readManifestJson(await readFile(path.join(dist, coreManifestRelative), 'utf8'), 'core executable manifest');
   if (!Array.isArray(coreManifest.files)) throw new Error('core executable manifest has no files array');
+  const manifestEntries = new Map();
   for (const entry of coreManifest.files) {
-    if (!entry || typeof entry.path !== 'string' || !relativeFiles.includes(`core/${entry.path}`)) {
+    if (!entry || typeof entry.path !== 'string' || /[\\%:#?\x00-\x1f\x7f]/.test(entry.path)
+      || entry.path.split('/').some(part => !part || part === '.' || part === '..')
+      || !relativeFiles.includes(`core/${entry.path}`)) {
       throw new Error(`missing executable asset: ${entry?.path ?? '<invalid>'}`);
     }
+    if (manifestEntries.has(entry.path)) throw new Error('duplicate executable asset');
+    if (!Number.isSafeInteger(entry.bytes) || entry.bytes < 0 || !/^[a-f0-9]{64}$/.test(entry.sha256)
+      || !['runtime', 'lua', 'lub', 'wasm', 'data-json', 'passive'].includes(entry.kind)) throw new Error('invalid executable asset integrity');
+    manifestEntries.set(entry.path, entry);
   }
   if (relativeFiles.some((file) => file.endsWith('.map'))) throw new Error('source maps are not allowed in the IWA bundle');
 
@@ -82,9 +88,11 @@ export async function auditDist(distDirectory, reportPath = path.resolve('releas
   const prohibitedResults = [];
   const bytesByCategory = {};
   let totalBytes = 0;
+  const contentHashes = new Map();
   for (const file of files) {
     const relative = path.relative(dist, file).replaceAll(path.sep, '/');
     const bytes = await readFile(file);
+    contentHashes.set(relative, { bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') });
     totalBytes += bytes.byteLength;
     const category = relative.startsWith('core/') ? 'core' : relative.startsWith('runtime/') ? 'runtime' : 'app';
     bytesByCategory[category] = (bytesByCategory[category] ?? 0) + bytes.byteLength;
@@ -113,6 +121,24 @@ export async function auditDist(distDirectory, reportPath = path.resolve('releas
   if (unapprovedOrigins.length) throw new Error(`unapproved remote origins: ${unapprovedOrigins.join(', ')}`);
   if (prohibitedResults.length) throw new Error(`prohibited bundle content: ${prohibitedResults.map((item) => `${item.name}@${item.file}`).join(', ')}`);
 
+  const runtimeAliases = new Map();
+  for (const [file, expected] of manifestEntries) {
+    const actual = contentHashes.get('core/' + file);
+    if (actual.bytes !== expected.bytes || actual.sha256 !== expected.sha256) throw new Error('executable asset integrity mismatch: ' + file);
+    if (expected.kind === 'runtime') {
+      const aliasPath = 'runtime/' + path.posix.basename(file);
+      const previous = runtimeAliases.get(aliasPath);
+      if (previous && previous !== expected.sha256) throw new Error('ambiguous runtime alias: ' + aliasPath);
+      runtimeAliases.set(aliasPath, expected.sha256);
+      const alias = contentHashes.get(aliasPath);
+      if ((!alias && file.startsWith('runtime/')) || (alias && alias.sha256 !== expected.sha256)) throw new Error('runtime alias integrity mismatch: ' + file);
+    }
+  }
+  for (const file of relativeFiles) {
+    if (file.startsWith('core/') && /\.(?:[cm]?js|lua|lub|wasm)$/i.test(file) && !manifestEntries.has(file.slice(5))) throw new Error('unlisted executable asset: ' + file);
+    if (file.startsWith('runtime/') && !runtimeAliases.has(file)) throw new Error('unlisted runtime asset: ' + file);
+  }
+
   await mkdir(path.dirname(reportPath), { recursive: true });
   const report = {
     bundleVersion: manifest.version,
@@ -121,16 +147,16 @@ export async function auditDist(distDirectory, reportPath = path.resolve('releas
     bytesByCategory,
     navigationOrigins: [...navigationOrigins],
     externalOrigins: [...originSet].filter((origin) => ALLOWED_ORIGINS.has(origin)),
-    coreManifestSummary: { fileCount: coreManifest.files.length, packagedBytes: coreManifest.bytes },
+    coreManifestSummary: { fileCount: coreManifest.files.length, packagedBytes: coreManifest.files.reduce((sum, file) => sum + file.bytes, 0) },
     prohibitedPatternResults: [],
     requiredHeaders: REQUIRED_HEADERS,
-    sha256: createHash('sha256').update(files.map((file) => path.relative(dist, file)).join('\n')).digest('hex'),
+    sha256: createHash('sha256').update(JSON.stringify([...contentHashes.entries()])).digest('hex'),
   };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   return report;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const dist = process.argv[2] ?? 'dist';
   const report = await auditDist(dist, process.argv[3] ?? path.resolve('release/audit-report.json'));
   process.stdout.write(`${JSON.stringify(report)}\n`);

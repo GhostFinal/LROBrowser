@@ -4,6 +4,8 @@ export interface DirectSocketDependencies {
   TCPSocket?: DirectTcpConstructor;
   schedule?: (callback: () => void) => void;
   reportError?: (error: unknown) => void;
+  yieldToMain?: () => Promise<void>;
+  now?: () => number;
 }
 
 export class DirectTcpSocket implements LegacyClientSocket {
@@ -19,6 +21,8 @@ export class DirectTcpSocket implements LegacyClientSocket {
   private readonly constructorForSocket: DirectTcpConstructor | undefined;
   private readonly schedule: (callback: () => void) => void;
   private readonly reportError: (error: unknown) => void;
+  private readonly yieldToMain: () => Promise<void>;
+  private readonly now: () => number;
   private native?: DirectTcpConnection;
   private reader?: ReadableStreamDefaultReader<Uint8Array>;
   private writer?: WritableStreamDefaultWriter<Uint8Array>;
@@ -26,6 +30,7 @@ export class DirectTcpSocket implements LegacyClientSocket {
   private completed = false;
   private terminated = false;
   private openedSuccessfully = false;
+  private nativeOpened = false;
   private closeRequested = false;
   private nativeCloseRequested = false;
 
@@ -37,10 +42,13 @@ export class DirectTcpSocket implements LegacyClientSocket {
     this.reportError = dependencies.reportError ?? ((error) => {
       globalThis.reportError?.(error);
     });
+    this.yieldToMain = dependencies.yieldToMain ?? (() => new Promise(resolve => globalThis.setTimeout(resolve, 0)));
+    this.now = dependencies.now ?? (() => globalThis.performance.now());
     this.schedule(() => { void this.initialize(); });
   }
 
   send(buffer: ArrayBuffer): void {
+    if (this.terminated) return;
     const copy = new Uint8Array(buffer.slice(0));
     this.writeTail = this.writeTail.then(async () => {
       if (this.terminated || !this.writer) return;
@@ -57,12 +65,16 @@ export class DirectTcpSocket implements LegacyClientSocket {
       this.terminated = true;
       this.connected = false;
       this.notifyComplete(false);
+      this.requestNativeClose();
       return;
     }
     this.terminate();
   }
 
   private async initialize(): Promise<void> {
+    // Legacy callbacks are installed before this microtask runs. A cancellation
+    // during that gap must not create an unwanted outbound connection.
+    if (this.terminated || this.closeRequested) return;
     try {
       if (!this.constructorForSocket) throw new Error('Direct TCP 不受当前环境支持');
       const native = new this.constructorForSocket(this.host, this.port, { noDelay: true, keepAliveDelay: 60_000 });
@@ -75,6 +87,7 @@ export class DirectTcpSocket implements LegacyClientSocket {
   }
 
   private handleOpened(info: { readable: ReadableStream<Uint8Array>; writable: WritableStream<Uint8Array> }): void {
+    this.nativeOpened = true;
     if (this.terminated || this.closeRequested) {
       const reader = info.readable.getReader();
       const writer = info.writable.getWriter();
@@ -98,6 +111,8 @@ export class DirectTcpSocket implements LegacyClientSocket {
     const reader = this.reader;
     if (!reader) return;
     try {
+      let readCount = 0;
+      let workDuration = 0;
       while (!this.terminated) {
         const result = await reader.read();
         if (result.done) {
@@ -105,9 +120,16 @@ export class DirectTcpSocket implements LegacyClientSocket {
           return;
         }
         if (!this.terminated && result.value) {
+          const started = this.now();
           const value = result.value;
           const bytes = new Uint8Array(value).slice().buffer;
           this.safeInvoke(() => this.onMessage?.(bytes));
+          workDuration += Math.max(0, this.now() - started);
+          if (++readCount >= 8 || workDuration >= 4) {
+            await this.yieldToMain();
+            readCount = 0;
+            workDuration = 0;
+          }
         }
       }
     } catch (error) {
@@ -121,6 +143,7 @@ export class DirectTcpSocket implements LegacyClientSocket {
     this.connected = false;
     this.notifyComplete(false);
     this.report(error);
+    this.requestNativeClose();
   }
 
   private handleNativeClosed(error?: unknown): void {
@@ -157,7 +180,9 @@ export class DirectTcpSocket implements LegacyClientSocket {
   }
 
   private requestNativeClose(): void {
-    if (this.nativeCloseRequested || !this.native) return;
+    // TCPSocket.close rejects while opened is pending. On cancellation
+    // keep the late-open handler responsible for releasing the streams first.
+    if (this.nativeCloseRequested || !this.native || !this.nativeOpened) return;
     this.nativeCloseRequested = true;
     try {
       void this.native.close().catch(error => this.report(error));

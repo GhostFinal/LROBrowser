@@ -269,6 +269,7 @@ export function createDirectHttpFetch(options: DirectHttpOptions = {}): typeof g
     const url = asUrl(input);
     const host = RESOURCE_ROOTS.get(url.origin);
     if (!host) throw new Error('Direct HTTP only permits approved resource origins');
+    if (url.username || url.password) throw new Error('Public resource requests cannot include credentials');
     if (!url.pathname.startsWith('/ro/client_re/') || url.search || url.hash) {
       throw new Error('Direct HTTP only permits passive resource paths');
     }
@@ -279,7 +280,7 @@ export function createDirectHttpFetch(options: DirectHttpOptions = {}): typeof g
     if (url.origin === 'https://rodata.ltsd.ro') {
       if (!nativeFetch) throw new Error('HTTPS fetch is unavailable for the backup resource origin');
       return nativeFetch(url, {
-        ...init,
+        method: 'GET',
         signal,
         redirect: 'error',
         credentials: 'omit',

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -15,7 +16,9 @@ it.each([
     await mkdir(path.join(root, 'core'), { recursive: true });
     await mkdir(path.join(root, 'core/runtime'), { recursive: true });
     await writeFile(path.join(root, '.well-known/manifest.webmanifest'), JSON.stringify({ version: '0.3.0' }));
-    await writeFile(path.join(root, 'core/executable-assets.json'), JSON.stringify({ files: [{ path: file, kind: 'runtime' }], bytes: 1 }));
+    await writeFile(path.join(root, 'core/executable-assets.json'), JSON.stringify({ files: [{ path: file, kind: 'runtime', bytes: Buffer.byteLength(source), sha256: createHash('sha256').update(source).digest('hex') }] }));
+    await mkdir(path.join(root, 'runtime'), { recursive: true });
+    await writeFile(path.join(root, file), source);
     await writeFile(path.join(root, 'core', file), source);
     const result = auditDist(root, path.join(root, 'report.json'));
     if (allowed) expect((await result).externalOrigins).toEqual([]);

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -38,7 +38,7 @@ describe('reviewed V2 import gate', () => {
     expect(result.status).toBe(0);
     expect(result.stderr + result.stdout).not.toMatch(/synthetic-user|synthetic-password/);
     expect(existsSync(path.join(f.output, 'v2/lastro-v2-config.js'))).toBe(false);
-    expect(await readdir(path.join(f.output, 'v2'))).toEqual(files);
+    expect((await readdir(path.join(f.output, 'v2'))).sort()).toEqual(files);
   });
 
   it('rejects an attempt to allowlist the personal config', async () => {
@@ -74,7 +74,7 @@ describe('reviewed V2 import gate', () => {
     expect(f.run().status).toBe(0);
     const first = await readFile(path.join(f.output, 'v2-manifest.json'), 'utf8');
     const manifest = JSON.parse(first);
-    expect(await readdir(path.join(f.output, 'v2'))).toEqual(files);
+    expect((await readdir(path.join(f.output, 'v2'))).sort()).toEqual(files);
     expect(manifest.files.map((entry: { path: string }) => entry.path)).toEqual(files);
     for (const entry of manifest.files) {
       const bytes = await readFile(path.join(f.source, entry.path));
@@ -152,11 +152,22 @@ describe('reviewed V2 import gate', () => {
     expect(await readFile(path.join(f.output, 'v2/lastro-example.mjs'), 'utf8')).toBe(previous);
   });
 
-  it('rejects symlinks and path traversal before staging', async () => {
+  it('rejects symlinks before staging', async () => {
     const f = await fixture();
-    await rm(path.join(f.source, 'lastro-example.mjs'));
-    await symlink(path.join(f.source, 'Online.js'), path.join(f.source, 'lastro-example.mjs'));
+    const link = path.join(f.source, 'lastro-example.mjs');
+    await rm(link);
+    const directory = path.join(f.root, 'outside');
+    await mkdir(directory);
+    await writeFile(path.join(directory, 'linked.mjs'), 'export const linked = true;');
+    await symlink(process.platform === 'win32' ? directory : path.join(f.source, 'Online.js'), link,
+      process.platform === 'win32' ? 'junction' : 'file');
+    expect((await lstat(link)).isSymbolicLink()).toBe(true);
     expect(f.run().stderr).toContain('symlink');
+    expect(existsSync(f.output)).toBe(false);
+  });
+
+  it('rejects path traversal before staging', async () => {
+    const f = await fixture();
     await writeFile(f.allowlist, JSON.stringify({ files: ['../escape.js'] }));
     expect(f.run().stderr).toContain('invalid-path');
     expect(existsSync(f.output)).toBe(false);

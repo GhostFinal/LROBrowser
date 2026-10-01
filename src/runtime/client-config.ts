@@ -1,5 +1,6 @@
 import type { AvailableServerProfile } from '../servers/server-profile';
 import { getAvailableServerProfile, LASTRO_SERVER_PROFILES } from '../servers/server-profiles';
+import { validateAccountCredentials } from '../accounts/account-storage.mjs';
 
 export interface ClientCredentials {
   username: string;
@@ -41,8 +42,14 @@ export interface V2ClientConfig {
   readonly enableMapName: true;
   readonly enableAchievements: true;
   readonly customItemInfo: readonly string[];
-  readonly development: boolean;
-  readonly enableConsole: boolean;
+  readonly development: false;
+  readonly enableConsole: false;
+  readonly debug: false;
+  readonly debugAI: false;
+  readonly packetDump: false;
+  readonly debugUseLegacyMapEnter: false;
+  readonly debugEnterUnknown: null;
+  readonly debugEnterSex: null;
 }
 
 export function buildClientConfig(profile: AvailableServerProfile, credentials: ClientCredentials, options: { assistantEnabled?: boolean } = {}): V2ClientConfig {
@@ -50,6 +57,8 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
   const hasUsername = Boolean(credentials.username);
   const hasPassword = Boolean(credentials.password);
   if (hasUsername !== hasPassword) throw new Error('账号资料不完整');
+  if (hasUsername) validateAccountCredentials(credentials.username, credentials.password);
+  let pendingLogin: readonly [string, string] | null = hasUsername ? Object.freeze([credentials.username, credentials.password] as const) : null;
   const server = Object.freeze({
     id: available.id,
     display: available.displayName,
@@ -78,7 +87,7 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
     lroAssistantEnabled: options.assistantEnabled !== false,
     lroAssistantProfile: available.id,
     servers: Object.freeze([server] as const),
-    autoLogin: hasUsername ? Object.freeze([credentials.username, credentials.password] as const) : null,
+    get autoLogin() { const value = pendingLogin; pendingLogin = null; return value; },
     loginServerProfiles,
     lastroProtocol: true,
     lastroCustomPackets: true,
@@ -101,7 +110,9 @@ export function buildClientConfig(profile: AvailableServerProfile, credentials: 
     resourcePathCharset: 'gbk', lastroDataCharset: 'gbk', statusDescriptionCharset: 'gbk', networkCharset: 'gbk',
     loadLua: true, skipIntro: true, skipServerList: true, enableCashShop: true, enableRefineUI: true, enableMapName: true, enableAchievements: true,
     customItemInfo: Object.freeze(['System/itemInfo_re_59.lua', 'System/itemInfo_re_61.lua']),
-    development: import.meta.env.DEV,
-    enableConsole: true,
+    development: false,
+    enableConsole: false,
+    debug: false, debugAI: false, packetDump: false,
+    debugUseLegacyMapEnter: false, debugEnterUnknown: null, debugEnterSex: null,
   });
 }

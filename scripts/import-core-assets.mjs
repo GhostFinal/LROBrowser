@@ -63,6 +63,9 @@ async function addFile(entries, destinations, source, destination, kind, output)
   if (kind === 'runtime' && /runtime\/(?:Online\.js|[^/]+\.mjs)$/.test(destination)
     && path.basename(destination) !== 'lastro-trusted-dom.mjs') {
     let text = bytes.toString('utf8');
+    if (path.basename(destination) === 'lastro-account-login.mjs') {
+      text = text.replaceAll('../accounts/account-storage.mjs', './account-storage.mjs');
+    }
     if (path.basename(destination) === 'lastro-guild-emblem-request.mjs') {
       text = patchGuildEmblemRequestCallbacks(text);
     }
@@ -107,7 +110,8 @@ export async function importCoreAssets({ coreRoot, moduleRoot, runtimePath, outp
     await addFile(entries, destinations, path.join(repo, relative), `runtime/${path.basename(relative)}`, 'runtime', destinationRoot);
   }
   for (const relative of await filesUnder(modules)) {
-    if (relative === 'Online.js' || !/\.(?:[cm]?js)$/i.test(relative) || /\.test\.mjs$/i.test(relative)) continue;
+    if (relative === 'Online.js' || relative === 'lastro-navigation-debug.mjs'
+      || !/\.(?:[cm]?js)$/i.test(relative) || /\.test\.mjs$/i.test(relative)) continue;
     const patchedWorker = runtimePath && ['ThreadEventHandler.js', 'LastROThreadEventHandler.js'].includes(relative);
     const inputRoot = patchedWorker ? path.dirname(runtimePath) : modules;
     await addFile(entries, destinations, path.join(inputRoot, relative), `runtime/${path.basename(relative)}`, 'runtime', destinationRoot);

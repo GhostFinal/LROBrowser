@@ -1,0 +1,332 @@
+{
+  "6017": [
+    {
+      "sex": 0,
+      "head": 15,
+      "accessory": 160,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 11,
+      "file": "È°¿ëº´"
+    }
+  ],
+  "6018": [
+    {
+      "sex": 0,
+      "head": 16,
+      "accessory": 30,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 11,
+      "file": "È°¿ëº´"
+    }
+  ],
+  "6019": [
+    {
+      "sex": 0,
+      "head": 17,
+      "accessory": 175,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 11,
+      "file": "È°¿ëº´"
+    }
+  ],
+  "6020": [
+    {
+      "sex": 0,
+      "head": 18,
+      "accessory": 208,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 11,
+      "file": "È°¿ëº´"
+    }
+  ],
+  "6021": [
+    {
+      "sex": 0,
+      "head": 19,
+      "accessory": 214,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 11,
+      "file": "È°¿ëº´"
+    }
+  ],
+  "6022": [
+    {
+      "sex": 0,
+      "head": 20,
+      "accessory": 164,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 11,
+      "file": "È°¿ëº´"
+    }
+  ],
+  "6023": [
+    {
+      "sex": 0,
+      "head": 21,
+      "accessory": 200,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 11,
+      "file": "È°¿ëº´"
+    }
+  ],
+  "6024": [
+    {
+      "sex": 0,
+      "head": 22,
+      "accessory": 218,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 11,
+      "file": "È°¿ëº´"
+    }
+  ],
+  "6025": [
+    {
+      "sex": 0,
+      "head": 23,
+      "accessory": 182,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 11,
+      "file": "È°¿ëº´"
+    }
+  ],
+  "6026": [
+    {
+      "sex": 0,
+      "head": 1,
+      "accessory": 211,
+      "accessory2": 198,
+      "accessory3": 57,
+      "weapon": 11,
+      "file": "È°¿ëº´"
+    }
+  ],
+  "6027": [
+    {
+      "sex": 1,
+      "head": 2,
+      "accessory": 64,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 4,
+      "file": "Ã¢¿ëº´"
+    }
+  ],
+  "6028": [
+    {
+      "sex": 1,
+      "head": 3,
+      "accessory": 0,
+      "accessory2": 187,
+      "accessory3": 0,
+      "weapon": 4,
+      "file": "Ã¢¿ëº´"
+    }
+  ],
+  "6029": [
+    {
+      "sex": 1,
+      "head": 4,
+      "accessory": 0,
+      "accessory2": 174,
+      "accessory3": 0,
+      "weapon": 4,
+      "file": "Ã¢¿ëº´"
+    }
+  ],
+  "6030": [
+    {
+      "sex": 1,
+      "head": 5,
+      "accessory": 205,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 4,
+      "file": "Ã¢¿ëº´"
+    }
+  ],
+  "6031": [
+    {
+      "sex": 1,
+      "head": 6,
+      "accessory": 168,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 4,
+      "file": "Ã¢¿ëº´"
+    }
+  ],
+  "6032": [
+    {
+      "sex": 1,
+      "head": 7,
+      "accessory": 107,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 4,
+      "file": "Ã¢¿ëº´"
+    }
+  ],
+  "6033": [
+    {
+      "sex": 1,
+      "head": 8,
+      "accessory": 212,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 4,
+      "file": "Ã¢¿ëº´"
+    }
+  ],
+  "6034": [
+    {
+      "sex": 1,
+      "head": 9,
+      "accessory": 202,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 4,
+      "file": "Ã¢¿ëº´"
+    }
+  ],
+  "6035": [
+    {
+      "sex": 1,
+      "head": 10,
+      "accessory": 203,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 4,
+      "file": "Ã¢¿ëº´"
+    }
+  ],
+  "6036": [
+    {
+      "sex": 1,
+      "head": 11,
+      "accessory": 99,
+      "accessory2": 187,
+      "accessory3": 188,
+      "weapon": 4,
+      "file": "Ã¢¿ëº´"
+    }
+  ],
+  "6037": [
+    {
+      "sex": 1,
+      "head": 12,
+      "accessory": 147,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 2,
+      "file": "°Ë¿ëº´"
+    }
+  ],
+  "6038": [
+    {
+      "sex": 1,
+      "head": 13,
+      "accessory": 0,
+      "accessory2": 0,
+      "accessory3": 194,
+      "weapon": 2,
+      "file": "°Ë¿ëº´"
+    }
+  ],
+  "6039": [
+    {
+      "sex": 1,
+      "head": 14,
+      "accessory": 215,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 2,
+      "file": "°Ë¿ëº´"
+    }
+  ],
+  "6040": [
+    {
+      "sex": 1,
+      "head": 15,
+      "accessory": 216,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 2,
+      "file": "°Ë¿ëº´"
+    }
+  ],
+  "6041": [
+    {
+      "sex": 1,
+      "head": 16,
+      "accessory": 77,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 2,
+      "file": "°Ë¿ëº´"
+    }
+  ],
+  "6042": [
+    {
+      "sex": 1,
+      "head": 17,
+      "accessory": 210,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 2,
+      "file": "°Ë¿ëº´"
+    }
+  ],
+  "6043": [
+    {
+      "sex": 1,
+      "head": 18,
+      "accessory": 181,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 2,
+      "file": "°Ë¿ëº´"
+    }
+  ],
+  "6044": [
+    {
+      "sex": 1,
+      "head": 19,
+      "accessory": 213,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 2,
+      "file": "°Ë¿ëº´"
+    }
+  ],
+  "6045": [
+    {
+      "sex": 1,
+      "head": 20,
+      "accessory": 204,
+      "accessory2": 0,
+      "accessory3": 0,
+      "weapon": 2,
+      "file": "°Ë¿ëº´"
+    }
+  ],
+  "6046": [
+    {
+      "sex": 1,
+      "head": 21,
+      "accessory": 138,
+      "accessory2": 207,
+      "accessory3": 0,
+      "weapon": 2,
+      "file": "°Ë¿ëº´"
+    }
+  ]
+}

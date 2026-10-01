@@ -24,12 +24,23 @@ describe('executable asset manifest loading', () => {
   });
 
   it('accepts a JSON manifest with a files array', async () => {
-    const response = new Response(JSON.stringify({ files: [{ path: 'runtime/Online.js', kind: 'runtime' }] }), {
+    const entry = { path: 'runtime/Online.js', kind: 'runtime', bytes: 1, sha256: 'a'.repeat(64) };
+    const response = new Response(JSON.stringify({ files: [entry] }), {
       status: 200,
       headers: { 'content-type': 'application/json' },
     });
     await expect(parseExecutableAssetManifest(response)).resolves.toEqual({
-      files: [{ path: 'runtime/Online.js', kind: 'runtime' }],
+      files: [entry],
     });
+  });
+  it('preserves an immutable package manifest without new resource metadata gates', async () => {
+    const entry = { path: 'data/resource.dat', kind: 'passive' };
+    const valid = await parseExecutableAssetManifest(Response.json({ files: [entry] }));
+    expect(Object.isFrozen(valid)).toBe(true); expect(Object.isFrozen(valid.files[0])).toBe(true);
+    expect(valid.files[0]).toEqual(entry);
+  });
+  it('rejects runtime replacement before network or credential initialization', async () => {
+    await expect(bootstrapV2Client({ mount: {} as HTMLElement, profile: getAvailableServerProfile('lastro-2x'),
+      credentials: { username: '', password: '' }, runtimeUrl: 'https://evil.invalid/plugin.js' })).rejects.toThrow('内置');
   });
 });

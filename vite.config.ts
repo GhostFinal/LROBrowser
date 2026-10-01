@@ -1,6 +1,9 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { defineConfig, type Plugin, type ViteDevServer } from 'vite';
+import { type Plugin, type ViteDevServer } from 'vite';
+import { defineConfig } from 'vitest/config';
+import { REQUIRED_HEADERS } from './scripts/iwa-security.mjs';
+import { isLocalRequest, resolveStagedResource } from './scripts/dev-resource-security.mjs';
 
 export function stripViteClientInjection(html: string): string {
   return html.replace(/<script\b(?=[^>]*\bsrc=["'][^"']*\/@vite\/client["'])[^>]*>\s*<\/script>\s*/g, '');
@@ -9,27 +12,31 @@ export function stripViteClientInjection(html: string): string {
 function packageRuntime(): Plugin {
   function serveStagedRuntime(server: ViteDevServer) {
     server.middlewares.use((request, response, next) => {
-      const pathname = decodeURIComponent((request.url ?? '').split('?')[0] ?? '');
-      let source: string | undefined;
-      if (pathname === '/runtime/Online.js') source = path.resolve('generated/runtime/Online.js');
-      else if (pathname === '/runtime/LastROThreadEventHandler.js') source = path.resolve('generated/runtime/LastROThreadEventHandler.js');
-      else if (pathname === '/runtime/lastro-account-login.mjs') source = path.resolve('src/runtime/lastro-account-login.mjs');
-      else if (pathname.startsWith('/runtime/')) source = path.resolve('generated/core/runtime', pathname.slice('/runtime/'.length));
-      else if (pathname.startsWith('/core/')) source = path.resolve('generated/core', pathname.slice('/core/'.length));
-      if (!source || !existsSync(source)) { next(); return; }
+      for (const [name, value] of Object.entries(REQUIRED_HEADERS)) response.setHeader(name, value);
+      if (!isLocalRequest(request.headers.host, request.headers.origin)) {
+        response.statusCode = 403; response.end('Forbidden request origin'); return;
+      }
+      let resource;
+      try { resource = resolveStagedResource(server.config.root, request.url); }
+      catch { response.statusCode = 403; response.end('Invalid resource path'); return; }
+      if (!resource) { next(); return; }
+      if (!resource.exists) { response.statusCode = 404; response.end('Resource not found'); return; }
+      const source = resource.file;
       const extension = path.extname(source).toLowerCase();
       const contentType = extension === '.json' ? 'application/json' : extension === '.wasm' ? 'application/wasm' : 'text/javascript; charset=utf-8';
       response.statusCode = 200;
       response.setHeader('Content-Type', contentType);
-      response.setHeader('Content-Security-Policy', "script-src 'self' 'wasm-unsafe-eval'");
-      response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-      response.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-      response.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+      response.setHeader('Cache-Control', 'no-store');
       response.end(readFileSync(source));
     });
   }
   return {
     name: 'package-patched-runtime',
+    resolveId(source) {
+      // This URL is served verbatim by the staged-resource middleware. Keep it
+      // resolvable during Vite's dev import analysis without rewriting/bundling it.
+      if (source === '/runtime/Online.js') return { id: source, external: true };
+    },
     configureServer: serveStagedRuntime,
     transformIndexHtml: {
       order: 'post',
@@ -57,15 +64,17 @@ function packageRuntime(): Plugin {
 export default defineConfig({
   base: './',
   plugins: [packageRuntime()],
-  build: { target: 'es2022', sourcemap: false },
+  optimizeDeps: { entries: ['index.html'], exclude: ['/runtime/Online.js'] },
+  build: { target: 'es2022', sourcemap: false, rollupOptions: { external: ['/runtime/Online.js'] } },
   server: {
+    host: '127.0.0.1',
     hmr: false,
-    headers: {
-      'Content-Security-Policy': "script-src 'self' 'wasm-unsafe-eval'",
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
-      'Cross-Origin-Resource-Policy': 'same-origin',
-    },
+    fs: { strict: true, allow: [path.resolve('.')], deny: ['**/.env', '**/.env.*', '**/*.{crt,pem,key}', '**/.git/**', '**/.local/**', '**/.codex/**', '**/.agents/**', '**/.npmrc', '**/.netrc'] },
+    headers: REQUIRED_HEADERS,
   },
-  test: { include: ['test/**/*.test.ts'] },
+  test: {
+    include: ['test/**/*.test.ts'],
+    // Runtime fixtures parse large bundled sources; keep their memory use bounded.
+    maxWorkers: 2,
+  },
 });

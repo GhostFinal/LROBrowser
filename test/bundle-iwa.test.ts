@@ -6,6 +6,7 @@ import { Bundle } from 'wbn';
 import { describe, expect, it } from 'vitest';
 import { createBundle } from '../scripts/bundle-iwa.mjs';
 import { signBundle } from '../scripts/sign-iwa.mjs';
+import { REQUIRED_HEADERS } from '../scripts/iwa-security.mjs';
 
 describe('IWA Web Bundle', () => {
   it('packages distribution files as relative IWA exchanges with isolated headers', async () => {
@@ -22,7 +23,7 @@ describe('IWA Web Bundle', () => {
       expect(bundle.urls.every((url) => !url.includes('://'))).toBe(true);
       const response = bundle.getResponse('');
       expect(response.status).toBe(200);
-      expect(response.headers['content-security-policy']).toBe("script-src 'self' 'wasm-unsafe-eval'");
+      expect(response.headers['content-security-policy']).toBe(REQUIRED_HEADERS['Content-Security-Policy']);
       expect(response.headers['cross-origin-opener-policy']).toBe('same-origin');
       expect(response.headers['cross-origin-embedder-policy']).toBe('require-corp');
       expect(response.headers['cross-origin-resource-policy']).toBe('same-origin');

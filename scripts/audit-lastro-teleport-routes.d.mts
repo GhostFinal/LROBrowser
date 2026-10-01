@@ -1,0 +1,8 @@
+export function parseOfficialTeleportCatalog(source: string): Record<string, Record<string, unknown>>;
+export function parseOfficialTeleportRuntimeEvidence(source: string): {sha256: string; catalogueSelector: string | null; catalogueSelectorExcerpt: string | null; outsetPoint: boolean; type: number | null; itemid: number | null; packetId: number | null; packetBytesForCurrentVersion: number | null};
+export function teleportAuditProfiles(catalogs: Record<string, Record<string, object>>): {id: string; clientVer: number; lastroNid: number; sourceCatalogProfile: string; catalogueSelector: string; orderIsolationKey: string; catalogRows: number}[];
+export function parseTeleportResourceAliases(bytes: Uint8Array): Record<string, string>;
+export function auditTeleportResourceAliases(assets: Record<string, unknown>, aliases: Record<string, string>): {checks: {map: string; role: string; key: string | null; aliasPresent: boolean; resolved: string | null; changed: boolean; verifiedFromCachedHeader: boolean; resourceUrl: string | null}[]; aliasHits: number; changedKeys: number; unverifiedKeys: number; resolvedAssets: Record<string, unknown>};
+export function parseTeleportMapHeader(extension: string, bytes: Uint8Array): {magic: string; version: string; width?: number; height?: number; ground?: string | null; altitude?: string | null};
+export function auditTeleportRoute(route: { outset?: unknown; path?: unknown; position?: unknown }, mapAssets: Record<string, unknown>): {result: string; issues: {code: string; severity: string}[]};
+export function auditLastroTeleportRoutes(options?: {reuseResources?: boolean}): Promise<unknown>;

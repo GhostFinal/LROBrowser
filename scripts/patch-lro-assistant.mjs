@@ -19,8 +19,8 @@ const lroAssistantModules = {
       'Core/Preferences': () => Preferences,
       'DB/DBManager': () => DB,
       'DB/Items/ItemTable': () => ItemTable_default,
-      'DB/WorldMapData': () => ({ load: loadWorldMapData, navigationMobs: NaviMobTable }),
-      'UI/WorldMapActions': () => ({ teleport: teleportSelectedWorldMap }),
+      'DB/WorldMapData': () => { init_WorldMap(); return { load: WorldMap_default.lroLoadData, navigationMobs: NaviMobTable }; },
+      'UI/WorldMapActions': () => { init_WorldMap(); return { teleport: map => WorldMap_default.lroTeleport(map) }; },
       'DB/Items/EquipmentLocation': () => EquipmentLocation_default,
       'DB/Skills/SkillInfo': () => SkillInfo,
       'Engine/SessionStorage': () => SessionStorage_default,
@@ -141,15 +141,6 @@ export function patchLroAssistantRuntime(source) {
 ` });
     }
     if (ts.isFunctionDeclaration(node) && node.body) {
-      if (node.name?.text === 'teleportSelectedWorldMap') {
-        const original=node.getText(parsed);
-        if (!original.includes('const mapname = WorldMap.selectedMap;') || !original.includes('hideWorldMap();')) throw new Error('Native world map teleport changed');
-        edits.push({start:node.getStart(parsed),end:node.end,text:original
-          .replace('teleportSelectedWorldMap()', 'teleportSelectedWorldMap(assistantMap)')
-          .replace('const mapname = WorldMap.selectedMap;', 'const mapname = typeof assistantMap === "string" ? assistantMap : WorldMap.selectedMap;')
-          .replace('hideWorldMap();', 'if (typeof assistantMap !== "string") hideWorldMap();\n  return true;')});
-        return;
-      }
       const additions = {
         createEquipment: 'Component.lroReadEquipment = () => Object.values(_list).map(item => ({item: {...item, slot: item.slot ? {...item.slot} : undefined, options: item.options ? {...item.options} : undefined}, location: Number(item.equipped ?? item.WearState ?? item.location) || 0}));',
         createStorage: 'Component.lroReadItems = () => _list.map(item => ({ ...item }));',
@@ -189,5 +180,14 @@ export function patchLroAssistantRuntime(source) {
   const boot = 'init();\n//#endregion';
   if (source.split(boot).length !== 2) throw new Error('Assistant boot anchor changed');
   source = source.replace(boot, START + '\n' + boot);
+  // Expose the native world-map callbacks without replacing their preflight,
+  // cancellation, map/profile checks, or loading behavior.
+  for (const [anchor, replacement] of [
+    ['loadData: async () => {', 'loadData: WorldMap.lroLoadData = async () => {'],
+    ['teleport: mapname => {', 'teleport: WorldMap.lroTeleport = mapname => {'],
+  ]) {
+    if (source.split(anchor).length !== 2) throw new Error('Native world map callback changed: ' + anchor);
+    source = source.replace(anchor, replacement);
+  }
   return IMPORTS + source;
 }

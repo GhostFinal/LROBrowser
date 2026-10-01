@@ -1,3 +1,4 @@
+import { installLastroItemDrag } from '../scripts/lastro-item-drag.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -13,7 +14,6 @@ import { setAssistantInnerHTML } from '../src/assistant/lro-assistant-dom.mjs';
 import { createStandardAssistant } from '../src/assistant/lro-assistant-standard.mjs';
 import { installLroAssistant } from '../src/assistant/lro-assistant.mjs';
 import { monsterReference, targetTraitText, tinyMonsterLife } from '../src/assistant/lro-assistant-target.mjs';
-import { patchLroAssistantRuntime } from '../scripts/patch-lro-assistant.mjs';
 import { assistantIcon } from '../src/assistant/lro-assistant-icon.mjs';
 import { nativeCardData } from '../src/assistant/lro-assistant-features.mjs';
 import { clientDropSources, findClientMonsters, mapMonsterCount } from '../src/assistant/lro-client-knowledge.mjs';
@@ -57,14 +57,18 @@ test('native world map data supplies monster maps and item drops without externa
     assert.deepEqual(warps,['field']);
     const source=fs.readFileSync('generated/runtime/Online.js','utf8');
     const parsed=ts.createSourceFile('Online.js',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
-    const fn=parsed.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='teleportSelectedWorldMap');
-    const packets=[],world={selectedMap:'prontera'};let hides=0;
-    const native=vm.runInNewContext(fn.getText(parsed)+';teleportSelectedWorldMap;',{
-      WorldMap:world,PACKET:{CZ:{PRIVATE_AIRSHIP_REQUEST:class{}}},
-      buildPrivateAirshipRequest:({mapname})=>({mapname}),Network:{sendPacket:p=>packets.push(p)},hideWorldMap:()=>hides++
+    const declaration=parsed.statements.filter(ts.isVariableStatement).flatMap(n=>[...n.declarationList.declarations]).find(n=>n.name.getText(parsed)==='lroAssistantModules');
+    const nativeCalls=[];let prepared=0;
+    const nativeMap={lroLoadData:async()=>data,lroTeleport:async map=>{nativeCalls.push(map);return false;}};
+    const bridge=vm.runInNewContext('('+declaration.initializer.getText(parsed)+')',{
+      WorldMap_default:nativeMap,init_WorldMap:()=>prepared++,NaviMobTable:[],
     });
-    assert.equal(native('field'),true);assert.equal(packets[0].mapname,'field');assert.equal(world.selectedMap,'prontera');assert.equal(hides,0);
-    native({type:'click'});assert.equal(packets[1].mapname,'prontera');assert.equal(hides,1);
+    assert.equal(await bridge.get('DB/WorldMapData').load(),data);
+    assert.equal(await bridge.get('UI/WorldMapActions').teleport('field'),false);
+    assert.deepEqual(nativeCalls,['field']);assert.equal(prepared,2);
+    assert.ok(source.includes('loadData: WorldMap.lroLoadData = async () => {'));
+    assert.ok(source.includes('teleport: WorldMap.lroTeleport = mapname => {'));
+    assert.ok(source.includes('return lastroWorldMapTeleport.request(mapname);'));
   }finally{f.cleanup();}
 });
 import { createAssistantTheme } from '../src/assistant/lro-assistant-theme.mjs';
@@ -538,7 +542,7 @@ test('target window receives native tiny HP and later absolute HP without fabric
 test('actual native storage, party and minimap factories expose read-only snapshots; late enabling recovers state',()=>{
   const f=fixture();
   try {
-    const runtime=patchLroAssistantRuntime(fs.readFileSync(new globalThis.URL('../vendor/v2/Online.js',import.meta.url),'utf8'));
+    const runtime=fs.readFileSync(new globalThis.URL('../generated/runtime/Online.js',import.meta.url),'utf8');
     const parsed=ts.createSourceFile('Online.js',runtime,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
     const factory=name=>parsed.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text===name).getText(parsed);
     const cursorSource=factory('bindMouseEvents');
@@ -546,6 +550,7 @@ test('actual native storage, party and minimap factories expose read-only snapsh
     installAssistantInputTracking(f.page);
     vm.runInNewContext(cursorSource+'\nbindMouseEvents();',{
       window:f.page,document:f.page.document,
+      installLastroItemDrag,Mouse:{},GraphicsSettings:{cursor:true},
       Cursor:{ACTION:{DEFAULT:0,CLICK:1},setType(){},getActualType:()=>0}
     });
     const control=f.page.document.createElement('div');control.dataset.lroAssistantRoot='true';f.page.document.body.append(control);
@@ -657,4 +662,23 @@ test('shadow shop detail matches exact slot, stays tied to seller after click ex
     type=0;assert.deepEqual(app.findShopContainers(),[]);assert.equal(app.findOpenStoreRow(app.records[1]),null);
     info.remove();assert.equal(app.findVisibleItemInfo(),null);
   } finally {f.cleanup();}
+});
+
+for(const outcome of ['sent','blocked','failed'])test('native async teleport waits for preflight: '+outcome,async()=>{
+  const f=fixture();
+  try{
+    const data={mobData:{1002:{kName:'波利',LV:1}},worldData:{field:{name:'原野',mobs:[1002]}}};
+    f.members.set('DB/WorldMapData',{load:async()=>data,navigationMobs:[]});
+    let complete,reject,calls=0;
+    const pending=new Promise((yes,no)=>{complete=yes;reject=no;});
+    f.members.set('UI/WorldMapActions',{teleport:()=>{calls++;return pending;}});
+    const app=createStandardAssistant({page:f.page,modules:f.members,storage:f.storage,subscribePackets:f.bus.subscribe});
+    await app.encyclopedia.openMonsterMap('1002','波利');
+    const button=app.shadow.querySelector('.client-map-card button'),status=app.shadow.querySelector('.client-map-card span');
+    button.click();button.click();
+    assert.equal(calls,1);assert.equal(button.disabled,true);assert.equal(status.textContent,'正在检查目标地图…');
+    if(outcome==='failed')reject(new Error('preflight failed'));else complete(outcome==='sent');
+    await new Promise(resolve=>f.page.setTimeout(resolve,0));
+    assert.equal(status.textContent,outcome==='sent'?'已提交原生传送请求，结果以游戏提示为准。':outcome==='blocked'?'当前无法使用原生传送。':'原生传送请求失败。');
+  }finally{f.cleanup();}
 });
