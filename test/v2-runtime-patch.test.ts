@@ -9,6 +9,15 @@ import { createLastroUiMessages } from '../scripts/lastro-ui-messages.mjs';
 const profile = LASTRO_SERVER_PROFILES[0];
 if (!profile || profile.availability !== 'available') throw new Error('missing fixture profile');
 
+async function nativeCacheRegions() {
+  const native = await readFile(new URL('../vendor/v2/Online.js', import.meta.url), 'utf8');
+  return ['src/Core/MemoryItem.js', 'src/Core/MemoryManager.js'].map(name => {
+    const start = native.indexOf('//#region ' + name), end = native.indexOf('//#endregion', start);
+    if (start < 0 || end < start) throw new Error('Missing native cache region: ' + name);
+    return native.slice(start, end + '//#endregion'.length);
+  });
+}
+
 describe('V2 runtime patch', () => {
   it.each([
     'function cleanGameUI() {}',
@@ -46,8 +55,9 @@ describe('V2 runtime patch', () => {
   it('requires an unambiguous world-map anchor on upstream updates', () => {
     expect(() => patchRuntimeWorldMap('unrecognized upstream source')).toThrow('anchor:worldmap-component');
   });
-  it('routes BGM and sound effects through decoded Web Audio buffers', () => {
+  it('routes BGM and sound effects through decoded Web Audio buffers', async () => {
     const source = [
+      ...await nativeCacheRegions(),
       'var BGM = class BGM {',
       '  static audio = document.createElement("audio");',
       '  static load(url) { BGM.audio.src = url; BGM.audio.play(); }',
@@ -165,9 +175,10 @@ end`;
     expect(patched).not.toContain('node.innerHTML +=');
   });
 
-  it('replaces the factory and removes legacy initialization regions', () => {
+  it('replaces the factory and removes legacy initialization regions', async () => {
     const fixture = [
       'import { existing } from "./existing.mjs?build=fixture-1";',
+      ...await nativeCacheRegions(),
       'var root = freeGlobal || freeSelf || Function("return this")();',
       'var Common_default$1 = "body {\\r\\n\\tfont-size: 12px;\\r\\n\\tfont-family: \'SCDream\', Arial, sans-serif;\\r\\n\\tfont-size-adjust: 0.5186;\\r\\n}\\r\\n:host {\\r\\n\\ttouch-action: manipulation;\\r\\n}";',
       'function drawLabel(ctx) { ctx.font = "10px Arial"; }',

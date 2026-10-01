@@ -543,11 +543,11 @@ function installLastROWebAudio() {
 		bgm = null;
 		return offset;
 	};
-	const playBgm = async (filename, url, volume, requestedOffset = 0) => {
+	const playBgm = async (filename, url, volume, requestedOffset = 0, isCurrent = () => true) => {
 		const generation = ++bgmGeneration;
 		const buffer = await decode("bgm:" + filename, url);
-		if (generation !== bgmGeneration) return;
-		if (bgm?.filename === filename) return;
+		if (generation !== bgmGeneration || !isCurrent()) return false;
+		if (bgm?.filename === filename) return true;
 		stopBgm();
 		const ctx = getContext();
 		const source = ctx.createBufferSource();
@@ -560,6 +560,7 @@ function installLastROWebAudio() {
 		gain.gain.value = Math.max(0, Math.min(1, volume));
 		source.start(0, offset);
 		bgm = { filename, source, gain, buffer, offset, startedAt: ctx.currentTime };
+		return true;
 	};
 	const playSound = async (filename, url, volume) => {
 		const buffer = await decode("sound:" + filename, url);
@@ -619,6 +620,22 @@ function replaceClassExpression(source, className, replacement) {
 
 export function patchWebAudioPlayback(source) {
   let output = source;
+  for (const [name, anchors] of [
+    ['src/Core/MemoryItem.js', ['_data = null;', 'complete = false;', 'return this._data;',
+      'this._data = data; this.complete = true;', 'this._error = error; this.complete = true;']],
+    ['src/Core/MemoryManager.js', ['const item = _memory[filename];', 'return item.data;', 'return !!_memory[filename];']],
+  ]) {
+    const marker = '//#region ' + name;
+    const start = output.indexOf(marker), end = output.indexOf('//#endregion', start);
+    if (start < 0 || end < start || output.indexOf(marker, start + marker.length) >= 0) fail('anchor:bgm:failed-cache');
+    const region = output.slice(start, end).replace(/\s+/g, ' ');
+    if (anchors.some((anchor) => !region.includes(anchor))) fail('anchor:bgm:failed-cache');
+  }
+  output = replaceOnce(output, 'MemoryManager = class MemoryManager {', `MemoryManager = class MemoryManager {
+    static discardFailedMusic(filename) {
+      const item = _memory[filename];
+      if (item?.complete && !item.data) delete _memory[filename];
+    }`);
   output = replaceClassExpression(output, 'BGM', `class BGM {
 		static filename = null;
 		static volume = Audio_default.BGM.volume;
@@ -637,21 +654,46 @@ export function patchWebAudioPlayback(source) {
 				filename = filename.match(/\\w+\\.mp3/i)?.toString();
 				if (!filename) return;
 			}
+			if (!Audio_default.BGM.play) {
+				BGM.stop();
+				BGM.filename = filename;
+				return;
+			}
 			if (BGM.filename === filename && !BGM.stopped) return;
 			if (BGM.filename && !BGM.stopped) BGM.cache.filename = BGM.filename;
 			BGM.filename = filename;
 			BGM.stopped = false;
-			if (Audio_default.BGM.play) Client.loadFile("BGM/" + filename, (url) => {
-				if (BGM.filename === filename) BGM.load(url);
-			});
+			const myToken = ++_playToken;
+			const onError = (error) => {
+				MemoryManager.discardFailedMusic("BGM/" + filename);
+				if (myToken !== _playToken) return;
+				BGM.stopped = true;
+				console.warn("Failed to load BGM:", filename, error);
+			};
+			try {
+				Client.loadFile("BGM/" + filename, (url) => {
+					if (myToken !== _playToken || BGM.stopped) return;
+					if (!Audio_default.BGM.play) { BGM.stopped = true; return; }
+					if (BGM.filename === filename) BGM.load(url);
+				}, onError);
+			} catch (error) { onError(error); }
 		}
 		static load(url) {
 			if (!Audio_default.BGM.play || !BGM.filename) return;
 			const filename = BGM.filename;
+			const myToken = _playToken;
 			const targetTime = BGM.cache.filename === filename ? BGM.cache.currentTime : 0;
-			void LastROWebAudio.playBgm(filename, url, BGM.volume, targetTime).catch((error) => console.warn("Failed to play BGM:", error));
+			const isCurrent = () => myToken === _playToken && !BGM.stopped && Audio_default.BGM.play && BGM.filename === filename;
+			void LastROWebAudio.playBgm(filename, url, BGM.volume, targetTime, isCurrent).then((started) => {
+				if (myToken === _playToken && !started) BGM.stopped = true;
+			}).catch((error) => {
+				if (myToken !== _playToken) return;
+				BGM.stopped = true;
+				console.warn("Failed to play BGM:", filename, error);
+			});
 		}
 		static stop() {
+			_playToken++;
 			BGM.cache.filename = BGM.filename;
 			BGM.cache.currentTime = LastROWebAudio.stopBgm();
 			BGM.stopped = true;

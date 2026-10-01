@@ -1,11 +1,12 @@
 import ts from 'typescript';
 
 // Native preferences use grid counts and window-specific flags, not pixel sizes.
-export function lastroUiWindowAppend(component, preferences, append, snapshot) {
+export function lastroUiWindowAppend(component, preferences, append, snapshot, options = {}) {
   const host = component._host, win = host?.ownerDocument?.defaultView;
   if (!host || !win || !preferences || typeof preferences.save !== 'function') return append();
   let state = component._lastroWindowState;
   if (!state) {
+    const restoreHeight = options.restoreHeight !== false;
     const number = value => Number.isFinite(Number(value)) ? Number(value) : undefined;
     const pixel = value => typeof value === 'string' && /^-?\d+(?:\.\d+)?px$/.test(value) ? number(parseFloat(value)) : undefined;
     const stored = preferences._lastroWindow;
@@ -37,7 +38,7 @@ export function lastroUiWindowAppend(component, preferences, append, snapshot) {
       }
       const width = pixel(host.style.width), height = pixel(host.style.height);
       if (width > 0) geometry.width = width;
-      if (height > 0) geometry.height = height;
+      if (height > 0 || (!restoreHeight && height === 0)) geometry.height = height;
       if (component._lastroResizeArgs) {
         const args = component._lastroResizeArgs;
         if (Object.hasOwn(preferences, 'width') && Number.isFinite(args[0])) preferences.width = args[0];
@@ -138,7 +139,7 @@ export function lastroUiWindowAppend(component, preferences, append, snapshot) {
       end() {
         if (component.isEmbedded?.()) { applying = false; observer.takeRecords(); fit(); return; }
         if (Number.isFinite(geometry.width) && geometry.width > 0) host.style.width = geometry.width + 'px';
-        if (Number.isFinite(geometry.height) && geometry.height > 0) host.style.height = geometry.height + 'px';
+        if (restoreHeight && Number.isFinite(geometry.height) && geometry.height > 0) host.style.height = geometry.height + 'px';
         if (Number.isFinite(geometry.left)) host.style.left = geometry.left + 'px';
         if (Number.isFinite(geometry.top)) host.style.top = geometry.top + 'px';
         applying = false; observer.takeRecords();
@@ -265,12 +266,43 @@ function snapshotBody(body, file, preference) {
     .replace(/this\._host\.getBoundingClientRect\(\)/g, '({ width: this._host.offsetWidth, height: this._host.offsetHeight })');
 }
 
+function patchShortcutSaveOrder(region) {
+  const file = ts.createSourceFile('ShortCut.js', region, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const handlers = [], clauses = [];
+  function findHandler(node) {
+    if (ts.isBinaryExpression(node) && node.left.getText(file) === 'ShortCut.onShortCut'
+      && ts.isFunctionExpression(node.right)) handlers.push(node.right);
+    ts.forEachChild(node, findHandler);
+  }
+  findHandler(file);
+  function findExtend(node) {
+    if (ts.isCaseClause(node) && ts.isStringLiteral(node.expression) && node.expression.text === 'EXTEND') clauses.push(node);
+    ts.forEachChild(node, findExtend);
+  }
+  if (handlers.length === 1) findExtend(handlers[0]);
+  const statements = clauses.length === 1 ? clauses[0].statements : [];
+  const expressions = statements.map(node => ts.isExpressionStatement(node) ? node.expression : undefined);
+  const [size, save, height] = expressions;
+  const preference = size && ts.isBinaryExpression(size) && ts.isPropertyAccessExpression(size.left)
+    && size.left.name.text === 'size' ? size.left.expression.getText(file) : undefined;
+  if (statements.length !== 3 || !preference || !ts.isBinaryExpression(size)
+    || size.operatorToken.kind !== ts.SyntaxKind.EqualsToken
+    || !save || !ts.isCallExpression(save) || save.expression.getText(file) !== preference + '.save' || save.arguments.length
+    || !height || !ts.isBinaryExpression(height) || height.operatorToken.kind !== ts.SyntaxKind.EqualsToken
+    || height.left.getText(file) !== 'this._host.style.height'
+    || !height.right.getText(file).includes(preference + '.size')) throw new Error('anchor:ui-state:shortcut-extend-save-order');
+  // The window snapshot reads the host height during save; update it first.
+  return region.slice(0, statements[1].getStart(file)) + statements[2].getText(file) + '\n\t\t\t' + statements[1].getText(file)
+    + region.slice(statements[2].end);
+}
+
 export function patchRuntimeUiState(source) {
   if (source.includes('function lastroUiWindowAppend(')) return source;
   let count = 0;
   let output = source.replace(/\/\/#region src\/UI\/Components\/([^\r\n]+)\.js\r?\n[\s\S]*?\/\/#endregion/g, (region, name) => {
     if (name === 'Vending/Vending' || name === 'NpcStore/NpcStore') { count++; return patchNestedWindowState(region, name); }
     if (excluded.test(name) || !region.includes('Preferences.get(')) return region;
+    if (name === 'ShortCut/ShortCut') region = patchShortcutSaveOrder(region);
     if (name === 'Rodex/WriteRodex') region = region.replace('Preferences.get("WriteRodex", { show: false }, 1);', 'const lastroWriteRodexPreferences = Preferences.get("WriteRodex", { show: false }, 1);');
     if (name === 'Storage/StorageV3/StorageFilter') {
       count++;
@@ -301,7 +333,9 @@ export function patchRuntimeUiState(source) {
       let body = remove ? snapshotBody(remove.right.body, file, preference) : '';
       if (!body.includes(preference + '.')) body = `${preference}.x = parseFloat(this._host.style.left) || 0; ${preference}.y = parseFloat(this._host.style.top) || 0;`;
       const original = append.right.body.getText(file).slice(1, -1);
-      const wrapped = `{ return lastroUiWindowAppend(this, ${preference}, () => {${original}\n}, () => {${body}\n}); }`;
+      // ShortCut's native row preference is the authority for its height.
+      const options = name === 'ShortCut/ShortCut' ? ', { restoreHeight: false }' : '';
+      const wrapped = `{ return lastroUiWindowAppend(this, ${preference}, () => {${original}\n}, () => {${body}\n}${options}); }`;
       edits.push({ start: append.right.body.getStart(file), end: append.right.body.end, text: wrapped }); count++;
     }
     for (const append of methods.filter(node => node.name.getText(file) === 'onAppend')) {

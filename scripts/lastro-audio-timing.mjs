@@ -102,16 +102,18 @@ function installLastroTimedWebAudio({ timingFactory, AudioContextCtor, registerC
     bgm = null;
     return offset;
   };
-  const playBgm = async (filename, url, volume, requestedOffset = 0) => {
+  const playBgm = async (filename, url, volume, requestedOffset = 0, isCurrent = () => true) => {
     bgmVolume = Math.max(0, Math.min(1, volume));
     const generation = ++bgmGeneration, buffer = await decode('bgm:' + filename, url);
-    if (generation !== bgmGeneration || bgm?.filename === filename) return;
+    if (generation !== bgmGeneration || !isCurrent()) return false;
+    if (bgm?.filename === filename) return true;
     stopBgm();
     const ctx = getContext(), source = ctx.createBufferSource(), gain = ctx.createGain();
     const offset = bgmPositions.get(filename) ?? requestedOffset;
     source.buffer = buffer; source.loop = true; source.connect(gain); gain.connect(ctx.destination);
     gain.gain.value = bgmVolume; source.start(0, offset);
     bgm = { filename, source, gain, buffer, offset, startedAt: ctx.currentTime };
+    return true;
   };
   const requestSound = (filename, dueTick) => {
     if (document.hidden || !soundEnabled()) return null;
