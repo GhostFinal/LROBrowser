@@ -1,10 +1,43 @@
 import { IDBFactory } from 'fake-indexeddb';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { IndexedDbResourceCache, MemoryResourceCache } from '../src/resources/resource-cache';
 import { buildResourcePathCandidates, DEFAULT_RESOURCE_ROOTS, ResourceResolutionError, resolvePassiveResource } from '../src/resources/resource-resolver';
+import { mapBinaryFixture } from './map-binary-fixture';
 
 function response(status: number, bytes = new Uint8Array([1, 2]).buffer, contentType = 'application/octet-stream'): Response {
   return { ok: status >= 200 && status < 300, status, headers: new Headers({ 'content-type': contentType }), arrayBuffer: async () => bytes } as Response;
+}
+
+function streamingResponse(bytes: ArrayBuffer, signal: AbortSignal, chunks: number, onChunk: (size: number) => void, onAbort: () => void): Response {
+  const source = new Uint8Array(bytes);
+  let timer: ReturnType<typeof setTimeout>;
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      let index = 0;
+      const abort = () => {
+        clearTimeout(timer);
+        onAbort();
+        controller.error(new DOMException('Aborted', 'AbortError'));
+      };
+      signal.addEventListener('abort', abort, { once: true });
+      const emit = () => {
+        const chunk = source.slice(Math.floor(index * source.length / chunks), Math.floor((index + 1) * source.length / chunks));
+        index++;
+        controller.enqueue(chunk);
+        onChunk(chunk.length);
+        if (index === chunks) {
+          signal.removeEventListener('abort', abort);
+          controller.close();
+        } else timer = setTimeout(emit, 1_000);
+      };
+      timer = setTimeout(emit, 1_000);
+    },
+  });
+  return new Response(stream, { headers: { 'content-type': 'application/octet-stream' } });
+}
+
+function downloadFixture(extension: string): ArrayBuffer {
+  return ['rsw', 'gnd', 'gat'].includes(extension) ? mapBinaryFixture(extension) : new Uint8Array(1_200).fill(7).buffer;
 }
 
 describe('passive resource resolver', () => {
@@ -29,33 +62,33 @@ describe('passive resource resolver', () => {
 
   it('serves a cache hit without calling fetch', async () => {
     const cache = new MemoryResourceCache();
-    await cache.put('data/map/prt.gat', new Uint8Array([7]).buffer, { sourceUrl: 'cache://test' });
+    await cache.put('data/map/prt.gat', mapBinaryFixture('gat', 7), { sourceUrl: 'cache://test' });
     const fetch = async () => { throw new Error('fetch should not run'); };
-    await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch })).resolves.toEqual(new Uint8Array([7]).buffer);
+    await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch })).resolves.toEqual(mapBinaryFixture('gat', 7));
   });
 
   it('expires cached resources after the 30-day retention period', async () => {
     const cache = new MemoryResourceCache();
     const thirtyDays = 30 * 24 * 60 * 60 * 1000;
-    await cache.put('data/map/prt.gat', new Uint8Array([7]).buffer, {
+    await cache.put('data/map/prt.gat', mapBinaryFixture('gat', 7), {
       sourceUrl: 'cache://expired',
       savedAt: Date.now() - thirtyDays - 1,
     });
-    const fetch = async () => response(200, new Uint8Array([8]).buffer);
+    const fetch = async () => response(200, mapBinaryFixture('gat', 8));
 
-    await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch })).resolves.toEqual(new Uint8Array([8]).buffer);
+    await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch })).resolves.toEqual(mapBinaryFixture('gat', 8));
     await expect(cache.match('data/map/prt.gat')).resolves.toMatchObject({ sourceUrl: DEFAULT_RESOURCE_ROOTS[0] + 'data/map/prt.gat' });
   });
 
   it('does not trust a cache entry with an invalid timestamp', async () => {
     const cache = new MemoryResourceCache();
-    await cache.put('data/map/prt.gat', new Uint8Array([7]).buffer, {
+    await cache.put('data/map/prt.gat', mapBinaryFixture('gat', 7), {
       sourceUrl: 'cache://invalid-time',
       savedAt: Number.NaN,
     });
-    const fetch = async () => response(200, new Uint8Array([8]).buffer);
+    const fetch = async () => response(200, mapBinaryFixture('gat', 8));
 
-    await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch })).resolves.toEqual(new Uint8Array([8]).buffer);
+    await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch })).resolves.toEqual(mapBinaryFixture('gat', 8));
   });
 
   it('keeps original logical paths for existing caches and packaged executables', async () => {
@@ -79,17 +112,17 @@ describe('passive resource resolver', () => {
       urls.push(url);
       if (url.startsWith(DEFAULT_RESOURCE_ROOTS[0])) {
         await new Promise((resolve) => setTimeout(resolve, 20));
-        return response(200, new Uint8Array([1]).buffer);
+        return response(200, mapBinaryFixture('gnd', 1));
       }
       await backupReady;
-      return response(200, new Uint8Array([2]).buffer);
+      return response(200, mapBinaryFixture('gnd', 2));
     };
     const result = await resolvePassiveResource('data/map/prt.gnd', {
       cache: new MemoryResourceCache(),
       fetch: fetch as typeof globalThis.fetch,
     });
     releaseBackup();
-    expect(result).toEqual(new Uint8Array([1]).buffer);
+    expect(result).toEqual(mapBinaryFixture('gnd', 1));
     expect(urls).toEqual([
       DEFAULT_RESOURCE_ROOTS[0] + 'data/map/prt.gnd',
       DEFAULT_RESOURCE_ROOTS[1] + 'data/map/prt.gnd',
@@ -100,7 +133,7 @@ describe('passive resource resolver', () => {
     const cache = new MemoryResourceCache();
     let cancelled = false;
     const fetch = async (url: string, init?: RequestInit) => {
-      if (url.startsWith(DEFAULT_RESOURCE_ROOTS[winner]!)) return response(200, new Uint8Array([9]).buffer);
+      if (url.startsWith(DEFAULT_RESOURCE_ROOTS[winner]!)) return response(200, mapBinaryFixture('gnd', 9));
       return {
         ...response(200),
         arrayBuffer: () => new Promise<ArrayBuffer>((_resolve, reject) => {
@@ -112,7 +145,7 @@ describe('passive resource resolver', () => {
       } as Response;
     };
     const bytes = await resolvePassiveResource('data/prt.gnd', { cache, fetch: fetch as typeof globalThis.fetch });
-    expect(bytes).toEqual(new Uint8Array([9]).buffer);
+    expect(bytes).toEqual(mapBinaryFixture('gnd', 9));
     expect(cancelled).toBe(true);
     expect((await cache.match('data/prt.gnd'))?.sourceUrl).toBe(DEFAULT_RESOURCE_ROOTS[winner] + 'data/prt.gnd');
   });
@@ -120,16 +153,17 @@ describe('passive resource resolver', () => {
   it('keeps trying backup path variants after the official origin fails', async () => {
     const fetch = async (url: string) => response(
       url.startsWith(DEFAULT_RESOURCE_ROOTS[0]) ? 503 : url.endsWith('.GND') ? 404 : 200,
+      mapBinaryFixture('gnd'),
     );
     await expect(resolvePassiveResource('data/Map.GND', { fetch: fetch as typeof globalThis.fetch }))
-      .resolves.toEqual(new Uint8Array([1, 2]).buffer);
+      .resolves.toEqual(mapBinaryFixture('gnd'));
   });
 
   it.each([0, 1])('falls back from invalid body on origin %s', async (invalidOrigin) => {
     const fetch = async (url: string) => response(200, url.startsWith(DEFAULT_RESOURCE_ROOTS[invalidOrigin]!)
-      ? new TextEncoder().encode('<html>error</html>').buffer : new Uint8Array([9]).buffer);
+      ? new TextEncoder().encode('<html>error</html>').buffer : mapBinaryFixture('gnd', 9));
     await expect(resolvePassiveResource('data/prt.gnd', { fetch: fetch as typeof globalThis.fetch }))
-      .resolves.toEqual(new Uint8Array([9]).buffer);
+      .resolves.toEqual(mapBinaryFixture('gnd', 9));
   });
 
   it('tries official candidates before the backup source', async () => {
@@ -149,11 +183,11 @@ describe('passive resource resolver', () => {
     let calls = 0;
     const fetch = async (url: string) => {
       calls++;
-      return url.startsWith(DEFAULT_RESOURCE_ROOTS[0]) ? response(503) : response(200, new Uint8Array([9]).buffer);
+      return url.startsWith(DEFAULT_RESOURCE_ROOTS[0]) ? response(503) : response(200, mapBinaryFixture('gat', 9));
     };
-    await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch: fetch as typeof globalThis.fetch })).resolves.toEqual(new Uint8Array([9]).buffer);
+    await expect(resolvePassiveResource('data/map/prt.gat', { cache, fetch: fetch as typeof globalThis.fetch })).resolves.toEqual(mapBinaryFixture('gat', 9));
     expect(calls).toBe(2);
-    await expect(cache.match('data/map/prt.gat')).resolves.toMatchObject({ sourceUrl: `${DEFAULT_RESOURCE_ROOTS[1]}data/map/prt.gat`, size: 1 });
+    await expect(cache.match('data/map/prt.gat')).resolves.toMatchObject({ sourceUrl: `${DEFAULT_RESOURCE_ROOTS[1]}data/map/prt.gat`, size: mapBinaryFixture('gat').byteLength });
   });
 
   it.each([
@@ -254,9 +288,144 @@ describe('passive resource resolver', () => {
     ['data/model/中文_배경.rsm', 'data/model/中文_硅版.rsm'],
   ])('normalizes the entire remote path %s before either origin is contacted', async (input, expected) => {
     const urls: string[] = [];
-    const fetch = async (url: string) => { urls.push(url); return response(url.startsWith(DEFAULT_RESOURCE_ROOTS[0]) ? 404 : 200); };
+    const fetch = async (url: string) => {
+      urls.push(url);
+      const kind = /\.(gat|gnd|rsw)$/i.exec(input)?.[1];
+      return response(url.startsWith(DEFAULT_RESOURCE_ROOTS[0]) ? 404 : 200, kind ? mapBinaryFixture(kind) : undefined);
+    };
     await resolvePassiveResource(input, { cache: new MemoryResourceCache(), fetch: fetch as typeof globalThis.fetch });
     expect(urls).toEqual(DEFAULT_RESOURCE_ROOTS.map(root => root + encodeURI(expected)));
     expect(urls.map(decodeURIComponent).join('\n')).not.toMatch(/[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af]/);
+  });
+});
+
+describe('resource download deadlines', () => {
+  afterEach(() => { vi.useRealTimers(); });
+
+  it.each(['rsw', 'gnd', 'gat', 'rsm', 'str'])('lets a continuously arriving %s body finish after eight seconds', async extension => {
+    vi.useFakeTimers();
+    const cache = new MemoryResourceCache();
+    const put = vi.spyOn(cache, 'put');
+    const bytes = downloadFixture(extension);
+    const path = `data/ein_fild04.${extension}`;
+    const aborted = vi.fn();
+    const chunks = vi.fn();
+    const fetch = vi.fn(async (url: string, init?: RequestInit) => url.startsWith(DEFAULT_RESOURCE_ROOTS[0])
+      ? streamingResponse(bytes, init!.signal!, 12, chunks, aborted) : response(503));
+    let settled = false;
+    const outcome = resolvePassiveResource(path, { cache, fetch: fetch as typeof globalThis.fetch })
+      .then(value => { settled = true; return { value }; }, error => { settled = true; return { error }; });
+
+    await vi.advanceTimersByTimeAsync(8_001);
+    expect(chunks).toHaveBeenCalledTimes(8);
+    expect(aborted).not.toHaveBeenCalled();
+    expect(settled).toBe(false);
+    expect(put).not.toHaveBeenCalled();
+    await expect(cache.match(path)).resolves.toBeNull();
+
+    await vi.advanceTimersByTimeAsync(3_999);
+    await expect(outcome).resolves.toEqual({ value: bytes });
+    expect(aborted).not.toHaveBeenCalled();
+    expect(put).toHaveBeenCalledTimes(1);
+    await expect(cache.match(path)).resolves.toMatchObject({ bytes, sourceUrl: DEFAULT_RESOURCE_ROOTS[0] + path });
+  });
+
+  it.each(['rsw', 'gnd', 'gat', 'rsm', 'str'])('stops both incomplete %s bodies at sixty seconds without caching partial bytes', async extension => {
+    vi.useFakeTimers();
+    const cache = new MemoryResourceCache();
+    const put = vi.spyOn(cache, 'put');
+    const path = `data/ein_fild04.${extension}`;
+    let receivedBytes = 0;
+    const aborted = vi.fn();
+    const fetch = vi.fn(async (_url: string, init?: RequestInit) => streamingResponse(
+      downloadFixture(extension), init!.signal!, 120, size => { receivedBytes += size; }, aborted,
+    ));
+    let settled = false;
+    const outcome = resolvePassiveResource(path, { cache, fetch: fetch as typeof globalThis.fetch })
+      .then(value => { settled = true; return value; }, error => { settled = true; return error; });
+
+    await vi.advanceTimersByTimeAsync(59_999);
+    expect(receivedBytes).toBeGreaterThan(0);
+    expect(settled).toBe(false);
+    expect(aborted).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+
+    const error = await outcome as ResourceResolutionError;
+    expect(error).toBeInstanceOf(ResourceResolutionError);
+    expect(error.attempts).toEqual(DEFAULT_RESOURCE_ROOTS.map(root => ({ url: root + path, reason: 'download-timeout-60000ms' })));
+    expect(error.message).toContain('download-timeout-60000ms');
+    expect(aborted).toHaveBeenCalledTimes(2);
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(put).not.toHaveBeenCalled();
+    await expect(cache.match(path)).resolves.toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('keeps the eight-second default for an ordinary asset body and tries the backup', async () => {
+    vi.useFakeTimers();
+    const cache = new MemoryResourceCache();
+    const put = vi.spyOn(cache, 'put');
+    const path = 'data/texture/item/potion.bmp';
+    const aborted = vi.fn();
+    const fetch = vi.fn(async (url: string, init?: RequestInit) => url.startsWith(DEFAULT_RESOURCE_ROOTS[0])
+      ? streamingResponse(downloadFixture('bmp'), init!.signal!, 12, () => {}, aborted) : response(503));
+    let settled = false;
+    const outcome = resolvePassiveResource(path, { cache, fetch: fetch as typeof globalThis.fetch })
+      .then(value => { settled = true; return value; }, error => { settled = true; return error; });
+
+    await vi.advanceTimersByTimeAsync(7_999);
+    expect(settled).toBe(false);
+    expect(aborted).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1);
+
+    const error = await outcome as ResourceResolutionError;
+    expect(error).toBeInstanceOf(ResourceResolutionError);
+    expect(error.attempts).toEqual([
+      { url: DEFAULT_RESOURCE_ROOTS[0] + path, reason: 'download-timeout-8000ms' },
+      { url: DEFAULT_RESOURCE_ROOTS[1] + path, reason: 'http-503' },
+    ]);
+    expect(aborted).toHaveBeenCalledTimes(1);
+    expect(put).not.toHaveBeenCalled();
+    await expect(cache.match(path)).resolves.toBeNull();
+  });
+
+  it.each(['gnd', 'bmp'])('honors a shorter explicit timeout for %s', async extension => {
+    vi.useFakeTimers();
+    const cache = new MemoryResourceCache();
+    const path = `data/test.${extension}`;
+    const aborted = vi.fn();
+    const fetch = vi.fn(async (_url: string, init?: RequestInit) => streamingResponse(
+      downloadFixture(extension), init!.signal!, 12, () => {}, aborted,
+    ));
+    const outcome = resolvePassiveResource(path, { cache, fetch: fetch as typeof globalThis.fetch, timeoutMs: 1_500 })
+      .catch(error => error as ResourceResolutionError);
+
+    await vi.advanceTimersByTimeAsync(extension === 'gnd' ? 1_500 : 3_000);
+    const error = await outcome as ResourceResolutionError;
+    expect(error).toBeInstanceOf(ResourceResolutionError);
+    expect(error.attempts).toEqual(DEFAULT_RESOURCE_ROOTS.map(root => ({ url: root + path, reason: 'download-timeout-1500ms' })));
+    expect(aborted).toHaveBeenCalledTimes(2);
+    await expect(cache.match(path)).resolves.toBeNull();
+  });
+
+  it.each([
+    ['gnd', 90_000, 70],
+    ['bmp', 20_000, 12],
+  ] as const)('honors a longer explicit timeout for %s', async (extension, timeoutMs, chunks) => {
+    vi.useFakeTimers();
+    const cache = new MemoryResourceCache();
+    const path = `data/test.${extension}`;
+    const bytes = downloadFixture(extension);
+    const aborted = vi.fn();
+    const fetch = vi.fn(async (url: string, init?: RequestInit) => url.startsWith(DEFAULT_RESOURCE_ROOTS[0])
+      ? streamingResponse(bytes, init!.signal!, chunks, () => {}, aborted) : response(503));
+    const outcome = resolvePassiveResource(path, { cache, fetch: fetch as typeof globalThis.fetch, timeoutMs })
+      .then(value => ({ value }), error => ({ error }));
+
+    await vi.advanceTimersByTimeAsync(chunks * 1_000);
+    await expect(outcome).resolves.toEqual({ value: bytes });
+    expect(aborted).not.toHaveBeenCalled();
+    await expect(cache.match(path)).resolves.toMatchObject({ bytes });
   });
 });

@@ -3,39 +3,40 @@
 export const ITEM_OBTAIN_CSS = `
 /* LastRO item-obtain placement and typography */
 :host {
-  top: var(--loot-top, 35vh);
-  left: auto !important;
-  right: var(--loot-edge, 20px) !important;
+  position: fixed !important;
+  top: var(--loot-top, 0px) !important;
+  left: var(--loot-left, 0px) !important;
+  right: auto !important;
   width: var(--loot-width, 304px);
   height: var(--loot-panel-height, auto);
-  max-width: calc(100vw - 32px);
-  transform: scale(.75);
-  transform-origin: top right;
+  max-width: none;
+  transform: scale(var(--loot-scale, .75));
+  transform-origin: top left;
   pointer-events: none;
 }
 #ItemObtain .content,
 #ItemObtain .loot-row {
-  clip-path: inset(0 0 0 0);
   transform: translateX(0);
   opacity: 1;
-  transition: transform 400ms cubic-bezier(.4,0,.6,1),
-    margin-bottom 400ms cubic-bezier(.4,0,.6,1), opacity 120ms linear;
 }
-#ItemObtain .content.is-entering,
+#ItemObtain .loot-row { clip-path: inset(0 0 0 0); }
+#ItemObtain .content.is-entering {
+  animation: lastro-loot-fade 120ms ease-out both;
+}
 #ItemObtain .loot-row.is-entering {
-  animation: lastro-loot-enter 240ms ease-out backwards;
+  animation: lastro-loot-enter 240ms ease-out both;
 }
-#ItemObtain .content.is-closing {
-  opacity: 0;
-  transition: opacity 120ms linear 280ms;
+#ItemObtain .content.is-closing .loot-heading {
+  animation: lastro-loot-heading-exit 400ms linear both;
 }
 #ItemObtain .loot-row.is-leaving {
-  transform: translateX(calc(100% + var(--loot-edge, 20px)));
-  margin-bottom: calc(0px - var(--loot-row-height, 56px) - var(--loot-gap, 6px));
-  opacity: 0;
   z-index: 2;
-  transition: transform 400ms cubic-bezier(.4,0,.6,1),
-    margin-bottom 400ms cubic-bezier(.4,0,.6,1), opacity 120ms linear 280ms;
+  animation: lastro-loot-exit 400ms cubic-bezier(.4,0,.6,1) both;
+}
+#ItemObtain .content.is-paused,
+#ItemObtain .content.is-paused .loot-row,
+#ItemObtain .content.is-paused .loot-heading {
+  animation-play-state: paused !important;
 }
 #ItemObtain {
   width: 100%;
@@ -43,7 +44,7 @@ export const ITEM_OBTAIN_CSS = `
   border: 0;
   border-radius: 0;
   background: transparent;
-  font-family: 'Source Han Sans CN', sans-serif;
+  font-family: 'MiSans', 'Source Han Sans CN', sans-serif;
   font-size: var(--loot-font, 14px);
   font-size-adjust: none;
   line-height: 1.4;
@@ -52,7 +53,7 @@ export const ITEM_OBTAIN_CSS = `
 }
 #ItemObtain .content {
   height: auto;
-  overflow: hidden;
+  overflow: visible;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -166,10 +167,24 @@ export const ITEM_OBTAIN_CSS = `
 }
 #ItemObtain .loot-times { font-size: var(--loot-small-font, 11px); opacity: .7; }
 @keyframes lastro-loot-enter {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes lastro-loot-fade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-@media (prefers-reduced-motion: reduce) {
-  #ItemObtain .content, #ItemObtain .loot-row { animation: none !important; transition: none !important; }
+@keyframes lastro-loot-exit {
+  from { opacity: 1; transform: translateX(0); margin-bottom: 0; }
+  70% { opacity: 1; }
+  to {
+    opacity: 0;
+    transform: translateX(calc(100% + var(--loot-edge, 20px)));
+    margin-bottom: calc(0px - var(--loot-row-height, 56px) - var(--loot-gap, 6px));
+  }
+}
+@keyframes lastro-loot-heading-exit {
+  from, 70% { opacity: 1; }
+  to { opacity: 0; }
 }
 `;

@@ -7,11 +7,46 @@ import { parseArgs } from 'node:util';
 import process from 'node:process';
 import ts from 'typescript';
 import { JOB_NAME_OVERRIDES, MESSAGE_FALLBACKS, RUNTIME_TEXT_REPLACEMENTS } from './lastro-localization.mjs';
+import jobNameAliases from './lastro-job-name-aliases.json' with { type: 'json' };
 import { SKILL_DESCRIPTION_OVERRIDES, SKILL_NAME_OVERRIDES } from './lastro-skill-localization.mjs';
 import { ITEM_OBTAIN_CSS } from './lastro-loot-style.mjs';
 import { installLastroLootList } from './lastro-loot-list.mjs';
 import { createWorldMapIndex, installLastroWorldMap, WORLD_MAP_HTML, WORLD_MAP_CSS } from './lastro-worldmap.mjs';
 import { createMonsterPortraitLoader } from './lastro-monster-portrait.mjs';
+import { createLastroChatMapLinks } from './lastro-chat-map-links.mjs';
+import { patchRuntimeNpcMapLinks } from './lastro-npc-map-links.mjs';
+import { patchRuntimeAchievementLinks } from './lastro-achievement-links.mjs';
+import { patchRuntimeTeleportFeedback } from './lastro-teleport-feedback.mjs';
+import { patchRuntimeAutomationSync } from './lastro-automation-sync.mjs';
+import { patchRuntimeFrameTiming } from './lastro-frame-timing.mjs';
+import { patchRuntimeAudioTiming } from './lastro-audio-timing.mjs';
+import { patchRuntimeEntitySync } from './lastro-entity-sync.mjs';
+import { patchRuntimeEntityAppearance } from './lastro-entity-appearance.mjs';
+import { patchRuntimeTeleportFade } from './lastro-teleport-fade.mjs';
+import { patchRuntimeMovementInput } from './lastro-movement-input.mjs';
+import { installLastroToolsPanels } from './lastro-tools-panels.mjs';
+import { LASTRO_TOOLS_CSS } from './lastro-tools-style.mjs';
+import { patchRuntimeMail } from './lastro-mail.mjs';
+import { patchPetDialogueDecoding } from './patch-pet-dialogue.mjs';
+import { patchRuntimeUiText } from './lastro-ui-text.mjs';
+import { patchRuntimeUiMessages } from './lastro-ui-messages.mjs';
+import { patchRuntimeUiLayout as patchScopedUiLayout } from './lastro-ui-layout.mjs';
+import { patchRuntimeUiState } from './lastro-ui-state.mjs';
+import { patchRuntimeStoreScroll } from './lastro-store-scroll.mjs';
+import { patchRuntimeUiInput } from './lastro-ui-input.mjs';
+import { patchRuntimeHotkeys } from './lastro-hotkeys.mjs';
+import { patchRuntimeTypography } from './lastro-typography.mjs';
+import { patchRuntimeDialogTypography } from './lastro-dialog-typography.mjs';
+import { patchRuntimeNavigationUi } from './lastro-navigation-ui.mjs';
+import { patchRuntimeBasicInfoLayout } from './lastro-basic-info.mjs';
+import { patchRuntimeQuests } from './lastro-quest-runtime.mjs';
+import { describeLastroMapLoadFailure } from './lastro-map-load-diagnostic.mjs';
+import teleportRoutes from './lastro-teleport-routes.json' with { type: 'json' };
+import { createLastroTeleportNavigation } from './lastro-teleport-navigation.mjs';
+import { createLastroTeleportPreflight } from './lastro-teleport-preflight.mjs';
+import { createLastroVerifiedTeleportRequest } from './lastro-teleport-request.mjs';
+import { createLastroWorldMapTeleport } from './lastro-worldmap-teleport.mjs';
+import { resolveLastroMapResourceName } from './lastro-map-resource-name.mjs';
 import worldMapLayout from './lastro-worldmap-layout.json' with { type: 'json' };
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
@@ -110,31 +145,6 @@ function patchLoginRegistrationHook(source) {
   return source.slice(0, node.body.getStart(file)) + body + source.slice(node.body.end);
 }
 
-function patchRuntimeTypography(source) {
-  const commonPattern = /(Common_default\$1\s*=\s*)("(?:\\.|[^"\\])*")/;
-  const match = source.match(commonPattern);
-  if (!match) fail('anchor:common-css');
-  let commonCss;
-  try {
-    const escapeMap = { '\\r': '\r', '\\n': '\n', '\\t': '\t', '\\b': '\b', '\\f': '\f', '\\v': '\v', '\\\\': '\\', '\\"': '"' };
-    commonCss = match[2].slice(1, -1).replace(/\\(?:r|n|t|b|f|v|\\|")/g, (escape) => escapeMap[escape]);
-  } catch {
-    fail('anchor:common-css-json');
-  }
-  commonCss = commonCss
-    .replaceAll('SCDream', 'Source Han Sans CN')
-    + '\r\n\r\n/* LastRO IWA bundled Chinese typography */\r\n'
-    + ':host, body {\r\n'
-    + '\tfont-family: \'Source Han Sans CN\', sans-serif;\r\n'
-    + '\tfont-size-adjust: 0.5186;\r\n'
-    + '}\r\n'
-    + 'body {\r\n'
-    + '\tfont-size: 12px;\r\n'
-    + '}\r\n';
-  return source.replace(match[0], `${match[1]}${JSON.stringify(commonCss)}`)
-    .replaceAll('SCDream', 'Source Han Sans CN');
-}
-
 export function patchRuntimeJobLocalization(source) {
   // JobNameTable, PalNameTable and WeaponJobTable contain asset basenames,
   // not UI labels. Never translate these or bodies/weapons/palettes disappear.
@@ -144,8 +154,17 @@ export function patchRuntimeJobLocalization(source) {
       replacements++; return `lastroJobDisplayName(${id})`;
     }));
   if (replacements !== 9) fail('anchor:job-display-lookups');
+  const labels = { ...JOB_NAME_OVERRIDES };
+  function resolveLabel(key, seen = new Set()) {
+    if (Object.hasOwn(labels, key)) return labels[key];
+    const target = jobNameAliases[key];
+    if (typeof target !== 'string' || seen.has(key)) fail('localization:job-alias:' + key);
+    const label = resolveLabel(target, new Set([...seen, key]));
+    return labels[key] = key.endsWith('_B') && !target.endsWith('_B') ? '宝宝' + label : label;
+  }
+  for (const key of Object.keys(jobNameAliases)) resolveLabel(key);
   return `/* LASTRO Chinese job-name overlay: display only, never resource paths. */
-const lastroJobLabels = ${JSON.stringify(JOB_NAME_OVERRIDES)};
+const lastroJobLabels = ${JSON.stringify(labels)};
 let lastroJobLabelsById;
 function lastroJobDisplayName(id) {
   if (!lastroJobLabelsById) {
@@ -340,6 +359,33 @@ function patchRuntimeUiLayout(source) {
   return source;
 }
 
+function teleportResourceLoaderCode() {
+  return `filename => new Promise((resolve, reject) => {
+    const resolvedFilename = (${resolveLastroMapResourceName.toString()})(filename, DB.mapalias);
+    let settled = false;
+    const timer = globalThis.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      reject(new Error("download-timeout-65000ms: " + resolvedFilename));
+    }, 65000);
+    try {
+      Thread.send("GET_FILE", { filename: resolvedFilename, args: null }, (bytes, error) => {
+        if (settled) return;
+        settled = true;
+        globalThis.clearTimeout(timer);
+        if (error || !bytes) {
+          console.warn("[LastRO] Teleport resource check failed", filename, resolvedFilename, error);
+          reject(new Error(String(error?.message || error || "ResourceResolutionError") + ": " + resolvedFilename));
+        } else resolve(bytes);
+      });
+    } catch (error) {
+      settled = true;
+      globalThis.clearTimeout(timer);
+      reject(error);
+    }
+  })`;
+}
+
 export function patchRuntimeWorldMap(source) {
   const pattern = /\/\/#region src\/UI\/Components\/WorldMap\/WorldMap\.js\r?\n[\s\S]*?\/\/#endregion/g;
   if ([...source.matchAll(pattern)].length !== 1) fail('anchor:worldmap-component');
@@ -349,6 +395,30 @@ var init_WorldMap = __esmMin(() => {
   init_DBManager(); init_Client(); init_UIManager(); init_GUIComponent();
   init_MonsterTable();
   init_NetworkManager(); init_PacketStructure(); init_SessionStorage(); init_MapRenderer(); init_Navigation();
+  init_Thread(); init_Configs();
+  const lastroWorldMapPreflight = (${createLastroTeleportPreflight.toString()})({
+    getMap: () => MapRenderer.loading ? "" : normalizeLastROTeleportMap(MapRenderer.currentMap),
+    loadFile: ${teleportResourceLoaderCode()},
+  });
+  const lastroWorldMapTeleport = (${createLastroWorldMapTeleport.toString()})({
+    preflight: lastroWorldMapPreflight,
+    getMap: () => MapRenderer.loading ? "" : normalizeLastROTeleportMap(MapRenderer.currentMap),
+    getProfile: () => String(Configs.get("lastroNid", 0)) + ":" + String(Configs.get("clientVer", 0)),
+    onSameMap: () => showLastroTeleportNotice("已在目标地图。"),
+    send: mapname => {
+      if (!PACKET.CZ.PRIVATE_AIRSHIP_REQUEST) throw new Error("当前客户端不支持传送");
+      const pkt = new PACKET.CZ.PRIVATE_AIRSHIP_REQUEST();
+      Object.assign(pkt, buildPrivateAirshipRequest({ mapname }));
+      Network.sendPacket(pkt);
+    },
+    onError: error => {
+      console.warn("[LastRO] World map teleport check failed", error);
+      if (error?.resource) {
+        const diagnostic = describeLastroMapLoadFailure("", error);
+        UIManager.showErrorBox("传送失败：" + diagnostic.reason + "。\\n文件：" + error.resource);
+      } else UIManager.showErrorBox(error.message || "传送地点检查失败，请重试。");
+    },
+  });
   WorldMap = new GUIComponent("WorldMap", ${JSON.stringify(WORLD_MAP_CSS)});
   WorldMap.render = () => ${JSON.stringify(WORLD_MAP_HTML)};
   (${installLastroWorldMap.toString()})(WorldMap, {
@@ -366,16 +436,16 @@ var init_WorldMap = __esmMin(() => {
       return { worldData: values[0], mobData: values[1] };
     },
     navigate: mapname => {
+      if (normalizeLastROTeleportMap(MapRenderer.currentMap) === normalizeLastROTeleportMap(mapname)) {
+        showLastroTeleportNotice("已在目标地图。");
+        return;
+      }
       const position = SessionStorage_default.Entity?.position || [0, 0];
       Navigation_default.show();
       Navigation_default.navigateTo({ startMap: MapRenderer.currentMap, startX: position[0] | 0, startY: position[1] | 0, endMap: mapname, endX: 0, endY: 0, displayName: mapname });
     },
-    teleport: mapname => {
-      if (!PACKET.CZ.PRIVATE_AIRSHIP_REQUEST) return;
-      const pkt = new PACKET.CZ.PRIVATE_AIRSHIP_REQUEST();
-      Object.assign(pkt, buildPrivateAirshipRequest({ mapname }));
-      Network.sendPacket(pkt);
-    }
+    teleport: mapname => lastroWorldMapTeleport.request(mapname),
+    cancelTeleport: () => lastroWorldMapTeleport.cancelPending(),
   }, ${JSON.stringify(worldMapLayout.regions)}, ${createWorldMapIndex.toString()});
   WorldMap.mouseMode = GUIComponent.MouseMode.STOP;
   WorldMap_default = UIManager.addComponent(WorldMap);
@@ -870,6 +940,254 @@ export function patchAchievementClaimButton(source) {
   return source;
 }
 
+export function patchRuntimeChatMapLinks(source) {
+  const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const edits = [];
+  let requestCount = 0, renderCount = 0, overrideCount = 0, clickCount = 0, inputCount = 0, itemCount = 0, announceCount = 0, broadcastInputCount = 0, playerNoticeCount = 0, npcNoticeCount = 0;
+  function visit(node, scope = '') {
+    if (ts.isFunctionDeclaration(node)) scope = node.name?.text ?? scope;
+    if (ts.isFunctionDeclaration(node) && ['onPlayerMessage', 'onEntityTalkColor'].includes(node.name?.text)) {
+      if (node.name.text === 'onPlayerMessage') playerNoticeCount++;
+      else npcNoticeCount++;
+      edits.push({ start: node.body.getStart(file) + 1, end: node.body.getStart(file) + 1, text: `
+  if (Configs.get("lastroProtocol", false)) {
+    const lastroMessage = LastROChatMapLinks.serverMessage(pkt.msg);
+    if (lastroMessage !== null) {
+      init_Announce();
+      Announce_default.append();
+      Announce_default.set(LastROChatMapLinks.plainText(lastroMessage), "#FFFF00", { life: 5000 });
+      ChatBox_default.addText(lastroMessage, ChatBox_default.TYPE.ANNOUNCE, ChatBox_default.FILTER.PUBLIC_LOG);
+      return false;
+    }
+  }
+` });
+    }
+    if (ts.isBinaryExpression(node) && node.left.getText(file) === 'ChatBox.addText') {
+      scope = 'ChatBox.addText';
+      if (!ts.isFunctionExpression(node.right) || !node.right.body) fail('anchor:chat-input');
+      inputCount++;
+      edits.push({ start: node.right.body.getStart(file) + 1, end: node.right.body.getStart(file) + 1, text: '\n    text = LastROChatMapLinks.normalize(text);' });
+    }
+    if (ts.isCallExpression(node) && scope === 'ChatBox.addText' && node.expression.getText(file) === 'text.replace'
+      && node.arguments[0]?.getText(file).includes('ITEMLINK') && node.arguments[1]) {
+      itemCount++;
+      edits.push({ start: node.arguments[1].getStart(file), end: node.arguments[1].end, text: `function (match) {
+        const html = LastROChatMapLinks.formatItemLink(match, () => DB.parseItemLink(match));
+        if (!html) return "[物品信息暂不可用]";
+        override = true;
+        return html;
+      }` });
+    }
+    if (ts.isCallExpression(node) && scope === 'onGlobalAnnounce' && node.expression.getText(file) === 'Announce_default.set' && node.arguments[0]) {
+      announceCount++;
+      edits.push({ start: node.arguments[0].getStart(file), end: node.arguments[0].end, text: `LastROChatMapLinks.plainText(${node.arguments[0].getText(file)})` });
+    }
+    if (ts.isFunctionDeclaration(node) && node.name?.text === 'requestChatMapTeleport') {
+      requestCount++;
+      edits.push({ start: node.body.getStart(file), end: node.body.end, text: '{ return LastROChatMapLinks.request(link); }' });
+    }
+    if (ts.isFunctionDeclaration(node) && node.name?.text === 'onGlobalAnnounce') {
+      broadcastInputCount++;
+      edits.push({ start: node.body.getStart(file) + 1, end: node.body.getStart(file) + 1, text: '\n  pkt.msg = LastROChatMapLinks.serverMessage(pkt.msg) ?? LastROChatMapLinks.normalize(pkt.msg);\n  if (!pkt.msg) return;' });
+    }
+    if (ts.isIfStatement(node) && scope === 'flushMessageBuffer' && node.expression.getText(file) === '!msg.override'
+      && node.thenStatement.getText(file).includes('div.textContent') && node.elseStatement?.getText(file).includes('div.innerHTML')) {
+      renderCount++;
+      edits.push({ start: node.getStart(file), end: node.end, text: 'LastROChatMapLinks.render(div, msg.text, msg.override);' });
+    }
+    if (ts.isIfStatement(node) && scope === 'ChatBox.addText' && node.expression.getText(file).includes('mapname')
+      && node.thenStatement.getText(file) === 'override = true;') {
+      overrideCount++;
+      edits.push({ start: node.getStart(file), end: node.end, text: '' });
+    }
+    if (ts.isIfStatement(node) && node.expression.getText(file) === 'requestChatMapTeleport(mapLink)') {
+      clickCount++;
+      edits.push({ start: node.getStart(file), end: node.end, text: 'event.preventDefault();\n            event.stopImmediatePropagation();\n            requestChatMapTeleport(mapLink);' });
+    }
+    ts.forEachChild(node, child => visit(child, scope));
+  }
+  visit(file);
+  if ([requestCount, renderCount, overrideCount, clickCount, inputCount, itemCount, announceCount, broadcastInputCount, playerNoticeCount, npcNoticeCount].some(value => value !== 1)) fail('anchor:chat-map-links');
+  edits.sort((a, b) => b.start - a.start);
+  for (const edit of edits) source = source.slice(0, edit.start) + edit.text + source.slice(edit.end);
+  return `const LastROChatMapLinks = (${createLastroChatMapLinks.toString()})({
+  setHtml: (parent, html) => setLastROInnerHTML(parent, html),
+  showPrompt: (message, yes, no) => UIManager.showPromptBox(message, "ok", "cancel", yes, no),
+  getMap: () => typeof MapRenderer !== "undefined" && !MapRenderer.loading ? normalizeLastROTeleportMap(MapRenderer.currentMap) : "",
+  canTeleport: () => !!PACKET?.CZ?.PRIVATE_AIRSHIP_REQUEST && typeof MapRenderer !== "undefined" && !MapRenderer.loading && !!normalizeLastROTeleportMap(MapRenderer.currentMap),
+  navigate: target => {
+    init_SessionStorage(); init_Altitude();
+    const position = SessionStorage_default.Entity?.position;
+    const currentMap = normalizeLastROTeleportMap(MapRenderer.currentMap);
+    if (MapRenderer.loading || currentMap !== target.mapname || !position || !Number.isFinite(position[0]) || !Number.isFinite(position[1]) || !(Altitude.width > 0) || !(Altitude.height > 0)) {
+      showLastroTeleportNotice("当前地图尚未就绪，请稍后再试。");
+      return;
+    }
+    if (target.x >= Altitude.width || target.y >= Altitude.height) {
+      showLastroTeleportNotice("目标坐标超出地图范围，无法前往。");
+      return;
+    }
+    if (typeof LastROTools !== "undefined") LastROTools?._lastroPanels?.cancelRoute();
+    init_Navigation();
+    return Navigation_default.navigateTo({startMap: currentMap, startX: Math.round(position[0]), startY: Math.round(position[1]), endMap: target.mapname, endX: target.x, endY: target.y, showWindow: false});
+  },
+  onError: error => console.warn("[LastRO] Notification recovered from an error", error),
+  teleport: target => {
+    const packet = new PACKET.CZ.PRIVATE_AIRSHIP_REQUEST();
+    Object.assign(packet, buildPrivateAirshipRequest({ ...target, type: 0 }));
+    Network.sendPacket(packet);
+  },
+});\n${source}`;
+}
+
+export function patchNavigationPendingTargets(source) {
+  const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const functions = [], waiters = [];
+  function visit(node) {
+    if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken
+      && node.left.getText(file) === 'Navigation.navigateTo' && ts.isFunctionExpression(node.right)) functions.push(node.right);
+    if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken
+      && node.left.getText(file) === 'Navigation.waitForMapData' && ts.isFunctionExpression(node.right)) waiters.push(node.right);
+    ts.forEachChild(node, visit);
+  }
+  visit(file);
+  if (functions.length !== 1 || waiters.length !== 1) fail('anchor:navigation-pending-targets');
+  const navigation = functions[0], assignments = [], callbacks = [];
+  function findAnchors(node) {
+    if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken
+      && ts.isIdentifier(node.left) && node.left.text === '_finalTargetData') assignments.push(node);
+    if (ts.isCallExpression(node) && node.expression.getText(file) === 'this.waitForMapData') callbacks.push(node);
+    if (ts.isIdentifier(node) && node.text === 'lastroNavigationPendingTarget') fail('anchor:navigation-pending-targets');
+    ts.forEachChild(node, findAnchors);
+  }
+  findAnchors(navigation.body);
+  const assignment = assignments[0], callback = callbacks[0]?.arguments[0];
+  if (assignments.length !== 1 || callbacks.length !== 1 || !ts.isObjectLiteralExpression(assignment.right)
+    || !ts.isExpressionStatement(assignment.parent) || assignment.parent.parent !== navigation.body
+    || !callback || !ts.isFunctionExpression(callback) || !callback.body
+    || callback.getStart(file) <= assignment.end) fail('anchor:navigation-pending-targets');
+  const waiter = waiters[0], recursiveCalls = [];
+  function findRecursion(node) {
+    if (ts.isCallExpression(node) && node.expression.getText(file) === 'Navigation.waitForMapData') recursiveCalls.push(node);
+    if (ts.isIdentifier(node) && node.text === 'lastroNavigationWaitingTarget') fail('anchor:navigation-pending-targets');
+    ts.forEachChild(node, findRecursion);
+  }
+  findRecursion(waiter.body);
+  const parameter = waiter.parameters[0], recursive = recursiveCalls[0];
+  if (waiter.parameters.length !== 1 || !ts.isIdentifier(parameter.name) || parameter.name.text !== 'callback'
+    || parameter.initializer || recursiveCalls.length !== 1 || recursive.arguments.length !== 1
+    || recursive.arguments[0].getText(file) !== 'callback') fail('anchor:navigation-pending-targets');
+  const edits = [
+    { start: assignment.parent.end, text: '\n    const lastroNavigationPendingTarget = _finalTargetData;' },
+    { start: callback.body.getStart(file) + 1, text: '\n        if (_finalTargetData !== lastroNavigationPendingTarget) return;' },
+    { start: parameter.end, text: ', lastroNavigationWaitingTarget = _finalTargetData' },
+    { start: waiter.body.getStart(file) + 1, text: '\n    if (lastroNavigationWaitingTarget !== _finalTargetData) return;' },
+    { start: recursive.arguments[0].end, text: ', lastroNavigationWaitingTarget' },
+  ].sort((a, b) => b.start - a.start);
+  for (const edit of edits) source = source.slice(0, edit.start) + edit.text + source.slice(edit.start);
+  return source;
+}
+
+export function patchRuntimeToolsPanels(source) {
+  const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const anchors = [], transitions = [], cleanups = [];
+  function visit(node, scope = '') {
+    if (ts.isFunctionDeclaration(node)) scope = node.name?.text ?? scope;
+    if (ts.isMethodDeclaration(node) && node.name?.getText(file) === 'setMap' && ts.isClassExpression(node.parent) && node.parent.name?.text === 'MapRenderer') scope = 'MapRenderer.setMap';
+    if (ts.isCallExpression(node) && node.expression.getText(file) === 'UIManager.addComponent' && node.arguments[0]?.getText(file) === 'LastROTools') anchors.push(node);
+    if (ts.isCallExpression(node) && scope === 'MapRenderer.setMap' && node.expression.getText(file) === 'UIManager.removeComponents') transitions.push(node);
+    if (ts.isFunctionDeclaration(node) && node.name?.text === 'cleanGameUI') cleanups.push(node);
+    ts.forEachChild(node, child => visit(child, scope));
+  }
+  visit(file);
+  if (anchors.length !== 1 || transitions.length !== 1 || cleanups.length !== 1) fail('anchor:lastro-tools-panels');
+  const anchor = anchors[0];
+  const install = `const lastroSendRouteTeleport = point => {
+    if (!PACKET?.CZ?.PRIVATE_AIRSHIP_REQUEST) throw new Error("当前客户端不支持传送");
+    const packet = new PACKET.CZ.PRIVATE_AIRSHIP_REQUEST();
+    Object.assign(packet, buildPrivateAirshipRequest({mapname: normalizeLastROTeleportMap(point[0]), x: point[1], y: point[2], type: 1}));
+    Network.sendPacket(packet);
+    if (Navigation_default?.__loaded) Navigation_default.clear();
+  };
+  const lastroRouteNavigation = (${createLastroTeleportNavigation.toString()})({
+    getMap: () => normalizeLastROTeleportMap(MapRenderer.currentMap),
+    getPosition: () => SessionStorage_default.Entity?.position,
+    clock: globalThis,
+    sendTeleport: lastroSendRouteTeleport,
+    navigate: point => {
+      const position = SessionStorage_default.Entity?.position;
+      if (!position || !Navigation_default?.navigateTo) throw new Error("当前地图尚未就绪");
+      return Navigation_default.navigateTo({startMap: MapRenderer.currentMap, startX: position[0], startY: position[1], endMap: point[0], endX: point[1], endY: point[2], showWindow: false});
+    },
+    setStatus: message => LastROTools._lastroPanels?.setStatus(message),
+  });
+  const lastroRoutePreflight = (${createLastroTeleportPreflight.toString()})({
+    getMap: () => MapRenderer.loading ? "" : normalizeLastROTeleportMap(MapRenderer.currentMap),
+    loadFile: ${teleportResourceLoaderCode()},
+  });
+  const lastroVerifiedRouteRequest = (${createLastroVerifiedTeleportRequest.toString()})({
+    sendTeleport: lastroSendRouteTeleport,
+    preflight: lastroRoutePreflight, navigation: lastroRouteNavigation,
+    getMap: () => MapRenderer.loading ? "" : normalizeLastROTeleportMap(MapRenderer.currentMap),
+    getProfile: () => String(Configs.get("lastroNid", 0)) + ":" + String(Configs.get("clientVer", 0)),
+    clearNavigation: () => { if (Navigation_default?.__loaded) Navigation_default.clear(); },
+  });
+  LastROTools._lastroQuestRoute = lastroVerifiedRouteRequest;
+  LastROTools._lastroTeleportRejected = message => lastroRouteNavigation.onTeleportRejected(message);
+  (${installLastroToolsPanels.toString()})(LastROTools, {
+    document: globalThis.document, window: globalThis, GUIComponent, UIManager,
+    setHtml: setLastROInnerHTML,
+    normalizeRoute: normalizeRouteEntry,
+    requestRoute: route => lastroVerifiedRouteRequest.request(route),
+    cancelPendingRoute: () => lastroVerifiedRouteRequest.cancelPending(),
+    routeMapChanging: () => { lastroVerifiedRouteRequest.cancelPending(); lastroRouteNavigation.onMapChanging(); },
+    routeMapChanged: () => lastroRouteNavigation.onMapChanged(),
+    cancelRoute: () => lastroVerifiedRouteRequest.cancel(),
+    showPrompt: (message, yes, no) => UIManager.showPromptBox(message, "ok", "cancel", yes, no),
+    getPresetRoutes: () => LastROTeleportPresets.profiles[Configs.get("clientVer", 0)] || {},
+    getProfile: () => Configs.get("lastroNid", 0),
+    loadPreferences: () => Preferences.get("LastROTeleportOrder:" + Configs.get("lastroNid", 0), { orders: {} }, 1),
+  }, ${JSON.stringify(LASTRO_TOOLS_CSS)});\n  `;
+  const edits = [
+    { start: anchor.getStart(file), text: 'init_Preferences$1();\n  ' + install },
+    { start: transitions[0].getStart(file), text: 'if (typeof LastROTools !== "undefined") LastROTools?._lastroPanels?.onMapChanging();\n      ' },
+    { start: cleanups[0].body.getStart(file) + 1, text: '\n  if (typeof LastROTools !== "undefined") LastROTools?._lastroPanels?.cancelRoute();' },
+  ].sort((a, b) => b.start - a.start);
+  for (const edit of edits) source = source.slice(0, edit.start) + edit.text + source.slice(edit.start);
+  return `const LastROTeleportPresets = ${JSON.stringify({ profiles: teleportRoutes.profiles })};\n` + patchNavigationPendingTargets(source);
+}
+
+export function patchMapLoadFailureRecovery(source) {
+  const file = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const functions = [];
+  function visit(node) {
+    if (ts.isFunctionDeclaration(node) && node.name?.text === 'onMapComplete') functions.push(node);
+    ts.forEachChild(node, visit);
+  }
+  visit(file);
+  const fn = functions[0];
+  const failures = fn?.body?.statements.filter(node => ts.isIfStatement(node) && node.expression.getText(file) === '!success') || [];
+  if (functions.length !== 1 || failures.length !== 1 || fn.parameters.map(node => node.getText(file)).join(',') !== 'success,error'
+      || !failures[0].thenStatement.getText(file).includes('UIManager.showErrorBox(error)')
+      || failures[0].thenStatement.getText(file).includes('lastroFailedMap')) fail('anchor:map-load-failure');
+  const failure = failures[0].thenStatement;
+  const replacement = `{
+    const lastroFailedMap = this.currentMap;
+    this.loading = false;
+    this.currentMap = "";
+    Mouse.intersect = false;
+    if (typeof LastROTools !== "undefined") LastROTools?._lastroPanels?.cancelRoute();
+    Network.close();
+    console.error("[LastRO] Map load failed", lastroFailedMap, error);
+    const lastroMapDiagnostic = describeLastroMapLoadFailure(lastroFailedMap, error);
+    globalThis.LastROMapLoadFailure = lastroMapDiagnostic;
+    try { globalThis.localStorage?.setItem("LastROMapLoadFailure", JSON.stringify(lastroMapDiagnostic)); } catch { /* Storage may be unavailable. */ }
+    UIManager.showErrorBox(lastroMapDiagnostic.message).ui.css("zIndex", 1e3);
+    return;
+  }`;
+  return describeLastroMapLoadFailure.toString() + '\n' + source.slice(0, failure.getStart(file)) + replacement + source.slice(failure.end);
+}
+
 export function patchV2Runtime(source) {
   if (!source.startsWith('import ')) fail('anchor:runtime-imports');
   const normalizedSource = source.replace(/\r\n/g, '\n');
@@ -976,6 +1294,11 @@ ${normalizedSource}`;
   output = replaceFunctionBody(output, 'defaultSocketFactory', '{\n\tif (typeof globalThis.LastRODirectSocketFactory !== "function") throw new Error("Direct TCP factory unavailable");\n\treturn globalThis.LastRODirectSocketFactory(host, port);\n}');
   output = patchLoginRegistrationHook(output);
   output = patchWebAudioPlayback(output);
+  output = patchRuntimeAudioTiming(output);
+  output = patchRuntimeFrameTiming(output);
+  output = patchRuntimeEntitySync(output);
+  output = patchRuntimeEntityAppearance(output);
+  output = patchRuntimeMovementInput(output);
   output = replaceOnce(output, 'init_WebSocket();', '');
   output = replaceOnce(output, 'init_NodeSocket();', '');
   output = replaceWorkerCreation(output);
@@ -1078,10 +1401,31 @@ ${normalizedSource}`;
       '\t\tconst pass = _inputPassword.value;\n\t\tconst beforeConnect = globalThis.LastROLoginBeforeConnect;\n\t\tif (typeof beforeConnect === "function" && beforeConnect(user, pass) === false) return false;\n\t\tapplyDebugLoginFields();'],
   ]);
   output = patchRuntimeTypography(output);
+  output = patchRuntimeDialogTypography(output);
   output = patchRuntimeLocalization(output);
+  output = patchRuntimeUiText(output);
+  output = patchRuntimeUiMessages(output);
+  output = patchRuntimeHotkeys(output);
   output = patchLuaTableCompletion(output);
   output = patchRuntimeUiLayout(output);
+  output = patchScopedUiLayout(output);
+  output = patchRuntimeBasicInfoLayout(output);
+  output = patchRuntimeMail(output);
+  output = patchPetDialogueDecoding(output);
   output = patchRuntimeWorldMap(output);
+  output = patchRuntimeChatMapLinks(output);
+  output = patchRuntimeNpcMapLinks(output, teleportResourceLoaderCode());
+  output = patchRuntimeAchievementLinks(output, teleportResourceLoaderCode());
+  output = patchRuntimeTeleportFeedback(output);
+  output = patchRuntimeAutomationSync(output);
+  output = patchRuntimeToolsPanels(output);
+  output = patchRuntimeNavigationUi(output);
+  output = patchRuntimeQuests(output);
+  output = patchRuntimeStoreScroll(output);
+  output = patchRuntimeUiState(output);
+  output = patchRuntimeUiInput(output);
+  output = patchMapLoadFailureRecovery(output);
+  output = patchRuntimeTeleportFade(output);
   if (/new WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i.test(output)) fail('legacy-transport');
   return patchTrustedTypesDomWrites(output);
 }

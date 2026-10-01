@@ -1,0 +1,4732 @@
+{
+  "source": "https://game.lastro.cn/ro/src/DB/logsTable.js?70.84",
+  "sourceSha256": "11b2ce0290e3a9ee08aba8f3f04cf833fd56fce974b7558848cd5df068620cfb",
+  "sourceCategoryMapping": {
+    "guide": "npc",
+    "train": "train",
+    "makeMonzy": "money",
+    "challenge": "challenge",
+    "dungeons": "instance",
+    "mvp": "boss"
+  },
+  "unavailableProfiles": [
+    "6"
+  ],
+  "profiles": {
+    "3": {
+      "npc": {
+        "0": {
+          "npc": "胖大海",
+          "desc": "每日签到、福利领取、重生",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              125,
+              144
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "卡普拉服务员#iz",
+          "desc": "存储服务、仓库服务、手推车租赁服务",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              128,
+              144
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "职业服务员",
+          "desc": "快速转职、转生、学习拓展技能",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              92,
+              144
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "事务官员莱因 伊贝诺尔#1",
+          "desc": "多人副本、单人副本和MVP副本",
+          "outset": [
+            "moc_para01",
+            30,
+            14
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_para01",
+              27,
+              30
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "公告栏#i1",
+          "desc": "荣誉排行榜、MVP日志",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              121,
+              149
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "交易所管理人#moc2",
+          "desc": "购买或出售装备，以C点为货币的交易所",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              130,
+              166
+            ]
+          ],
+          "position": []
+        },
+        "6": {
+          "npc": "道具商人#iz1",
+          "desc": "购买或出售道具",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              117,
+              160
+            ]
+          ],
+          "position": []
+        },
+        "7": {
+          "npc": "武器商人#iz",
+          "desc": "购买日常练级武器",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              110,
+              180
+            ],
+            [
+              "izlude_in",
+              60,
+              123
+            ]
+          ],
+          "position": []
+        },
+        "8": {
+          "npc": "防具商人#iz",
+          "desc": "购买日常练级防具",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              110,
+              180
+            ],
+            [
+              "izlude_in",
+              69,
+              124
+            ]
+          ],
+          "position": []
+        },
+        "9": {
+          "npc": "活动负责人",
+          "desc": "抽奖活动，抽完即止",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              120,
+              183
+            ]
+          ],
+          "position": []
+        },
+        "10": {
+          "npc": "荣誉商店",
+          "desc": "珍藏的宝贝，数量有限先到先得",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              95,
+              162
+            ]
+          ],
+          "position": []
+        },
+        "11": {
+          "npc": "赏金任务栏",
+          "desc": "完成赏金任务，可以获得游戏积分和荣誉积分",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              147,
+              204
+            ]
+          ],
+          "position": []
+        },
+        "12": {
+          "npc": "工匠",
+          "desc": "一键鉴定、装备分解、卡片分解和魔石分解",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              124,
+              161
+            ]
+          ],
+          "position": []
+        },
+        "13": {
+          "npc": "精炼大师#1",
+          "desc": "武器每精炼一级，武器攻击力增加5~10",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              152,
+              125
+            ]
+          ],
+          "position": []
+        },
+        "14": {
+          "npc": "伊月",
+          "desc": "装备附上魔石，使装备获得额外属性附加",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              155,
+              139
+            ]
+          ],
+          "position": []
+        },
+        "15": {
+          "npc": "埃米斯",
+          "desc": "重铸装备，使装备附加更强大的属性词条",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              153,
+              139
+            ]
+          ],
+          "position": []
+        },
+        "16": {
+          "npc": "拆卡老婆婆",
+          "desc": "可以卸载装备上的卡片",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              110,
+              180
+            ],
+            [
+              "izlude_in",
+              66,
+              114
+            ]
+          ],
+          "position": []
+        },
+        "17": {
+          "npc": "荣誉管理员",
+          "desc": "完成挑战可获得丰富礼品，包括点券、商城道具",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              103,
+              166
+            ]
+          ],
+          "position": []
+        },
+        "18": {
+          "npc": "银行职员#3-1",
+          "desc": "游戏币储存业务",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              111,
+              143
+            ]
+          ],
+          "position": []
+        },
+        "19": {
+          "npc": "佣兵管理员#iz",
+          "desc": "佣兵签约业务",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              48,
+              167
+            ]
+          ],
+          "position": []
+        },
+        "20": {
+          "npc": "宠物商人#iz2",
+          "desc": "出售宠物补给道具",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              155,
+              194
+            ]
+          ],
+          "position": []
+        },
+        "21": {
+          "npc": "宠物扭蛋机",
+          "desc": "直接扭出宠物蛋，亲密后还会辅助角色",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              141,
+              163
+            ]
+          ],
+          "position": []
+        },
+        "22": {
+          "npc": "星愿扭蛋机",
+          "desc": "随机扭出各种MVP星愿转蛋",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              147,
+              173
+            ]
+          ],
+          "position": []
+        },
+        "23": {
+          "npc": "重力圣人#GymPass",
+          "desc": "使用健身卷学习负重量上升，拓展背包负重",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              105,
+              125
+            ]
+          ],
+          "position": []
+        },
+        "24": {
+          "npc": "波利跑步竞猜管理员#1",
+          "desc": "完成比赛竞猜可获得银币",
+          "outset": [
+            "izlude",
+            127,
+            162
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "izlude",
+              111,
+              125
+            ]
+          ],
+          "position": []
+        }
+      },
+      "train": {
+        "0": {
+          "npc": "普隆德拉 区域8(prt_fild08)",
+          "desc": "适合1至10级",
+          "outset": [
+            "prt_fild08",
+            170,
+            368
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_fild08",
+              170,
+              368
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "废弃村落1层(pay_dun00)",
+          "desc": "适合10至30级",
+          "outset": [
+            "pay_dun00",
+            21,
+            180
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "pay_dun00",
+              21,
+              180
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "兽人地下洞窟1层(orcsdun01)",
+          "desc": "适合15至40级",
+          "outset": [
+            "orcsdun01",
+            32,
+            167
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "orcsdun01",
+              32,
+              167
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "古城修道院(gl_church)",
+          "desc": "适合60至80级",
+          "outset": [
+            "gl_church",
+            156,
+            15
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gl_church",
+              156,
+              15
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "伯仁斯旷野区域7(ve_fild07)",
+          "desc": "适合81至99级",
+          "outset": [
+            "ve_fild07",
+            147,
+            366
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ve_fild07",
+              147,
+              366
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "诺可罗德洞窟2层(mag_dun02)",
+          "desc": "适合100至120级",
+          "outset": [
+            "mag_dun02",
+            48,
+            35
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mag_dun02",
+              48,
+              35
+            ]
+          ],
+          "position": []
+        },
+        "6": {
+          "npc": "神殿圣域1层(ra_san01)",
+          "desc": "适合110至130级",
+          "outset": [
+            "ra_san01",
+            139,
+            130
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ra_san01",
+              139,
+              130
+            ]
+          ],
+          "position": []
+        },
+        "7": {
+          "npc": "甲虫洞(dic_dun02)",
+          "desc": "适合130至140级",
+          "outset": [
+            "dic_dun02",
+            196,
+            107
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dic_dun02",
+              196,
+              107
+            ]
+          ],
+          "position": []
+        },
+        "8": {
+          "npc": "龙巢穴(lasa_dun02)",
+          "desc": "适合121至135级",
+          "outset": [
+            "lasa_dun02",
+            121,
+            135
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "lasa_dun02",
+              121,
+              135
+            ]
+          ],
+          "position": []
+        },
+        "9": {
+          "npc": "彩虹高塔(ecl_tdun03)",
+          "desc": "适合136至160级",
+          "outset": [
+            "ecl_tdun03",
+            51,
+            40
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ecl_tdun03",
+              51,
+              40
+            ]
+          ],
+          "position": []
+        },
+        "10": {
+          "npc": "龙巢穴(lasa_dun03)",
+          "desc": "适合136至160级",
+          "outset": [
+            "lasa_dun03",
+            158,
+            230
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "lasa_dun03",
+              158,
+              230
+            ]
+          ],
+          "position": []
+        },
+        "11": {
+          "npc": "幻影冰洞(ice_d03_i)",
+          "desc": "适合126至139级",
+          "outset": [
+            "ice_d03_i",
+            183,
+            253
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ice_d03_i",
+              183,
+              253
+            ]
+          ],
+          "position": []
+        },
+        "12": {
+          "npc": "幻影吸血鬼(gef_d01_i)",
+          "desc": "适合130至139级",
+          "outset": [
+            "gef_d01_i",
+            81,
+            258
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_d01_i",
+              81,
+              258
+            ]
+          ],
+          "position": []
+        },
+        "13": {
+          "npc": "幻影乌龟(tur_d03_i)",
+          "desc": "适合157至165级",
+          "outset": [
+            "tur_d03_i",
+            168,
+            164
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "tur_d03_i",
+              168,
+              164
+            ]
+          ],
+          "position": []
+        },
+        "14": {
+          "npc": "幻影矿洞(ein_d02_i)",
+          "desc": "适合152至160级",
+          "outset": [
+            "ein_d02_i",
+            256,
+            248
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ein_d02_i",
+              256,
+              248
+            ]
+          ],
+          "position": []
+        },
+        "15": {
+          "npc": "幻影废弃村落(pay_d03_i)",
+          "desc": "适合120至150级",
+          "outset": [
+            "pay_d03_i",
+            80,
+            76
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "pay_d03_i",
+              80,
+              76
+            ]
+          ],
+          "position": []
+        },
+        "16": {
+          "npc": "幻影卢安达(com_d02_i)",
+          "desc": "适合150至175级",
+          "outset": [
+            "com_d02_i",
+            106,
+            39
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "com_d02_i",
+              106,
+              39
+            ]
+          ],
+          "position": []
+        },
+        "17": {
+          "npc": "幻影蚂蚁洞(ant_d02_i)",
+          "desc": "适合150至175级",
+          "outset": [
+            "ant_d02_i",
+            249,
+            199
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ant_d02_i",
+              249,
+              199
+            ]
+          ],
+          "position": []
+        },
+        "18": {
+          "npc": "幻影海底洞穴(iz_d05_i)",
+          "desc": "适合150至175级",
+          "outset": [
+            "iz_d05_i",
+            141,
+            59
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "iz_d05_i",
+              141,
+              59
+            ]
+          ],
+          "position": []
+        }
+      },
+      "money": {
+        "0": {
+          "npc": "普隆地下水道2层(prt_sewb2)",
+          "desc": "推荐 ✯",
+          "outset": [
+            "prt_sewb2",
+            20,
+            23
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_sewb2",
+              20,
+              23
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "金字塔迷宫3层(moc_pryd03)",
+          "desc": "推荐 ✯✯",
+          "outset": [
+            "moc_pryd03",
+            100,
+            90
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_pryd03",
+              100,
+              90
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "史芬克斯密穴4层(in_sphinx4)",
+          "desc": "推荐 ✯✯",
+          "outset": [
+            "in_sphinx4",
+            10,
+            219
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "in_sphinx4",
+              10,
+              219
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "奥顿拉草原 区域1(ra_fild01)",
+          "desc": "推荐 ✯✯",
+          "outset": [
+            "ra_fild01",
+            304,
+            46
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ra_fild01",
+              304,
+              46
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "诺可罗德洞窟2层(mag_dun02)",
+          "desc": "推荐 ✯✯✯",
+          "outset": [
+            "mag_dun02",
+            48,
+            34
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mag_dun02",
+              48,
+              34
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "莫斯科比亚 森林(mosk_dun01)",
+          "desc": "推荐 ✯✯✯",
+          "outset": [
+            "mosk_dun01",
+            205,
+            50
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mosk_dun01",
+              205,
+              50
+            ]
+          ],
+          "position": []
+        },
+        "6": {
+          "npc": "花枝散叶的大地(ecl_fild01)",
+          "desc": "推荐 ✯✯✯✯ (手机用户慎入，偶尔会卡图)",
+          "outset": [
+            "ecl_fild01",
+            181,
+            115
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ecl_fild01",
+              181,
+              115
+            ]
+          ],
+          "position": []
+        },
+        "7": {
+          "npc": "达纳托斯之塔10层(tha_t10)",
+          "desc": "推荐 ✯✯✯✯",
+          "outset": [
+            "tha_t10",
+            165,
+            137
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "tha_t10",
+              165,
+              137
+            ]
+          ],
+          "position": []
+        },
+        "8": {
+          "npc": "彩虹桥南部(bif_fild01)",
+          "desc": "推荐 ✯✯✯✯",
+          "outset": [
+            "bif_fild01",
+            289,
+            67
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "bif_fild01",
+              289,
+              67
+            ]
+          ],
+          "position": []
+        }
+      },
+      "challenge": {
+        "0": {
+          "npc": "试炼挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "umbala",
+            141,
+            148
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "umbala",
+              147,
+              163
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "守护挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "alde_gld",
+            183,
+            177
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "alde_gld",
+              188,
+              177
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "探索挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "ama_fild01",
+            174,
+            326
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ama_fild01",
+              179,
+              324
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "生存挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "prt_monk",
+            128,
+            249
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_monk",
+              135,
+              264
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "迷宫挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "alberta",
+            211,
+            47
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "alberta",
+              227,
+              51
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "逃生挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "gef_tower",
+            58,
+            27
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_tower",
+              56,
+              44
+            ]
+          ],
+          "position": []
+        }
+      },
+      "instance": {
+        "0": {
+          "npc": "无尽之塔",
+          "desc": "EP10.0",
+          "outset": [
+            "alberta",
+            214,
+            73
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "alberta",
+              214,
+              73
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "封印神殿",
+          "desc": "EP13.0",
+          "outset": [
+            "monk_test",
+            306,
+            144
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "monk_test",
+              306,
+              144
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "兽人的回忆",
+          "desc": "EP13.1",
+          "outset": [
+            "gef_fild10",
+            242,
+            198
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_fild10",
+              242,
+              198
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "尼德霍格巢穴",
+          "desc": "EP13.2",
+          "outset": [
+            "nyd_dun02",
+            97,
+            194
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "nyd_dun02",
+              97,
+              194
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "吉芬魔法大赛",
+          "desc": "EP14.1",
+          "outset": [
+            "dali",
+            94,
+            142
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali",
+              94,
+              142
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "古代的克雷斯特汉姆",
+          "desc": "EP14.2",
+          "outset": [
+            "glast_01",
+            204,
+            269
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "glast_01",
+              204,
+              269
+            ]
+          ],
+          "position": []
+        },
+        "6": {
+          "npc": "魔神之塔",
+          "desc": "EP14.2",
+          "outset": [
+            "dali02",
+            137,
+            117
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali02",
+              137,
+              117
+            ]
+          ],
+          "position": []
+        },
+        "7": {
+          "npc": "莎拉的记忆",
+          "desc": "EP14.2",
+          "outset": [
+            "dali",
+            132,
+            109
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali",
+              132,
+              109
+            ]
+          ],
+          "position": []
+        },
+        "8": {
+          "npc": "幽灵皇宫",
+          "desc": "EP14.2",
+          "outset": [
+            "dali02",
+            45,
+            129
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali02",
+              45,
+              129
+            ]
+          ],
+          "position": []
+        },
+        "9": {
+          "npc": "拜欧斯之岛",
+          "desc": "EP14.3",
+          "outset": [
+            "moro_cav",
+            49,
+            57
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moro_cav",
+              49,
+              57
+            ]
+          ],
+          "position": []
+        },
+        "10": {
+          "npc": "噩梦吉特巴",
+          "desc": "EP14.3",
+          "outset": [
+            "moc_para01",
+            26,
+            92
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_para01",
+              26,
+              92
+            ]
+          ],
+          "position": []
+        },
+        "11": {
+          "npc": "恐怖玩具工厂",
+          "desc": "EP14.3",
+          "outset": [
+            "xmas",
+            234,
+            299
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "xmas",
+              234,
+              299
+            ]
+          ],
+          "position": []
+        },
+        "12": {
+          "npc": "摩尔斯洞穴",
+          "desc": "EP14.3",
+          "outset": [
+            "moro_cav",
+            61,
+            65
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moro_cav",
+              61,
+              65
+            ]
+          ],
+          "position": []
+        },
+        "13": {
+          "npc": "魔神殿",
+          "desc": "EP14.3",
+          "outset": [
+            "moro_cav",
+            43,
+            68
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moro_cav",
+              43,
+              68
+            ]
+          ],
+          "position": []
+        },
+        "14": {
+          "npc": "人面虫巢穴",
+          "desc": "EP14.3",
+          "outset": [
+            "dali",
+            81,
+            61
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali",
+              81,
+              61
+            ]
+          ],
+          "position": []
+        },
+        "15": {
+          "npc": "查尔斯顿危机",
+          "desc": "EP15.1",
+          "outset": [
+            "verus04",
+            78,
+            118
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "verus04",
+              78,
+              118
+            ]
+          ],
+          "position": []
+        },
+        "16": {
+          "npc": "飞空艇袭击",
+          "desc": "EP15.1",
+          "outset": [
+            "dali02",
+            138,
+            82
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali02",
+              138,
+              82
+            ]
+          ],
+          "position": []
+        },
+        "17": {
+          "npc": "莎拉与芬里尔",
+          "desc": "EP15.1",
+          "outset": [
+            "dali02",
+            94,
+            139
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali02",
+              94,
+              139
+            ]
+          ],
+          "position": []
+        },
+        "18": {
+          "npc": "尽头的房间",
+          "desc": "EP15.2",
+          "outset": [
+            "un_myst",
+            159,
+            38
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "un_myst",
+              159,
+              38
+            ]
+          ],
+          "position": []
+        },
+        "19": {
+          "npc": "中央实验室",
+          "desc": "EP15.2",
+          "outset": [
+            "verus01",
+            151,
+            151
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "verus01",
+              151,
+              151
+            ]
+          ],
+          "position": []
+        },
+        "20": {
+          "npc": "无限空间",
+          "desc": "EP16.1",
+          "outset": [
+            "cmd_fild07",
+            54,
+            276
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "cmd_fild07",
+              54,
+              276
+            ]
+          ],
+          "position": []
+        },
+        "21": {
+          "npc": "迷雾森林",
+          "desc": "未知",
+          "outset": [
+            "bif_fild01",
+            160,
+            344
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "bif_fild01",
+              160,
+              344
+            ]
+          ],
+          "position": []
+        },
+        "22": {
+          "npc": "排水沟",
+          "desc": "未知",
+          "outset": [
+            "mal_in01",
+            160,
+            31
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mal_in01",
+              160,
+              31
+            ]
+          ],
+          "position": []
+        },
+        "23": {
+          "npc": "八爪鱼巢穴",
+          "desc": "未知",
+          "outset": [
+            "mal_dun01",
+            153,
+            235
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mal_dun01",
+              153,
+              235
+            ]
+          ],
+          "position": []
+        },
+        "24": {
+          "npc": "噩梦医院",
+          "desc": "未知",
+          "outset": [
+            "ma_dun01",
+            150,
+            10
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ma_dun01",
+              150,
+              10
+            ]
+          ],
+          "position": []
+        },
+        "25": {
+          "npc": "宝箱巨鳄之巢",
+          "desc": "未知",
+          "outset": [
+            "ma_fild02",
+            315,
+            316
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ma_fild02",
+              315,
+              316
+            ]
+          ],
+          "position": []
+        },
+        "26": {
+          "npc": "食月暴龙湖泊",
+          "desc": "未知",
+          "outset": [
+            "ma_scene01",
+            174,
+            176
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ma_scene01",
+              174,
+              176
+            ]
+          ],
+          "position": []
+        },
+        "27": {
+          "npc": "生命体研究所",
+          "desc": "未知",
+          "outset": [
+            "lhz_dun04",
+            148,
+            273
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "lhz_dun04",
+              148,
+              273
+            ]
+          ],
+          "position": []
+        },
+        "28": {
+          "npc": "艾卡拉奇",
+          "desc": "未知",
+          "outset": [
+            "ecl_hub01",
+            129,
+            12
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ecl_hub01",
+              129,
+              12
+            ]
+          ],
+          "position": []
+        },
+        "29": {
+          "npc": "极限挑战",
+          "desc": "未知",
+          "outset": [
+            "prontera",
+            148,
+            75
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              148,
+              75
+            ]
+          ],
+          "position": []
+        },
+        "30": {
+          "npc": "天使之赐福",
+          "desc": "未知",
+          "outset": [
+            "prt_lib",
+            91,
+            81
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_lib",
+              91,
+              81
+            ]
+          ],
+          "position": []
+        },
+        "31": {
+          "npc": "过去的仪式之屋",
+          "desc": "未知",
+          "outset": [
+            "prt_lib",
+            91,
+            81
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_lib",
+              91,
+              81
+            ]
+          ],
+          "position": []
+        },
+        "32": {
+          "npc": "空中要塞",
+          "desc": "未知",
+          "outset": [
+            "prt_q",
+            241,
+            84
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_q",
+              241,
+              84
+            ]
+          ],
+          "position": []
+        },
+        "33": {
+          "npc": "邪心猎人军事基地",
+          "desc": "未知",
+          "outset": [
+            "ein_fild04",
+            275,
+            338
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ein_fild04",
+              275,
+              338
+            ]
+          ],
+          "position": []
+        },
+        "34": {
+          "npc": "维尔纳研究所",
+          "desc": "未知",
+          "outset": [
+            "slabw01",
+            240,
+            88
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "slabw01",
+              240,
+              88
+            ]
+          ],
+          "position": []
+        },
+        "35": {
+          "npc": "周五副本",
+          "desc": "未知",
+          "outset": [
+            "gef_tower",
+            53,
+            170
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_tower",
+              53,
+              170
+            ]
+          ],
+          "position": []
+        },
+        "36": {
+          "npc": "周末副本",
+          "desc": "未知",
+          "outset": [
+            "pay_arche",
+            46,
+            124
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "pay_arche",
+              46,
+              124
+            ]
+          ],
+          "position": []
+        },
+        "37": {
+          "npc": "被时间遗忘的饲养场",
+          "desc": "未知",
+          "breakpoint": false,
+          "path": [],
+          "position": []
+        },
+        "38": {
+          "npc": "波利村",
+          "desc": "未知",
+          "outset": [
+            "prt_fild05",
+            145,
+            238
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_fild05",
+              145,
+              238
+            ]
+          ],
+          "position": []
+        },
+        "39": {
+          "npc": "水上花园",
+          "desc": "未知",
+          "breakpoint": false,
+          "path": [],
+          "position": []
+        },
+        "40": {
+          "npc": "秘密花园",
+          "desc": "未知",
+          "breakpoint": false,
+          "path": [],
+          "position": []
+        },
+        "41": {
+          "npc": "白天出来的半月",
+          "desc": "未知",
+          "outset": [
+            "rachel",
+            176,
+            140
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "rachel",
+              176,
+              140
+            ]
+          ],
+          "position": []
+        }
+      },
+      "boss": {
+        "0": {
+          "npc": "黄金虫",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "prt_sewb3",
+            23,
+            181
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_sewb3",
+              23,
+              181
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "俄塞里斯",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "moc_pryd03",
+            20,
+            189
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_pryd03",
+              20,
+              189
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "死灵",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "gef_dun01",
+            201,
+            46
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_dun01",
+              201,
+              46
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "巴风特",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "prt_maze02",
+            92,
+            177
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_maze02",
+              92,
+              177
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "蚁后",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "anthell01",
+            248,
+            42
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "anthell01",
+              248,
+              42
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "月夜猫",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "pay_dun03",
+            118,
+            65
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "pay_dun03",
+              118,
+              65
+            ]
+          ],
+          "position": []
+        },
+        "6": {
+          "npc": "海盗之王",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "treasure01",
+            78,
+            171
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "treasure01",
+              78,
+              171
+            ]
+          ],
+          "position": []
+        },
+        "7": {
+          "npc": "黑暗之王",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "gl_church",
+            288,
+            52
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gl_church",
+              288,
+              52
+            ]
+          ],
+          "position": []
+        },
+        "8": {
+          "npc": "德古拉伯爵",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "gef_dun00",
+            106,
+            174
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_dun00",
+              106,
+              174
+            ]
+          ],
+          "position": []
+        },
+        "9": {
+          "npc": "法老王",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "in_sphinx4",
+            120,
+            127
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "in_sphinx4",
+              120,
+              127
+            ]
+          ],
+          "position": []
+        },
+        "10": {
+          "npc": "古埃及王",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "moc_pryd05",
+            220,
+            31
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_pryd05",
+              220,
+              31
+            ]
+          ],
+          "position": []
+        },
+        "11": {
+          "npc": "蜂后",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "mjolnir_08",
+            160,
+            345
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mjolnir_08",
+              160,
+              345
+            ]
+          ],
+          "position": []
+        },
+        "12": {
+          "npc": "兽人酋长",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "in_orcs01",
+            21,
+            163
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "in_orcs01",
+              21,
+              163
+            ]
+          ],
+          "position": []
+        },
+        "13": {
+          "npc": "兽人英雄",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "gef_fild02",
+            30,
+            278
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_fild02",
+              30,
+              278
+            ]
+          ],
+          "position": []
+        },
+        "14": {
+          "npc": "皮里恩",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "moc_fild18",
+            377,
+            305
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_fild18",
+              377,
+              305
+            ]
+          ],
+          "position": []
+        },
+        "15": {
+          "npc": "虎王",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "pay_fild07",
+            375,
+            291
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "pay_fild07",
+              375,
+              291
+            ]
+          ],
+          "position": []
+        },
+        "16": {
+          "npc": "冰暴骑士",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "xmas_dun01",
+            126,
+            150
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "xmas_dun01",
+              126,
+              150
+            ]
+          ],
+          "position": []
+        },
+        "17": {
+          "npc": "卡仑",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "xmas",
+            151,
+            49
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "xmas",
+              151,
+              49
+            ]
+          ],
+          "position": []
+        },
+        "18": {
+          "npc": "死灵骑士",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "umbala",
+            142,
+            205
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "umbala",
+              142,
+              205
+            ]
+          ],
+          "position": []
+        },
+        "19": {
+          "npc": "墨蛇君",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "gon_dun02",
+            254,
+            261
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gon_dun02",
+              254,
+              261
+            ]
+          ],
+          "position": []
+        },
+        "20": {
+          "npc": "元灵武士",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "ama_dun02",
+            196,
+            113
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ama_dun02",
+              196,
+              113
+            ]
+          ],
+          "position": []
+        },
+        "21": {
+          "npc": "塔奥群卡",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "comodo",
+            34,
+            215
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "comodo",
+              34,
+              215
+            ]
+          ],
+          "position": []
+        },
+        "22": {
+          "npc": "乌龟将军",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "tur_dun03",
+            219,
+            88
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "tur_dun03",
+              219,
+              88
+            ]
+          ],
+          "position": []
+        },
+        "23": {
+          "npc": "阿特罗斯",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "ra_fild05",
+            40,
+            353
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ra_fild05",
+              40,
+              353
+            ]
+          ],
+          "position": []
+        },
+        "24": {
+          "npc": "贝思波",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "juperos_02",
+            128,
+            271
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "juperos_02",
+              128,
+              271
+            ]
+          ],
+          "position": []
+        },
+        "25": {
+          "npc": "嗒妮小姐",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "ayo_dun01",
+            146,
+            151
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ayo_dun01",
+              146,
+              151
+            ]
+          ],
+          "position": []
+        },
+        "26": {
+          "npc": "迪塔勒泰晤勒斯",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "hu_fild05",
+            85,
+            150
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "hu_fild05",
+              85,
+              150
+            ]
+          ],
+          "position": []
+        },
+        "27": {
+          "npc": "基尔",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "yuno_fild02",
+            112,
+            217
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "yuno_fild02",
+              112,
+              217
+            ]
+          ],
+          "position": []
+        },
+        "28": {
+          "npc": "影魔",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "ra_san04",
+            130,
+            18
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ra_san04",
+              130,
+              18
+            ]
+          ],
+          "position": []
+        },
+        "29": {
+          "npc": "寒冰龙",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "ice_dun02",
+            156,
+            277
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ice_dun02",
+              156,
+              277
+            ]
+          ],
+          "position": []
+        },
+        "30": {
+          "npc": "堕落大神官",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "abbey01",
+            323,
+            76
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "abbey01",
+              323,
+              76
+            ]
+          ],
+          "position": []
+        },
+        "31": {
+          "npc": "贝雷杰",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "abbey02",
+            163,
+            282
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "abbey02",
+              163,
+              282
+            ]
+          ],
+          "position": []
+        }
+      }
+    },
+    "5": {
+      "npc": {
+        "0": {
+          "npc": "胖大海",
+          "desc": "存钱罐、双倍掉率领取、开荒礼包领取",
+          "outset": [
+            "prontera",
+            116,
+            72
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              139,
+              92
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "卡普拉服务员#iz",
+          "desc": "存储服务、仓库服务、手推车租赁服务",
+          "outset": [
+            "prontera",
+            116,
+            72
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              149,
+              89
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "职业服务员",
+          "desc": "快速转职、学习拓展技能",
+          "outset": [
+            "prontera",
+            156,
+            182
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              135,
+              185
+            ],
+            [
+              "prt_in",
+              43,
+              106
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "事务官员莱因 伊贝诺尔#1",
+          "desc": "多人副本、单人副本和MVP副本",
+          "outset": [
+            "moc_para01",
+            30,
+            14
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_para01",
+              27,
+              30
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "公告栏#i1",
+          "desc": "MVP日志",
+          "outset": [
+            "prontera",
+            116,
+            72
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              149,
+              104
+            ]
+          ],
+          "position": []
+        },
+        "6": {
+          "npc": "道具商人#Extended_Prt1",
+          "desc": "购买或出售道具",
+          "outset": [
+            "prontera",
+            156,
+            182
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              134,
+              220
+            ],
+            [
+              "prt_in",
+              126,
+              73
+            ]
+          ],
+          "position": []
+        },
+        "7": {
+          "npc": "武器商人#prt",
+          "desc": "购买日常练级武器",
+          "outset": [
+            "prontera",
+            156,
+            182
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              175,
+              220
+            ],
+            [
+              "prt_in",
+              168,
+              130
+            ]
+          ],
+          "position": []
+        },
+        "8": {
+          "npc": "防具商人#prt'",
+          "desc": "购买日常练级防具",
+          "outset": [
+            "prontera",
+            156,
+            182
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              175,
+              220
+            ],
+            [
+              "prt_in",
+              168,
+              132
+            ]
+          ],
+          "position": []
+        },
+        "9": {
+          "npc": "活动负责人#iz",
+          "desc": "抽奖活动，抽完即止",
+          "outset": [
+            "prontera",
+            156,
+            117
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              152,
+              129
+            ]
+          ],
+          "position": []
+        },
+        "11": {
+          "npc": "赏金猎人",
+          "desc": "完成赏金任务，可以获得游戏币和商城点券",
+          "outset": [
+            "prontera",
+            116,
+            72
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              156,
+              117
+            ]
+          ],
+          "position": []
+        },
+        "12": {
+          "npc": "工匠",
+          "desc": "装备鉴定、装备回收",
+          "outset": [
+            "prontera",
+            156,
+            182
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              134,
+              220
+            ],
+            [
+              "prt_in",
+              129,
+              73
+            ]
+          ],
+          "position": []
+        },
+        "13": {
+          "npc": "忽克连",
+          "desc": "武器每精炼一级，武器攻击力增加5~10",
+          "outset": [
+            "prontera",
+            156,
+            182
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              178,
+              185
+            ],
+            [
+              "prt_in",
+              60,
+              64
+            ]
+          ],
+          "position": []
+        },
+        "15": {
+          "npc": "埃米斯",
+          "desc": "重铸装备，使装备附加更强大的属性词条",
+          "outset": [
+            "prontera",
+            156,
+            182
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              178,
+              185
+            ],
+            [
+              "prt_in",
+              56,
+              57
+            ]
+          ],
+          "position": []
+        },
+        "16": {
+          "npc": "拆卡老婆婆",
+          "desc": "可以卸载装备上的卡片",
+          "outset": [
+            "prontera",
+            156,
+            182
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              178,
+              185
+            ],
+            [
+              "prt_in",
+              68,
+              66
+            ],
+            [
+              "prt_in",
+              90,
+              64
+            ]
+          ],
+          "position": []
+        },
+        "18": {
+          "npc": "银行职员#1-1",
+          "desc": "游戏币储存业务",
+          "outset": [
+            "prontera",
+            116,
+            72
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              119,
+              102
+            ]
+          ],
+          "position": []
+        },
+        "19": {
+          "npc": "佣兵管理员#prt",
+          "desc": "佣兵签约业务",
+          "outset": [
+            "prontera",
+            52,
+            339
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              43,
+              336
+            ]
+          ],
+          "position": []
+        },
+        "20": {
+          "npc": "宠物商人#prt",
+          "desc": "出售宠物补给道具",
+          "outset": [
+            "prontera",
+            156,
+            182
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              218,
+              207
+            ]
+          ],
+          "position": []
+        },
+        "23": {
+          "npc": "重力圣人#GymPass12",
+          "desc": "使用健身卷学习负重量上升，拓展背包负重",
+          "outset": [
+            "prontera",
+            156,
+            182
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              157,
+              137
+            ]
+          ],
+          "position": []
+        },
+        "25": {
+          "npc": "头饰工匠#prt",
+          "desc": "制作可爱头饰",
+          "outset": [
+            "prontera",
+            172,
+            217
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              175,
+              219
+            ],
+            [
+              "prt_in",
+              168,
+              138
+            ]
+          ],
+          "position": []
+        }
+      },
+      "train": {
+        "0": {
+          "npc": "普隆德拉 区域8(prt_fild08)",
+          "desc": "适合1至10级",
+          "outset": [
+            "prt_fild08",
+            170,
+            368
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_fild08",
+              170,
+              368
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "废弃村落1层(pay_dun00)",
+          "desc": "适合10至30级",
+          "outset": [
+            "pay_dun00",
+            21,
+            180
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "pay_dun00",
+              21,
+              180
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "兽人地下洞窟1层(orcsdun01)",
+          "desc": "适合15至40级",
+          "outset": [
+            "orcsdun01",
+            32,
+            167
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "orcsdun01",
+              32,
+              167
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "古城修道院(gl_church)",
+          "desc": "适合60至80级",
+          "outset": [
+            "gl_church",
+            156,
+            15
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gl_church",
+              156,
+              15
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "伯仁斯旷野区域7(ve_fild07)",
+          "desc": "适合81至99级",
+          "outset": [
+            "ve_fild07",
+            147,
+            366
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ve_fild07",
+              147,
+              366
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "诺可罗德洞窟2层(mag_dun02)",
+          "desc": "适合100至120级",
+          "outset": [
+            "mag_dun02",
+            48,
+            35
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mag_dun02",
+              48,
+              35
+            ]
+          ],
+          "position": []
+        },
+        "6": {
+          "npc": "神殿圣域1层(ra_san01)",
+          "desc": "适合110至130级",
+          "outset": [
+            "ra_san01",
+            139,
+            130
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ra_san01",
+              139,
+              130
+            ]
+          ],
+          "position": []
+        },
+        "7": {
+          "npc": "甲虫洞(dic_dun02)",
+          "desc": "适合130至140级",
+          "outset": [
+            "dic_dun02",
+            196,
+            107
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dic_dun02",
+              196,
+              107
+            ]
+          ],
+          "position": []
+        },
+        "8": {
+          "npc": "龙巢穴(lasa_dun02)",
+          "desc": "适合121至135级",
+          "outset": [
+            "lasa_dun02",
+            121,
+            135
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "lasa_dun02",
+              121,
+              135
+            ]
+          ],
+          "position": []
+        },
+        "9": {
+          "npc": "彩虹高塔(ecl_tdun03)",
+          "desc": "适合136至160级",
+          "outset": [
+            "ecl_tdun03",
+            51,
+            40
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ecl_tdun03",
+              51,
+              40
+            ]
+          ],
+          "position": []
+        },
+        "10": {
+          "npc": "龙巢穴(lasa_dun03)",
+          "desc": "适合136至160级",
+          "outset": [
+            "lasa_dun03",
+            158,
+            230
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "lasa_dun03",
+              158,
+              230
+            ]
+          ],
+          "position": []
+        },
+        "11": {
+          "npc": "幻影冰洞(ice_d03_i)",
+          "desc": "适合126至139级",
+          "outset": [
+            "ice_d03_i",
+            183,
+            253
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ice_d03_i",
+              183,
+              253
+            ]
+          ],
+          "position": []
+        },
+        "12": {
+          "npc": "幻影吸血鬼(gef_d01_i)",
+          "desc": "适合130至139级",
+          "outset": [
+            "gef_d01_i",
+            81,
+            258
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_d01_i",
+              81,
+              258
+            ]
+          ],
+          "position": []
+        },
+        "13": {
+          "npc": "幻影乌龟(tur_d03_i)",
+          "desc": "适合157至165级",
+          "outset": [
+            "tur_d03_i",
+            168,
+            164
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "tur_d03_i",
+              168,
+              164
+            ]
+          ],
+          "position": []
+        },
+        "14": {
+          "npc": "幻影矿洞(ein_d02_i)",
+          "desc": "适合152至160级",
+          "outset": [
+            "ein_d02_i",
+            256,
+            248
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ein_d02_i",
+              256,
+              248
+            ]
+          ],
+          "position": []
+        },
+        "15": {
+          "npc": "幻影废弃村落(pay_d03_i)",
+          "desc": "适合120至150级",
+          "outset": [
+            "pay_d03_i",
+            80,
+            76
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "pay_d03_i",
+              80,
+              76
+            ]
+          ],
+          "position": []
+        },
+        "16": {
+          "npc": "幻影卢安达(com_d02_i)",
+          "desc": "适合150至175级",
+          "outset": [
+            "com_d02_i",
+            106,
+            39
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "com_d02_i",
+              106,
+              39
+            ]
+          ],
+          "position": []
+        },
+        "17": {
+          "npc": "幻影蚂蚁洞(ant_d02_i)",
+          "desc": "适合150至175级",
+          "outset": [
+            "ant_d02_i",
+            249,
+            199
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ant_d02_i",
+              249,
+              199
+            ]
+          ],
+          "position": []
+        },
+        "18": {
+          "npc": "幻影海底洞穴(iz_d05_i)",
+          "desc": "适合150至175级",
+          "outset": [
+            "iz_d05_i",
+            141,
+            59
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "iz_d05_i",
+              141,
+              59
+            ]
+          ],
+          "position": []
+        }
+      },
+      "money": {
+        "0": {
+          "npc": "普隆地下水道2层(prt_sewb2)",
+          "desc": "推荐 ✯",
+          "outset": [
+            "prt_sewb2",
+            20,
+            23
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_sewb2",
+              20,
+              23
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "金字塔迷宫3层(moc_pryd03)",
+          "desc": "推荐 ✯✯",
+          "outset": [
+            "moc_pryd03",
+            100,
+            90
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_pryd03",
+              100,
+              90
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "史芬克斯密穴4层(in_sphinx4)",
+          "desc": "推荐 ✯✯",
+          "outset": [
+            "in_sphinx4",
+            10,
+            219
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "in_sphinx4",
+              10,
+              219
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "奥顿拉草原 区域1(ra_fild01)",
+          "desc": "推荐 ✯✯",
+          "outset": [
+            "ra_fild01",
+            304,
+            46
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ra_fild01",
+              304,
+              46
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "诺可罗德洞窟2层(mag_dun02)",
+          "desc": "推荐 ✯✯✯",
+          "outset": [
+            "mag_dun02",
+            48,
+            34
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mag_dun02",
+              48,
+              34
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "莫斯科比亚 森林(mosk_dun01)",
+          "desc": "推荐 ✯✯✯",
+          "outset": [
+            "mosk_dun01",
+            205,
+            50
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mosk_dun01",
+              205,
+              50
+            ]
+          ],
+          "position": []
+        },
+        "6": {
+          "npc": "花枝散叶的大地(ecl_fild01)",
+          "desc": "推荐 ✯✯✯✯ (手机用户慎入，偶尔会卡图)",
+          "outset": [
+            "ecl_fild01",
+            181,
+            115
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ecl_fild01",
+              181,
+              115
+            ]
+          ],
+          "position": []
+        },
+        "7": {
+          "npc": "达纳托斯之塔10层(tha_t10)",
+          "desc": "推荐 ✯✯✯✯",
+          "outset": [
+            "tha_t10",
+            165,
+            137
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "tha_t10",
+              165,
+              137
+            ]
+          ],
+          "position": []
+        },
+        "8": {
+          "npc": "彩虹桥南部(bif_fild01)",
+          "desc": "推荐 ✯✯✯✯",
+          "outset": [
+            "bif_fild01",
+            289,
+            67
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "bif_fild01",
+              289,
+              67
+            ]
+          ],
+          "position": []
+        }
+      },
+      "challenge": {
+        "0": {
+          "npc": "试炼挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "umbala",
+            141,
+            148
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "umbala",
+              147,
+              163
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "守护挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "alde_gld",
+            183,
+            177
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "alde_gld",
+              188,
+              177
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "探索挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "ama_fild01",
+            174,
+            326
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ama_fild01",
+              179,
+              324
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "生存挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "prt_monk",
+            128,
+            249
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_monk",
+              135,
+              264
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "迷宫挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "alberta",
+            211,
+            47
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "alberta",
+              227,
+              51
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "逃生挑战",
+          "desc": "每日0时自动更新奖品",
+          "outset": [
+            "gef_tower",
+            58,
+            27
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_tower",
+              56,
+              44
+            ]
+          ],
+          "position": []
+        }
+      },
+      "instance": {
+        "0": {
+          "npc": "无尽之塔",
+          "desc": "EP10.0",
+          "outset": [
+            "alberta",
+            214,
+            73
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "alberta",
+              214,
+              73
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "封印神殿",
+          "desc": "EP13.0",
+          "outset": [
+            "monk_test",
+            306,
+            144
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "monk_test",
+              306,
+              144
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "兽人的回忆",
+          "desc": "EP13.1",
+          "outset": [
+            "gef_fild10",
+            242,
+            198
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_fild10",
+              242,
+              198
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "尼德霍格巢穴",
+          "desc": "EP13.2",
+          "outset": [
+            "nyd_dun02",
+            97,
+            194
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "nyd_dun02",
+              97,
+              194
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "吉芬魔法大赛",
+          "desc": "EP14.1",
+          "outset": [
+            "dali",
+            94,
+            142
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali",
+              94,
+              142
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "古代的克雷斯特汉姆",
+          "desc": "EP14.2",
+          "outset": [
+            "glast_01",
+            204,
+            269
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "glast_01",
+              204,
+              269
+            ]
+          ],
+          "position": []
+        },
+        "6": {
+          "npc": "魔神之塔",
+          "desc": "EP14.2",
+          "outset": [
+            "dali02",
+            137,
+            117
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali02",
+              137,
+              117
+            ]
+          ],
+          "position": []
+        },
+        "7": {
+          "npc": "莎拉的记忆",
+          "desc": "EP14.2",
+          "outset": [
+            "dali",
+            132,
+            109
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali",
+              132,
+              109
+            ]
+          ],
+          "position": []
+        },
+        "8": {
+          "npc": "幽灵皇宫",
+          "desc": "EP14.2",
+          "outset": [
+            "dali02",
+            45,
+            129
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali02",
+              45,
+              129
+            ]
+          ],
+          "position": []
+        },
+        "9": {
+          "npc": "拜欧斯之岛",
+          "desc": "EP14.3",
+          "outset": [
+            "moro_cav",
+            49,
+            57
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moro_cav",
+              49,
+              57
+            ]
+          ],
+          "position": []
+        },
+        "10": {
+          "npc": "噩梦吉特巴",
+          "desc": "EP14.3",
+          "outset": [
+            "moc_para01",
+            26,
+            92
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_para01",
+              26,
+              92
+            ]
+          ],
+          "position": []
+        },
+        "11": {
+          "npc": "恐怖玩具工厂",
+          "desc": "EP14.3",
+          "outset": [
+            "xmas",
+            234,
+            299
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "xmas",
+              234,
+              299
+            ]
+          ],
+          "position": []
+        },
+        "12": {
+          "npc": "摩尔斯洞穴",
+          "desc": "EP14.3",
+          "outset": [
+            "moro_cav",
+            61,
+            65
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moro_cav",
+              61,
+              65
+            ]
+          ],
+          "position": []
+        },
+        "13": {
+          "npc": "魔神殿",
+          "desc": "EP14.3",
+          "outset": [
+            "moro_cav",
+            43,
+            68
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moro_cav",
+              43,
+              68
+            ]
+          ],
+          "position": []
+        },
+        "14": {
+          "npc": "人面虫巢穴",
+          "desc": "EP14.3",
+          "outset": [
+            "dali",
+            81,
+            61
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali",
+              81,
+              61
+            ]
+          ],
+          "position": []
+        },
+        "15": {
+          "npc": "查尔斯顿危机",
+          "desc": "EP15.1",
+          "outset": [
+            "verus04",
+            78,
+            118
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "verus04",
+              78,
+              118
+            ]
+          ],
+          "position": []
+        },
+        "16": {
+          "npc": "飞空艇袭击",
+          "desc": "EP15.1",
+          "outset": [
+            "dali02",
+            138,
+            82
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali02",
+              138,
+              82
+            ]
+          ],
+          "position": []
+        },
+        "17": {
+          "npc": "莎拉与芬里尔",
+          "desc": "EP15.1",
+          "outset": [
+            "dali02",
+            94,
+            139
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "dali02",
+              94,
+              139
+            ]
+          ],
+          "position": []
+        },
+        "18": {
+          "npc": "尽头的房间",
+          "desc": "EP15.2",
+          "outset": [
+            "un_myst",
+            159,
+            38
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "un_myst",
+              159,
+              38
+            ]
+          ],
+          "position": []
+        },
+        "19": {
+          "npc": "中央实验室",
+          "desc": "EP15.2",
+          "outset": [
+            "verus01",
+            151,
+            151
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "verus01",
+              151,
+              151
+            ]
+          ],
+          "position": []
+        },
+        "20": {
+          "npc": "无限空间",
+          "desc": "EP16.1",
+          "outset": [
+            "cmd_fild07",
+            54,
+            276
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "cmd_fild07",
+              54,
+              276
+            ]
+          ],
+          "position": []
+        },
+        "21": {
+          "npc": "迷雾森林",
+          "desc": "未知",
+          "outset": [
+            "bif_fild01",
+            160,
+            344
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "bif_fild01",
+              160,
+              344
+            ]
+          ],
+          "position": []
+        },
+        "22": {
+          "npc": "排水沟",
+          "desc": "未知",
+          "outset": [
+            "mal_in01",
+            160,
+            31
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mal_in01",
+              160,
+              31
+            ]
+          ],
+          "position": []
+        },
+        "23": {
+          "npc": "八爪鱼巢穴",
+          "desc": "未知",
+          "outset": [
+            "mal_dun01",
+            153,
+            235
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mal_dun01",
+              153,
+              235
+            ]
+          ],
+          "position": []
+        },
+        "24": {
+          "npc": "噩梦医院",
+          "desc": "未知",
+          "outset": [
+            "ma_dun01",
+            150,
+            10
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ma_dun01",
+              150,
+              10
+            ]
+          ],
+          "position": []
+        },
+        "25": {
+          "npc": "宝箱巨鳄之巢",
+          "desc": "未知",
+          "outset": [
+            "ma_fild02",
+            315,
+            316
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ma_fild02",
+              315,
+              316
+            ]
+          ],
+          "position": []
+        },
+        "26": {
+          "npc": "食月暴龙湖泊",
+          "desc": "未知",
+          "outset": [
+            "ma_scene01",
+            174,
+            176
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ma_scene01",
+              174,
+              176
+            ]
+          ],
+          "position": []
+        },
+        "27": {
+          "npc": "生命体研究所",
+          "desc": "未知",
+          "outset": [
+            "lhz_dun04",
+            148,
+            273
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "lhz_dun04",
+              148,
+              273
+            ]
+          ],
+          "position": []
+        },
+        "28": {
+          "npc": "艾卡拉奇",
+          "desc": "未知",
+          "outset": [
+            "ecl_hub01",
+            129,
+            12
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ecl_hub01",
+              129,
+              12
+            ]
+          ],
+          "position": []
+        },
+        "29": {
+          "npc": "极限挑战",
+          "desc": "未知",
+          "outset": [
+            "prontera",
+            148,
+            75
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prontera",
+              148,
+              75
+            ]
+          ],
+          "position": []
+        },
+        "30": {
+          "npc": "天使之赐福",
+          "desc": "未知",
+          "outset": [
+            "prt_lib",
+            91,
+            81
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_lib",
+              91,
+              81
+            ]
+          ],
+          "position": []
+        },
+        "31": {
+          "npc": "过去的仪式之屋",
+          "desc": "未知",
+          "outset": [
+            "prt_lib",
+            91,
+            81
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_lib",
+              91,
+              81
+            ]
+          ],
+          "position": []
+        },
+        "32": {
+          "npc": "空中要塞",
+          "desc": "未知",
+          "outset": [
+            "prt_q",
+            241,
+            84
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_q",
+              241,
+              84
+            ]
+          ],
+          "position": []
+        },
+        "33": {
+          "npc": "邪心猎人军事基地",
+          "desc": "未知",
+          "outset": [
+            "ein_fild04",
+            275,
+            338
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ein_fild04",
+              275,
+              338
+            ]
+          ],
+          "position": []
+        },
+        "34": {
+          "npc": "维尔纳研究所",
+          "desc": "未知",
+          "outset": [
+            "slabw01",
+            240,
+            88
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "slabw01",
+              240,
+              88
+            ]
+          ],
+          "position": []
+        },
+        "35": {
+          "npc": "周五副本",
+          "desc": "未知",
+          "outset": [
+            "gef_tower",
+            53,
+            170
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_tower",
+              53,
+              170
+            ]
+          ],
+          "position": []
+        },
+        "36": {
+          "npc": "周末副本",
+          "desc": "未知",
+          "outset": [
+            "pay_arche",
+            46,
+            124
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "pay_arche",
+              46,
+              124
+            ]
+          ],
+          "position": []
+        },
+        "37": {
+          "npc": "被时间遗忘的饲养场",
+          "desc": "未知",
+          "breakpoint": false,
+          "path": [],
+          "position": []
+        },
+        "38": {
+          "npc": "波利村",
+          "desc": "未知",
+          "outset": [
+            "prt_fild05",
+            145,
+            238
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_fild05",
+              145,
+              238
+            ]
+          ],
+          "position": []
+        },
+        "39": {
+          "npc": "水上花园",
+          "desc": "未知",
+          "breakpoint": false,
+          "path": [],
+          "position": []
+        },
+        "40": {
+          "npc": "秘密花园",
+          "desc": "未知",
+          "breakpoint": false,
+          "path": [],
+          "position": []
+        },
+        "41": {
+          "npc": "白天出来的半月",
+          "desc": "未知",
+          "outset": [
+            "rachel",
+            176,
+            140
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "rachel",
+              176,
+              140
+            ]
+          ],
+          "position": []
+        }
+      },
+      "boss": {
+        "0": {
+          "npc": "黄金虫",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "prt_sewb3",
+            23,
+            181
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_sewb3",
+              23,
+              181
+            ]
+          ],
+          "position": []
+        },
+        "1": {
+          "npc": "俄塞里斯",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "moc_pryd03",
+            20,
+            189
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_pryd03",
+              20,
+              189
+            ]
+          ],
+          "position": []
+        },
+        "2": {
+          "npc": "死灵",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "gef_dun01",
+            201,
+            46
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_dun01",
+              201,
+              46
+            ]
+          ],
+          "position": []
+        },
+        "3": {
+          "npc": "巴风特",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "prt_maze02",
+            92,
+            177
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "prt_maze02",
+              92,
+              177
+            ]
+          ],
+          "position": []
+        },
+        "4": {
+          "npc": "蚁后",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "anthell01",
+            248,
+            42
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "anthell01",
+              248,
+              42
+            ]
+          ],
+          "position": []
+        },
+        "5": {
+          "npc": "月夜猫",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "pay_dun03",
+            118,
+            65
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "pay_dun03",
+              118,
+              65
+            ]
+          ],
+          "position": []
+        },
+        "6": {
+          "npc": "海盗之王",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "treasure01",
+            78,
+            171
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "treasure01",
+              78,
+              171
+            ]
+          ],
+          "position": []
+        },
+        "7": {
+          "npc": "黑暗之王",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "gl_church",
+            288,
+            52
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gl_church",
+              288,
+              52
+            ]
+          ],
+          "position": []
+        },
+        "8": {
+          "npc": "德古拉伯爵",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "gef_dun00",
+            106,
+            174
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_dun00",
+              106,
+              174
+            ]
+          ],
+          "position": []
+        },
+        "9": {
+          "npc": "法老王",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "in_sphinx4",
+            120,
+            127
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "in_sphinx4",
+              120,
+              127
+            ]
+          ],
+          "position": []
+        },
+        "10": {
+          "npc": "古埃及王",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "moc_pryd05",
+            220,
+            31
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_pryd05",
+              220,
+              31
+            ]
+          ],
+          "position": []
+        },
+        "11": {
+          "npc": "蜂后",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "mjolnir_08",
+            160,
+            345
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "mjolnir_08",
+              160,
+              345
+            ]
+          ],
+          "position": []
+        },
+        "12": {
+          "npc": "兽人酋长",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "in_orcs01",
+            21,
+            163
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "in_orcs01",
+              21,
+              163
+            ]
+          ],
+          "position": []
+        },
+        "13": {
+          "npc": "兽人英雄",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "gef_fild02",
+            30,
+            278
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gef_fild02",
+              30,
+              278
+            ]
+          ],
+          "position": []
+        },
+        "14": {
+          "npc": "皮里恩",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "moc_fild18",
+            377,
+            305
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "moc_fild18",
+              377,
+              305
+            ]
+          ],
+          "position": []
+        },
+        "15": {
+          "npc": "虎王",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "pay_fild07",
+            375,
+            291
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "pay_fild07",
+              375,
+              291
+            ]
+          ],
+          "position": []
+        },
+        "16": {
+          "npc": "冰暴骑士",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "xmas_dun01",
+            126,
+            150
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "xmas_dun01",
+              126,
+              150
+            ]
+          ],
+          "position": []
+        },
+        "17": {
+          "npc": "卡仑",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "xmas",
+            151,
+            49
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "xmas",
+              151,
+              49
+            ]
+          ],
+          "position": []
+        },
+        "18": {
+          "npc": "死灵骑士",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "umbala",
+            142,
+            205
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "umbala",
+              142,
+              205
+            ]
+          ],
+          "position": []
+        },
+        "19": {
+          "npc": "墨蛇君",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "gon_dun02",
+            254,
+            261
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "gon_dun02",
+              254,
+              261
+            ]
+          ],
+          "position": []
+        },
+        "20": {
+          "npc": "元灵武士",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "ama_dun02",
+            196,
+            113
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ama_dun02",
+              196,
+              113
+            ]
+          ],
+          "position": []
+        },
+        "21": {
+          "npc": "塔奥群卡",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "comodo",
+            34,
+            215
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "comodo",
+              34,
+              215
+            ]
+          ],
+          "position": []
+        },
+        "22": {
+          "npc": "乌龟将军",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "tur_dun03",
+            219,
+            88
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "tur_dun03",
+              219,
+              88
+            ]
+          ],
+          "position": []
+        },
+        "23": {
+          "npc": "阿特罗斯",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "ra_fild05",
+            40,
+            353
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ra_fild05",
+              40,
+              353
+            ]
+          ],
+          "position": []
+        },
+        "24": {
+          "npc": "贝思波",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "juperos_02",
+            128,
+            271
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "juperos_02",
+              128,
+              271
+            ]
+          ],
+          "position": []
+        },
+        "25": {
+          "npc": "嗒妮小姐",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "ayo_dun01",
+            146,
+            151
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ayo_dun01",
+              146,
+              151
+            ]
+          ],
+          "position": []
+        },
+        "26": {
+          "npc": "迪塔勒泰晤勒斯",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "hu_fild05",
+            85,
+            150
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "hu_fild05",
+              85,
+              150
+            ]
+          ],
+          "position": []
+        },
+        "27": {
+          "npc": "基尔",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "yuno_fild02",
+            112,
+            217
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "yuno_fild02",
+              112,
+              217
+            ]
+          ],
+          "position": []
+        },
+        "28": {
+          "npc": "影魔",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "ra_san04",
+            130,
+            18
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ra_san04",
+              130,
+              18
+            ]
+          ],
+          "position": []
+        },
+        "29": {
+          "npc": "寒冰龙",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "ice_dun02",
+            156,
+            277
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "ice_dun02",
+              156,
+              277
+            ]
+          ],
+          "position": []
+        },
+        "30": {
+          "npc": "堕落大神官",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "abbey01",
+            323,
+            76
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "abbey01",
+              323,
+              76
+            ]
+          ],
+          "position": []
+        },
+        "31": {
+          "npc": "贝雷杰",
+          "desc": "与魔王之石对话开始挑战",
+          "outset": [
+            "abbey02",
+            163,
+            282
+          ],
+          "breakpoint": false,
+          "path": [
+            [
+              "abbey02",
+              163,
+              282
+            ]
+          ],
+          "position": []
+        }
+      }
+    },
+    "6": {
+      "npc": {},
+      "train": {},
+      "money": {},
+      "challenge": {},
+      "instance": {},
+      "boss": {}
+    }
+  }
+}

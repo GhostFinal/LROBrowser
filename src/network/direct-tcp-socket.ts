@@ -4,6 +4,8 @@ export interface DirectSocketDependencies {
   TCPSocket?: DirectTcpConstructor;
   schedule?: (callback: () => void) => void;
   reportError?: (error: unknown) => void;
+  yieldToMain?: () => Promise<void>;
+  now?: () => number;
 }
 
 export class DirectTcpSocket implements LegacyClientSocket {
@@ -19,6 +21,8 @@ export class DirectTcpSocket implements LegacyClientSocket {
   private readonly constructorForSocket: DirectTcpConstructor | undefined;
   private readonly schedule: (callback: () => void) => void;
   private readonly reportError: (error: unknown) => void;
+  private readonly yieldToMain: () => Promise<void>;
+  private readonly now: () => number;
   private native?: DirectTcpConnection;
   private reader?: ReadableStreamDefaultReader<Uint8Array>;
   private writer?: WritableStreamDefaultWriter<Uint8Array>;
@@ -37,6 +41,8 @@ export class DirectTcpSocket implements LegacyClientSocket {
     this.reportError = dependencies.reportError ?? ((error) => {
       globalThis.reportError?.(error);
     });
+    this.yieldToMain = dependencies.yieldToMain ?? (() => new Promise(resolve => globalThis.setTimeout(resolve, 0)));
+    this.now = dependencies.now ?? (() => globalThis.performance.now());
     this.schedule(() => { void this.initialize(); });
   }
 
@@ -98,6 +104,8 @@ export class DirectTcpSocket implements LegacyClientSocket {
     const reader = this.reader;
     if (!reader) return;
     try {
+      let readCount = 0;
+      let workDuration = 0;
       while (!this.terminated) {
         const result = await reader.read();
         if (result.done) {
@@ -105,9 +113,16 @@ export class DirectTcpSocket implements LegacyClientSocket {
           return;
         }
         if (!this.terminated && result.value) {
+          const started = this.now();
           const value = result.value;
           const bytes = new Uint8Array(value).slice().buffer;
           this.safeInvoke(() => this.onMessage?.(bytes));
+          workDuration += Math.max(0, this.now() - started);
+          if (++readCount >= 8 || workDuration >= 4) {
+            await this.yieldToMain();
+            readCount = 0;
+            workDuration = 0;
+          }
         }
       }
     } catch (error) {

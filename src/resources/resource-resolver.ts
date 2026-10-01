@@ -1,7 +1,10 @@
 import { classifyResource, normalizeResourcePath } from './resource-policy';
 import { createResourceCache, type ResourceCache } from './resource-cache';
+import { validateMapBinary } from './map-binary-validation';
 
 export const RESOURCE_CACHE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+export const MAP_RESOURCE_TIMEOUT_MS = 60_000;
+export const RESOURCE_TIMEOUT_MS = 8_000;
 
 export const DEFAULT_RESOURCE_ROOTS = Object.freeze([
   'https://game.lastro.cn/ro/client_re/',
@@ -158,7 +161,9 @@ async function fetchResource(url: string, options: ResolvePassiveResourceOptions
   const controller = new AbortController();
   const abort = () => controller.abort();
   signal?.addEventListener('abort', abort, { once: true });
-  const timeout = setTimeout(abort, Math.max(1, options.timeoutMs ?? 8000));
+  const timeoutMs = Math.max(1, options.timeoutMs ?? RESOURCE_TIMEOUT_MS);
+  let timedOut = false;
+  const timeout = setTimeout(() => { timedOut = true; abort(); }, timeoutMs);
   try {
     const response = await fetchImpl(url, { signal: controller.signal, redirect: 'error', credentials: 'omit' });
     if (!response.ok) throw new Error(`http-${response.status}`);
@@ -169,6 +174,9 @@ async function fetchResource(url: string, options: ResolvePassiveResourceOptions
     const sample = new TextDecoder().decode(bytes.slice(0, 64)).trimStart().toLowerCase();
     if (sample.startsWith('<!doctype html') || sample.startsWith('<html')) throw new Error('html-response');
     return { bytes, response };
+  } catch (error) {
+    if (timedOut) throw new Error(`download-timeout-${timeoutMs}ms`);
+    throw error;
   } finally {
     clearTimeout(timeout);
     signal?.removeEventListener('abort', abort);
@@ -182,17 +190,25 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
   if (classification === 'forbidden') throw new ResourceResolutionError(resourcePath, [{ url: resourcePath, reason: 'forbidden-resource' }]);
   if (options.packageLookup) {
     const packaged = await options.packageLookup(normalizedPath);
-    if (packaged) return packaged.slice(0);
+    if (packaged) {
+      validateMapBinary(normalizedPath, packaged);
+      return packaged.slice(0);
+    }
   }
   if (classification === 'packaged-executable') throw new ResourceResolutionError(normalizedPath, [{ url: normalizedPath, reason: 'package-only-resource' }]);
   const cache = options.cache ?? createResourceCache();
   const backdropOnly = isWorldMapBackdrop(normalizedPath);
   const cached = await cache.match(normalizedPath).catch(() => null);
-  if (cached?.bytes.byteLength) {
+  if (cached) {
     const age = Date.now() - cached.savedAt;
     // Drop cached backdrops that came from the localized origin once.
     const staleBackdrop = backdropOnly && !cached.sourceUrl.startsWith(CLEAN_BACKDROP_ROOT);
-    if (Number.isFinite(age) && age >= 0 && age <= RESOURCE_CACHE_MAX_AGE_MS && !staleBackdrop) return cached.bytes.slice(0);
+    if (cached.bytes.byteLength && Number.isFinite(age) && age >= 0 && age <= RESOURCE_CACHE_MAX_AGE_MS && !staleBackdrop) {
+      try {
+        validateMapBinary(normalizedPath, cached.bytes);
+        return cached.bytes.slice(0);
+      } catch { /* Invalid map bytes must be fetched again instead of poisoning every load. */ }
+    }
     await cache.delete(normalizedPath).catch(() => {});
   }
   const candidates = buildResourcePathCandidates(normalizedPath, options.primaryCharset, options.fallbackCharset);
@@ -205,13 +221,15 @@ export async function resolvePassiveResource(resourcePath: string, options: Reso
     for (const candidate of candidates) {
       const url = root + candidate;
       try {
-        const result = await fetchResource(url, options, controller.signal);
+        const timeoutMs = options.timeoutMs ?? (/\.(?:gat|gnd|rsw|rsm|str)$/i.test(normalizedPath) ? MAP_RESOURCE_TIMEOUT_MS : RESOURCE_TIMEOUT_MS);
+        const result = await fetchResource(url, { ...options, timeoutMs }, controller.signal);
+        validateMapBinary(normalizedPath, result.bytes);
         return { url, ...result };
       } catch (error) {
         if (controller.signal.aborted) throw error;
         const reason = error instanceof Error ? error.message : 'fetch-failed';
         failures.push({ url, reason });
-        if (reason !== 'http-404' && reason !== 'html-response') break;
+        if (reason !== 'http-404' && reason !== 'html-response' && !reason.startsWith('invalid-map-')) break;
       }
     }
     throw new ResourceResolutionError(normalizedPath, failures);

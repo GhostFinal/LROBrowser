@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { DirectTcpSocket } from '../src/network/direct-tcp-socket';
+import { DirectTcpSocket, type DirectSocketDependencies } from '../src/network/direct-tcp-socket';
 
 function deferred<T>() {
   let resolve!: (value: T) => void, reject!: (reason: unknown) => void;
   const promise = new Promise<T>((yes, no) => { resolve = yes; reject = no; });
   return { promise, resolve, reject };
 }
-function harness(write?: (chunk: Uint8Array) => Promise<void>) {
+function harness(write?: (chunk: Uint8Array) => Promise<void>, dependencies: Partial<DirectSocketDependencies> = {}) {
   const opened = deferred<{ readable: ReadableStream<Uint8Array>; writable: WritableStream<Uint8Array> }>();
   const closed = deferred<void>();
   let controller!: ReadableStreamDefaultController<Uint8Array>;
@@ -24,7 +24,7 @@ function harness(write?: (chunk: Uint8Array) => Promise<void>) {
     close = close;
     constructor(...args: unknown[]) { options.push(args); }
   }
-  const socket = new DirectTcpSocket('45.248.8.68', 26569, { TCPSocket: Native });
+  const socket = new DirectTcpSocket('45.248.8.68', 26569, { TCPSocket: Native, ...dependencies });
   socket.onComplete = vi.fn();
   socket.onClose = vi.fn();
   socket.onMessage = vi.fn();
@@ -35,6 +35,37 @@ function harness(write?: (chunk: Uint8Array) => Promise<void>) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('Direct TCP lifecycle', () => {
+  it('yields between buffered read batches so input and render tasks can run', async () => {
+    const gate = deferred<void>();
+    const yieldToMain = vi.fn().mockImplementationOnce(() => gate.promise).mockResolvedValue(undefined);
+    const h = harness(undefined, { yieldToMain, now: () => 0 });
+    await h.open();
+    for (let i = 0; i < 20; i++) h.controller.enqueue(new Uint8Array([i]));
+    await vi.waitFor(() => expect(yieldToMain).toHaveBeenCalledOnce());
+    expect(h.socket.onMessage).toHaveBeenCalledTimes(8);
+    gate.resolve();
+    await vi.waitFor(() => expect(h.socket.onMessage).toHaveBeenCalledTimes(20));
+    expect(vi.mocked(h.socket.onMessage!).mock.calls.map(call => new Uint8Array(call[0])[0])).toEqual(Array.from({ length: 20 }, (_, i) => i));
+    h.socket.close();
+  });
+
+  it('yields after an expensive packet handler even with fewer than eight chunks', async () => {
+    let mono = 0;
+    const gate = deferred<void>();
+    const yieldToMain = vi.fn(() => gate.promise);
+    const h = harness(undefined, { yieldToMain, now: () => mono });
+    h.socket.onMessage = vi.fn(() => { mono += 5; });
+    await h.open();
+    h.controller.enqueue(new Uint8Array([1]));
+    h.controller.enqueue(new Uint8Array([2]));
+    await vi.waitFor(() => expect(yieldToMain).toHaveBeenCalledOnce());
+    expect(h.socket.onMessage).toHaveBeenCalledOnce();
+    h.socket.close();
+    gate.resolve();
+    await vi.waitFor(() => expect(h.close).toHaveBeenCalledOnce());
+    expect(h.socket.onMessage).toHaveBeenCalledOnce();
+  });
+
   it('opens asynchronously when the browser scheduler requires the global receiver', async () => {
     const schedule = globalThis.queueMicrotask;
     vi.stubGlobal('queueMicrotask', function (this: unknown, callback: () => void) {

@@ -10,3 +10,7 @@ export function patchLuaTableCompletion(source: string): string;
 export function patchRuntimeSkillLocalization(source: string): string;
 export function patchRuntimeJobLocalization(source: string): string;
 export function patchRuntimeWorldMap(source: string): string;
+export function patchRuntimeChatMapLinks(source: string): string;
+export function patchNavigationPendingTargets(source: string): string;
+export function patchRuntimeToolsPanels(source: string): string;
+export function patchMapLoadFailureRecovery(source: string): string;

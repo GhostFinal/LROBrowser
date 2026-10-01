@@ -15,9 +15,6 @@ function visit(node) {
 visit(ast);
 for (const name of wanted) if (!values[name]) throw new Error(`Missing ${name}`);
 if (!lootInstaller) throw new Error('Missing pickup list installer');
-// This fixture demonstrates motion even when the automation browser requests
-// reduced motion. The packaged game CSS/preferences are not changed.
-values['ItemObtain_default$1'] = values['ItemObtain_default$1'].replace(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\n\}/, '');
 writeFileSync('generated/localization-preview.js', `
 const values = ${JSON.stringify(values)};
 function mount(id, css, html) {
@@ -32,6 +29,19 @@ shortcut.querySelectorAll('.container').forEach((cell,i)=>{
   cell.innerHTML = '<div class="icon"><div class="img" style="background:#d9e6ed;outline:1px solid #84939c"></div><div class="amount">' + [10,1,5,10,1,258,1,10,1][i%9] + '</div></div>';
 });
 const notice = mount('notice', values['ItemObtain_default$1'], values['ItemObtain_default$2']);
+const noticeHost = document.getElementById('notice');
+const motionEvents = [];
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+const updateMotionPreference = () => { noticeHost.dataset.reducedMotion = String(motionPreference.matches); };
+updateMotionPreference();
+motionPreference.addEventListener('change', updateMotionPreference);
+for (const type of ['animationstart', 'animationend', 'animationcancel', 'transitionrun', 'transitionstart', 'transitionend', 'transitioncancel']) {
+  notice.addEventListener(type, event => {
+    motionEvents.push({ type, target: event.target.className, name: event.animationName || event.propertyName, elapsed: event.elapsedTime, at: Math.round(performance.now()) });
+    if (motionEvents.length > 100) motionEvents.shift();
+    noticeHost.dataset.motionEvents = JSON.stringify(motionEvents);
+  });
+}
 const sampleNames = ['红色药水', '漂亮旧娃娃', '杰勒比结晶', '蓝色药水', '古老冒险者的华丽纪念徽章与祝福结晶', '天地树叶子', '蝴蝶翅膀', '白色药水'];
 const DB = { INTERFACE_PATH: '', getItemInfo: () => ({identifiedResourceName:'preview'}), getItemName: item => (item.RefiningLevel ? '+' + item.RefiningLevel + ' ' : '') + sampleNames[item.ITID - 1] };
 const previewIcon = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#ebdca9" d="M9 1h6v5l4 6v9H5v-9l4-6z"/><path fill="#ad655b" d="M7 13h10v6H7z"/><path fill="#f7eacf" d="M9 2h6v3H9z"/><path fill="#fff" opacity=".5" d="M8 10h2v7H8z"/></svg>');
@@ -82,5 +92,5 @@ burst();
 `);
 writeFileSync('generated/localization-preview.html', `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>LASTRO 字体与布局复核</title>
 <style>@font-face{font-family:'Source Han Sans CN';src:url('/core/System/Font/Source%20Han%20Sans%20CN4.otf')}body{margin:0;background:#18202b;color:#e7edf4;font:14px 'Source Han Sans CN',sans-serif}header{padding:20px 40px}h1{font-size:20px;margin:0 0 8px}#shortcut{background:white;color:#222}#notice{color:#222}</style>
-<header><h1>LASTRO · 连续拾取提示</h1><div>实际列表逻辑、示例图标。本页强制展示动效，不改变系统或游戏的减少动画设置。</div><div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"><button id="play">实时播放动画</button><button id="burst">连续获得 8 种物品</button><button id="merge">再获得红色药水 ×3</button><button id="variant">获得同名 +5 物品</button><button id="step">推进 1 秒</button><button id="fine">推进 0.2 秒</button><button id="expire">推进 5 秒</button><button id="clear">清空</button></div><p id="clock">演示时间：0 秒</p></header><div id="shortcut"></div><div id="notice"></div>
+<header><h1>LASTRO · 连续拾取提示</h1><div>实际列表逻辑、示例图标。沿用游戏动效与系统的减少动画设置。</div><div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"><button id="play">实时播放动画</button><button id="burst">连续获得 8 种物品</button><button id="merge">再获得红色药水 ×3</button><button id="variant">获得同名 +5 物品</button><button id="step">推进 1 秒</button><button id="fine">推进 0.2 秒</button><button id="expire">推进 5 秒</button><button id="clear">清空</button></div><p id="clock">演示时间：0 秒</p></header><div id="shortcut"></div><div id="notice"></div>
 <script type="module" src="./localization-preview.js"></script></html>`);

@@ -3,6 +3,7 @@ import { createDirectSocket, isDirectSocketsSupported } from '../network/socket-
 import { prepareLastROLoginSession, sendLastROLoginPost, type LastROLoginPhase } from '../network/lastro-login-http';
 import type { AvailableServerProfile } from '../servers/server-profile';
 import { buildClientConfig, type ClientCredentials, type V2ClientConfig } from './client-config';
+import { loadClientFonts } from './client-fonts';
 
 export interface BootstrapOptions {
   mount: HTMLElement;
@@ -61,7 +62,8 @@ export async function bootstrapV2Client(options: BootstrapOptions): Promise<void
   // until after the game connection has already switched to the map server.
   void prepareLastROLoginSession().catch(() => undefined);
   globalThis.LastROResourceRoots = LASTRO_RESOURCE_ROOTS;
-  globalThis.LastROExecutableManifest = await loadExecutableManifest();
+  const [manifest] = await Promise.all([loadExecutableManifest(), loadClientFonts()]);
+  globalThis.LastROExecutableManifest = manifest;
   const runtimeUrl = options.runtimeUrl ?? '/runtime/Online.js';
   await import(/* @vite-ignore */ runtimeUrl);
 }

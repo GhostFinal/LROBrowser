@@ -60,16 +60,17 @@ export function createWorldMapIndex(worldData, mobData, itemTable, getItemInfo) 
   return { maps, monsters, items, floors, search, normalize };
 }
 
-export const WORLD_MAP_HTML = '<div id="WorldMap"><div class="wm-canvas" aria-label="世界地图"><div class="wm-grid"></div></div><nav class="wm-toolbar" aria-label="世界地图工具"><select aria-label="大陆" class="wm-region"></select><div><button type="button" class="wm-search">搜索</button><button type="button" class="wm-close">关闭</button></div></nav><div class="wm-message" role="status" hidden></div><section class="wm-panel" role="dialog" aria-label="地图资料查询" hidden><header><button type="button" class="wm-back">返回</button><h2 class="wm-title"></h2><button type="button" class="wm-dismiss">关闭详情</button></header><div class="wm-body"></div></section></div>';
+export const WORLD_MAP_HTML = '<div id="WorldMap"><div class="wm-canvas" aria-label="世界地图"><div class="wm-grid"></div></div><nav class="wm-toolbar" aria-label="世界地图工具"><select aria-label="大陆" class="wm-region"></select><div><button type="button" class="wm-search">搜索</button><button type="button" class="wm-close">关闭</button></div></nav><div class="wm-message" role="status" hidden></div><section class="wm-panel" role="dialog" aria-label="地图资料查询" hidden><header><button type="button" class="wm-back">返回</button><h2 class="wm-title"></h2></header><div class="wm-body"></div></section></div>';
 
 export const WORLD_MAP_CSS = `
-:host{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;display:block}
-#WorldMap{position:absolute;inset:0;background:#1b2423;color:#f1f0e9;font:13px/1.5 Arial,'Source Han Sans CN','Microsoft YaHei',sans-serif;isolation:isolate}
+:host{position:fixed!important;inset:0;width:100vw;height:100vh;display:block;overflow:hidden}
+.ui-component-root{position:absolute;inset:0;min-width:0;min-height:0;overflow:hidden}
+#WorldMap{position:absolute;inset:0;overflow:hidden;background:#1b2423;color:#f1f0e9;font:13px/1.5 Arial,'Microsoft YaHei','MiSans','Source Han Sans CN',sans-serif;font-size-adjust:none;isolation:isolate}
 #WorldMap *{box-sizing:border-box}#WorldMap [hidden]{display:none!important}
 #WorldMap button,#WorldMap select,#WorldMap input{font:inherit;color:inherit}
 #WorldMap button{cursor:pointer}#WorldMap button:focus-visible,#WorldMap select:focus-visible,#WorldMap input:focus-visible{outline:2px solid #e1cf8f;outline-offset:2px}
-.wm-canvas{position:absolute;inset:0;overflow:auto;overscroll-behavior:contain}
-.wm-grid{position:relative;width:max(100%,1104px);background-size:100% 100%;background-repeat:no-repeat}
+.wm-canvas{position:absolute;inset:0;overflow:hidden}
+.wm-grid{position:absolute;background-size:100% 100%;background-repeat:no-repeat}
 .wm-tile{position:absolute;padding:0;border:1px solid #090909;border-radius:4px;background:#282d29;overflow:hidden}
 .wm-tile img{display:block;width:100%;height:100%;object-fit:fill}.wm-tile:hover{outline:2px solid #ddcb90;z-index:1}.wm-tile.selected{outline:2px dashed #f6de92;z-index:2}.wm-tile.current{box-shadow:0 0 0 2px #e9ca6d;z-index:1}
 .wm-tile .wm-boss{position:absolute;left:4px;top:4px;width:14px;height:14px;object-fit:contain;filter:drop-shadow(0 1px 1px #000)}
@@ -79,10 +80,10 @@ export const WORLD_MAP_CSS = `
 .wm-message{position:absolute;left:50%;top:66px;transform:translateX(-50%);padding:12px 18px;background:#172021ed;border:1px solid #93866a;z-index:4;max-width:90%}
 .wm-message button{margin-left:12px;background:#384449;border:1px solid #9a9682;border-radius:3px}
 .wm-panel{position:absolute;inset:0;z-index:5;overflow:auto;background:rgba(8,12,12,.94);padding:18px clamp(12px,3vw,48px);overscroll-behavior:contain}
-.wm-panel header{display:flex;align-items:center;gap:16px;position:sticky;top:-18px;background:#111919f5;padding:14px 0;z-index:1;border-bottom:1px solid #ffffff26}.wm-panel h2{flex:1;font-size:20px;margin:0;overflow-wrap:anywhere}.wm-panel h3{font-size:15px;margin:22px 0 10px}.wm-panel p{margin:10px 0}.wm-panel button{border:1px solid #ffffff30;border-radius:3px;color:#f2f0e6;background:#ffffff14;padding:7px 12px}.wm-panel button:hover{background:#ffffff25;border-color:#d4c390}
+.wm-panel header{display:flex;align-items:center;gap:16px;position:sticky;top:-18px;background:#111919f5;padding:14px 0;z-index:1;border-bottom:1px solid #ffffff26}.wm-panel header>button{flex:none}.wm-panel h2{flex:1;min-width:0;font-size:20px;margin:0;overflow-wrap:anywhere}.wm-panel h3{font-size:15px;margin:22px 0 10px}.wm-panel p{margin:10px 0}.wm-panel button{border:1px solid #ffffff30;border-radius:3px;color:#f2f0e6;background:#ffffff14;padding:7px 12px}.wm-panel button:hover{background:#ffffff25;border-color:#d4c390}
 .wm-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}.wm-card{display:flex;align-items:center;gap:10px;text-align:left;min-height:54px;overflow-wrap:anywhere}.wm-card span{flex:1}.wm-card small{display:block;color:#b9c2c1;font-size:11px;line-height:1.6}.wm-card img{width:26px;height:26px;object-fit:contain;flex:none}.wm-card img.wm-map-thumb{width:48px;height:48px;border-radius:3px}.wm-muted{color:#b4bfbc}.wm-form{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}.wm-form input{flex:1;min-width:120px}.wm-form input,.wm-form select{border:1px solid #ffffff35;border-radius:4px;background:#263231;padding:9px}.wm-description{white-space:pre-wrap;overflow-wrap:anywhere;background:#ffffff08;padding:16px;border-left:2px solid #a99561;line-height:1.8}.wm-description .wm-item-icon{width:48px;height:48px;object-fit:contain;float:right;margin:0 0 12px 16px}.wm-actions{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.wm-page{display:flex;gap:12px;justify-content:center;align-items:center;margin:22px 0}.wm-selected{border-color:#d4c390!important}
 .wm-card .wm-item-thumbnail,.wm-item-thumbnail{display:inline-grid;place-items:center;width:40px;height:40px;flex:none;border-radius:4px;background:#ffffff0a;vertical-align:middle}.wm-item-thumbnail img.wm-item-icon{width:32px;height:32px;object-fit:contain;image-rendering:pixelated;margin:0;float:none}.wm-item-thumbnail .wm-icon-fallback{font-size:10px;line-height:1.3;color:#a3afab;text-align:center}.wm-description>.wm-item-thumbnail{float:right;width:64px;height:64px;margin:0 0 12px 16px}.wm-description>.wm-item-thumbnail img{width:48px;height:48px}
-.wm-workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;padding-top:16px}.wm-context,.wm-inspectors{min-width:0;max-height:none;overflow:visible;padding:0 0 12px}.wm-inspectors{border-top:1px solid #ffffff26;padding-top:16px}.wm-inspectors:empty::before{content:'点击怪物查看掉落，点击物品查看说明';display:block;padding:24px;color:#b4bfbc}.wm-inspector{scroll-margin-top:100px}.wm-inspector+.wm-inspector{border-top:1px solid #ffffff30;margin-top:24px;padding-top:12px}.wm-inspector h3.wm-detail-title{margin-top:0;font-size:18px}.wm-map-image{margin:0;background:#050a09;border:1px solid #ffffff20;border-radius:4px;text-align:center;padding:12px}.wm-map-image img.wm-map-thumb{display:block;width:100%;height:clamp(180px,35vh,380px);object-fit:contain;image-rendering:pixelated}.wm-map-image figcaption{color:#b4bfbc;margin-top:8px}.wm-portrait{width:64px;height:64px;flex:none;display:grid;place-items:center;background:radial-gradient(ellipse,#ffffff12,transparent);border-radius:4px}.wm-portrait img{width:64px;height:64px;object-fit:contain;image-rendering:pixelated}.wm-portrait small{font-size:10px;text-align:center;color:#a3afab}.wm-monster-heading{display:flex;align-items:center;gap:12px}.wm-monster-heading .wm-portrait,.wm-monster-heading .wm-portrait img{width:88px;height:88px}.wm-card[aria-pressed=true]{border-color:#d4c390;background:#d4c39019}.wm-workspace .wm-cards{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.wm-workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;padding-top:16px}.wm-context,.wm-inspectors{min-width:0;max-height:none;overflow:visible;padding:0 0 12px}.wm-inspectors{border-top:1px solid #ffffff26;padding-top:16px}.wm-inspectors:empty{display:none}.wm-inspector{scroll-margin-top:100px}.wm-inspector+.wm-inspector{border-top:1px solid #ffffff30;margin-top:24px;padding-top:12px}.wm-inspector h3.wm-detail-title{margin-top:0;font-size:18px}.wm-map-image{margin:0;background:#050a09;border:1px solid #ffffff20;border-radius:4px;text-align:center;padding:12px}.wm-map-image img.wm-map-thumb{display:block;width:100%;height:clamp(180px,35vh,380px);object-fit:contain;image-rendering:pixelated}.wm-map-image figcaption{color:#b4bfbc;margin-top:8px}.wm-portrait{width:64px;height:64px;flex:none;display:grid;place-items:center;background:radial-gradient(ellipse,#ffffff12,transparent);border-radius:4px}.wm-portrait img{width:64px;height:64px;object-fit:contain;image-rendering:pixelated}.wm-portrait small{font-size:10px;text-align:center;color:#a3afab}.wm-monster-heading{display:flex;align-items:center;gap:12px}.wm-monster-heading .wm-portrait,.wm-monster-heading .wm-portrait img{width:88px;height:88px}.wm-card[aria-pressed=true]{border-color:#d4c390;background:#d4c39019}.wm-workspace .wm-cards{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
 @media(max-width:760px){.wm-toolbar{left:8px;right:8px;top:10px}.wm-toolbar button,.wm-toolbar select{padding:6px 10px}.wm-toolbar>div{gap:6px}.wm-panel{padding:10px}.wm-panel header{top:-10px;gap:8px}.wm-panel h2{font-size:16px}.wm-workspace .wm-cards{grid-template-columns:repeat(auto-fill,minmax(145px,1fr))}.wm-card{padding:6px!important}.wm-card small{font-size:11px}}
 .wm-item-window{position:absolute;z-index:10;width:280px;max-width:calc(100% - 12px);max-height:calc(100% - 12px);display:flex;flex-direction:column;color:#000;background-color:#fff;background-repeat:no-repeat;border:0;border-radius:5px;box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 4px #c0c0c0,0 2px 5px #0005;font-size:12px;line-height:18px;overflow:hidden;padding:3px}
 .wm-item-window-header{position:relative;z-index:1;display:flex;align-items:center;flex:none;height:27px;padding:0 16px 0 86px;cursor:grab;touch-action:none;user-select:none;background:linear-gradient(#fff 4px,#e5eaf2 5px,#f7f9fc 6px,#d5deeb 7px,#f8faff 8px,#e2e7f0 9px,#fff 20px);border-radius:3px 3px 0 0}.wm-item-window[data-skinned] .wm-item-window-header{background:transparent}.wm-item-window[data-dragging] .wm-item-window-header{cursor:grabbing}
@@ -106,10 +107,67 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
   let root, grid, canvas, panel, body, title, regionSelect, message;
   let index, loading, alive = false, generation = 0, currentRegion = 0;
   let route = null, fromSearch = false, selectedMap = '', searchTerm = '', searchType = 'all', searchPage = 0;
+  let searchMonsterId = null;
   let context, inspectors, monsterPane, itemPopup, itemOpener;
   let itemPosition = null, itemDrag = null, itemResizeObserver;
   let partyMaps = new Set();
   const document = deps.document || globalThis.document;
+  const window = document.defaultView;
+  function visible() {
+    const host = component._host;
+    return alive && component.__active !== false && !!host?.isConnected && !host.hidden
+      && host.style.display !== 'none' && window.getComputedStyle(host).display !== 'none';
+  }
+  function scaleOf(element) {
+    const rect = element.getBoundingClientRect(), style = window.getComputedStyle(element);
+    const size = (axis, sides, fallback) => {
+      const value = parseFloat(style[axis]);
+      if (!(value > 0)) return fallback;
+      return style.boxSizing === 'border-box' ? value : value + sides.reduce((sum, side) => sum + (parseFloat(style[side]) || 0), 0);
+    };
+    // offsetWidth/Height round to integers. Computed dimensions avoid repeated
+    // fit operations shrinking a fractional 150% layout by that rounding error.
+    const width = size('width', ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'], element.offsetWidth);
+    const height = size('height', ['paddingTop', 'paddingBottom', 'borderTopWidth', 'borderBottomWidth'], element.offsetHeight);
+    return { x: width && rect.width ? rect.width / width : 1, y: height && rect.height ? rect.height / height : 1 };
+  }
+  function fitViewport() {
+    if (!visible()) return;
+    const host = component._host, scale = scaleOf(host);
+    // vw/vh are viewport units before ancestor zoom. Convert the visual viewport
+    // back to this host's layout units rather than scaling the full-screen UI twice.
+    const rect = host.getBoundingClientRect();
+    const width = window.innerWidth || document.documentElement.clientWidth;
+    const height = window.innerHeight || document.documentElement.clientHeight;
+    if (!(width > 0 && height > 0)) return;
+    for (const [name, value] of Object.entries({ position: 'fixed', right: 'auto', bottom: 'auto',
+      width: `${width / scale.x}px`, height: `${height / scale.y}px`,
+      left: `${(parseFloat(host.style.left) || 0) - rect.left / scale.x}px`,
+      top: `${(parseFloat(host.style.top) || 0) - rect.top / scale.y}px` })) host.style.setProperty(name, value, 'important');
+    fitRegion(); placeItem();
+  }
+  function fitRegion() {
+    if (!grid || !visible()) return;
+    const region = regions[currentRegion], bounds = canvas.getBoundingClientRect(), scale = scaleOf(canvas);
+    const width = canvas.clientWidth || bounds.width / scale.x;
+    const height = canvas.clientHeight || bounds.height / scale.y;
+    if (!(width > 0 && height > 0)) return;
+    const edge = Math.min(12, width / 4, height / 4);
+    const toolbar = root.querySelector('.wm-toolbar').getBoundingClientRect();
+    const top = Math.min(height - edge - 1, Math.max(edge, (toolbar.bottom - bounds.top) / scale.y + edge));
+    const availableWidth = Math.max(1, width - edge * 2), availableHeight = Math.max(1, height - top - edge);
+    const ratio = region.columns * 50 / (region.rows * 48);
+    const mapWidth = Math.min(availableWidth, availableHeight * ratio), mapHeight = mapWidth / ratio;
+    Object.assign(grid.style, { width: `${mapWidth}px`, height: `${mapHeight}px`,
+      left: `${edge + (availableWidth - mapWidth) / 2}px`, top: `${top + (availableHeight - mapHeight) / 2}px` });
+    canvas.scrollTop = canvas.scrollLeft = 0;
+  }
+  function showWindow() {
+    if (!root) component.prepare();
+    if (!component._host.isConnected) component.append();
+    alive = true; component._host.style.display = '';
+    fitViewport(); component.focus?.(); drawRegion();
+  }
   // Client's raw resources already persist in IndexedDB for 30 days. Reuse
   // decoded image URLs here too, including in-flight work shared by repeated cards.
   const imageCache = new Map();
@@ -225,6 +283,7 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
       }
       grid.append(el);
     }
+    fitRegion();
   }
   async function ensureData() {
     if (index) return index;
@@ -242,12 +301,14 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
     document.defaultView.removeEventListener('resize', placeItem);
     itemPopup.remove(); itemPopup = null;
     for (const card of body.querySelectorAll('.wm-card[data-kind="item"]')) card.setAttribute('aria-pressed', 'false');
-    if (restoreFocus) (itemOpener?.isConnected ? itemOpener : root.querySelector('.wm-dismiss')).focus({ preventScroll: true });
+    if (restoreFocus) (itemOpener?.isConnected ? itemOpener : root.querySelector('.wm-back')).focus({ preventScroll: true });
     itemOpener = null;
   }
-  function closePanel() { generation++; closeItem(false); panel.hidden = true; route = null; fromSearch = false; body.replaceChildren(); root.querySelector('.wm-search').focus(); }
+  function closePanel() { deps.cancelTeleport?.(); generation++; closeItem(false); panel.hidden = true; route = null; fromSearch = false; body.replaceChildren(); root.querySelector('.wm-search').focus(); }
   function hide() { closePanel(); component._host.style.display = 'none'; }
-  async function open(next, opener) {
+  async function open(next, opener, monsterTarget) {
+    if (!visible()) showWindow();
+    deps.cancelTeleport?.();
     const inline = next.kind === 'monster' || next.kind === 'item';
     if (next.kind !== 'item') closeItem(false);
     if (next.kind === 'search') fromSearch = false;
@@ -255,19 +316,35 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
     if (!inline || !route) route = inline ? { kind: 'search' } : next;
     panel.hidden = false; message.hidden = true;
     if (!inline || !body.children.length) { title.textContent = '正在读取资料…'; body.replaceChildren(); }
-    const back = root.querySelector('.wm-back'); back.hidden = false; back.textContent = fromSearch ? '返回搜索' : '返回世界地图';
+    const back = root.querySelector('.wm-back'); back.hidden = false; back.textContent = '返回';
     const ticket = ++generation;
     try {
       await ensureData();
       if (!alive || ticket !== generation) return;
       if (!inline || !body.querySelector('.wm-workspace')) { render(); panel.scrollTop = 0; }
       if (inline) inspect(next, opener);
-      else if (next.kind === 'search') context.querySelector('input')?.focus();
-      else root.querySelector('.wm-dismiss').focus();
+      else if (next.kind === 'search') {
+        const match = monsterTarget?.id !== null && monsterTarget?.id !== undefined
+          ? index.monsters.get(monsterTarget.id)
+          : monsterTarget?.name ? index.search(monsterTarget.name, 'monster').filter(hit => hit.rank === 0 && String(hit.record.name).replace(/\^[0-9a-f]{6}/gi, '').trim().toLowerCase() === monsterTarget.name.toLowerCase()) : [];
+        const monster = Array.isArray(match) ? match.length === 1 ? match[0].record : null : match;
+        if (monster) inspect({ kind: 'monster', id: monster.id }, context.querySelector(`.wm-card[data-kind="monster"][data-id="${monster.id}"]`));
+        else context.querySelector('input')?.focus();
+      }
+      else back.focus({ preventScroll: true });
     } catch {
       if (!alive || ticket !== generation) return;
-      title.textContent = '资料加载失败'; body.replaceChildren(node('p', '未能读取本地地图资料，请重试。'), button('重试', () => open(next)));
+      title.textContent = '资料加载失败'; body.replaceChildren(node('p', '未能读取本地地图资料，请重试。'), button('重试', () => open(next, opener, monsterTarget)));
     }
+  }
+  async function searchMonster(target) {
+    // The caller supplies a real mobGID, never a quest's huntID. Do not infer IDs
+    // from other target fields or fall back to a different monster when it is absent.
+    const id = typeof target?.id === 'number' && Number.isInteger(target.id) && target.id > 0 && target.id <= 0xffffffff ? target.id : null;
+    const name = typeof target?.name === 'string' ? target.name.replace(/\^[0-9a-f]{6}/gi, '').trim() : '';
+    showWindow();
+    searchTerm = id === null ? name : String(id); searchType = 'monster'; searchPage = 0; searchMonsterId = id;
+    return open({ kind: 'search' }, undefined, { id, name });
   }
   function mapDetails(map) {
     title.textContent = `${map.name} · ${map.id}`;
@@ -277,33 +354,46 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
     large.alt = `${map.name}地图大图`; large.loading = 'eager'; figure.append(large, caption); context.append(figure);
     const actions = node('div', undefined, 'wm-actions');
     if (deps.navigate) actions.append(button('前往此地图', () => { deps.navigate(map.id); hide(); }));
-    if (deps.teleport) actions.append(button('传送到此地图', () => { deps.teleport(map.id); hide(); }));
+    if (deps.teleport) {
+      const teleport = button('传送到此地图', async () => {
+        if (teleport.disabled) return;
+        const ticket = generation;
+        teleport.disabled = true;
+        try {
+          const result = await deps.teleport(map.id);
+          // Older synchronous adapters return void after sending successfully.
+          if (result !== false && alive && ticket === generation) hide();
+        } catch { /* The adapter reports failures; keep the selected map for retry. */ }
+        finally { teleport.disabled = false; }
+      });
+      actions.append(teleport);
+    }
     context.append(actions);
     const floors = index.floors(map.id);
     if (floors.length > 1) {
       const list = section('区域／地下城楼层');
       for (const floor of floors) { const el = card(floor, 'map'); el.classList.toggle('wm-selected', floor.id === map.id); list.append(el); }
     }
-    const list = section(`地图怪物 · ${map.monsters.length} 种`);
-    for (const monster of map.monsters) list.append(card(monster, 'monster'));
-    if (!map.monsters.length) context.append(node('p', '本地资料未记录此地图的怪物。', 'wm-muted'));
+    if (map.monsters.length) {
+      const list = section(`地图怪物 · ${map.monsters.length} 种`);
+      for (const monster of map.monsters) list.append(card(monster, 'monster'));
+    }
   }
   function monsterDetails(monster, target) {
     const heading = node('div', undefined, 'wm-monster-heading'); heading.append(portrait(monster), node('h3', `${monster.name} · Lv.${monster.level ?? '未知'}`, 'wm-detail-title')); target.append(heading);
     target.append(node('p', `怪物 ID ${monster.id}`, 'wm-muted'));
     for (const kind of ['普通掉落', 'MVP 奖励']) {
       const drops = monster.drops.filter(d => d.kind === kind);
+      if (!drops.length) continue;
       const list = section(`${kind} · ${drops.length}`, target);
       for (const drop of drops) list.append(card(drop.item, 'item', `${(drop.rate / 100).toFixed(2)}% · ID ${drop.item.id}`));
-      if (!drops.length) target.append(node('p', `本地资料未记录${kind}。`, 'wm-muted'));
     }
-    target.append(node('p', '概率为本地资料的基础值，不含服务器倍率或活动加成。重复物品保留独立掉落项，不合并概率。', 'wm-muted'));
+    if (!monster.maps.length) return;
     const locations = node('details', undefined, 'wm-locations');
     locations.open = true;
     locations.append(node('summary', `出没地图 · ${monster.maps.length}`));
     const maps = node('div', undefined, 'wm-cards'); locations.append(maps);
     for (const map of monster.maps) maps.append(card(map, 'map'));
-    if (!monster.maps.length) locations.append(node('p', '本地资料未记录出没地图。', 'wm-muted'));
     target.append(locations);
   }
   function itemDetails(item, target) {
@@ -316,7 +406,7 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
       collection.addEventListener('error', () => collection.remove()); collection.hidden = true; collection.src = url; thumbnail.append(collection);
     });
     const prose = node('div', undefined, 'wm-description-text'); description.append(prose);
-    const text = Array.isArray(item.description) ? item.description.join('\n') : String(item.description || '本地资料未提供物品说明。');
+    const text = Array.isArray(item.description) ? item.description.join('\n') : String(item.description || '');
     // Render RO color codes as spans, never insert item descriptions as HTML.
     let color = '', offset = 0;
     for (const match of text.matchAll(/\^([0-9a-f]{6})/gi)) {
@@ -327,12 +417,11 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
     }
     const tail = node('span', text.slice(offset)); if (color) tail.style.color = color; prose.append(tail); target.append(description);
     target.append(node('p', `ID ${item.id}${item.slots !== undefined ? ` · 插槽：${item.slots}` : ''}`, 'wm-item-meta'));
+    if (!item.sources.length) return;
     const sources = node('details', undefined, 'wm-item-sources');
     sources.append(node('summary', `掉落来源 · ${item.sources.length}`));
     const list = node('div', undefined, 'wm-cards'); sources.append(list); target.append(sources);
     for (const source of item.sources) list.append(card(source.monster, 'monster', `${source.kind} ${(source.rate / 100).toFixed(2)}% · ${source.monster.maps.length} 张地图`));
-    if (!item.sources.length) sources.append(node('p', '本地资料未记录掉落来源；不代表该物品无法获得。', 'wm-muted'));
-    else sources.append(node('p', '点击怪物查看出没地图与完整掉落。概率为本地资料基础值。', 'wm-muted'));
   }
   function searchView() {
     title.textContent = '搜索怪物、物品与地图';
@@ -349,9 +438,9 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
     const run = () => {
       closeItem(false);
       searchTerm = input.value; searchType = type.value; results.replaceChildren();
-      const hits = index.search(searchTerm, searchType);
-      if (!searchTerm.trim()) { results.append(node('p', '输入怪物、物品、地图名称或数字 ID。支持部分名称。', 'wm-muted')); return; }
-      results.append(node('p', hits.length ? `找到 ${hits.length} 条结果` : '没有匹配结果，请尝试其他名称或 ID。', 'wm-muted'));
+      const hits = index.search(searchTerm, searchType).filter(hit => searchMonsterId === null || searchType !== 'monster' || hit.record.id === searchMonsterId);
+      if (!searchTerm.trim()) return;
+      results.append(node('p', hits.length ? `找到 ${hits.length} 条结果` : '没有匹配结果', 'wm-muted'));
       const list = node('div', undefined, 'wm-cards'); results.append(list);
       searchPage = Math.min(searchPage, Math.max(0, Math.ceil(hits.length / 60) - 1));
       for (const hit of hits.slice(searchPage * 60, (searchPage + 1) * 60)) list.append(card(hit.record, hit.kind, `${{ map: '地图', monster: '怪物', item: '物品' }[hit.kind]} · ID ${hit.record.id}`));
@@ -362,9 +451,9 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
         pager.append(prev, node('span', `${searchPage + 1} / ${Math.ceil(hits.length / 60)}`), next); results.append(pager);
       }
     };
-    form.addEventListener('submit', event => { event.preventDefault(); searchPage = 0; run(); });
-    input.addEventListener('input', () => { searchPage = 0; run(); });
-    type.addEventListener('change', () => { searchPage = 0; run(); });
+    form.addEventListener('submit', event => { event.preventDefault(); searchPage = 0; searchMonsterId = null; run(); });
+    input.addEventListener('input', () => { searchPage = 0; searchMonsterId = null; run(); });
+    type.addEventListener('change', () => { searchPage = 0; searchMonsterId = null; run(); });
     run();
   }
   function render() {
@@ -394,7 +483,11 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
     if (!record) pane.append(node('p', `本地资料未收录 ${next.id}。`));
     else monsterDetails(record, pane);
     for (const card of body.querySelectorAll(`.wm-card[data-kind="${next.kind}"]`)) card.setAttribute('aria-pressed', String(card.dataset.id === String(next.id)));
-    pane.focus({ preventScroll: true }); pane.scrollIntoView?.({ block: 'start' });
+    pane.focus({ preventScroll: true });
+    // scrollIntoView also scrolls the game's body/ancestors under browser zoom.
+    // Only the details page owns this scroll position.
+    const scale = scaleOf(panel), heading = panel.querySelector('header').getBoundingClientRect();
+    panel.scrollTop = Math.max(0, panel.scrollTop + (pane.getBoundingClientRect().top - panel.getBoundingClientRect().top - heading.height) / scale.y);
   }
   function showItem(item, id, opener) {
     if (!itemPopup) {
@@ -425,11 +518,14 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
   }
   function placeItem() {
     if (!itemPopup) return;
-    const area = root.querySelector('#WorldMap').getBoundingClientRect();
+    const surface = root.querySelector('#WorldMap'), scale = scaleOf(surface);
+    const bounds = surface.getBoundingClientRect();
+    const area = { width: bounds.width / scale.x, height: bounds.height / scale.y };
     const size = itemPopup.getBoundingClientRect();
-    const position = itemPosition || { x: (area.width - size.width) / 2, y: (area.height - size.height) / 2 };
-    const x = Math.max(6, Math.min(position.x, area.width - size.width - 6));
-    const y = Math.max(6, Math.min(position.y, area.height - size.height - 6));
+    const width = size.width / scale.x, height = size.height / scale.y;
+    const position = itemPosition || { x: (area.width - width) / 2, y: (area.height - height) / 2 };
+    const x = Math.max(6, Math.min(position.x, area.width - width - 6));
+    const y = Math.max(6, Math.min(position.y, area.height - height - 6));
     itemPosition = { x, y }; itemPopup.style.left = `${x}px`; itemPopup.style.top = `${y}px`;
   }
   function enableItemDrag(header) {
@@ -441,7 +537,8 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
     });
     header.addEventListener('pointermove', event => {
       if (!itemDrag || itemDrag.id !== event.pointerId) return;
-      itemPosition = { x: itemDrag.left + event.clientX - itemDrag.x, y: itemDrag.top + event.clientY - itemDrag.y };
+      const scale = scaleOf(root.querySelector('#WorldMap'));
+      itemPosition = { x: itemDrag.left + (event.clientX - itemDrag.x) / scale.x, y: itemDrag.top + (event.clientY - itemDrag.y) / scale.y };
       placeItem(); event.preventDefault(); event.stopPropagation();
     });
     const end = event => {
@@ -467,19 +564,19 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
     regionSelect.addEventListener('change', () => { currentRegion = Number(regionSelect.value); drawRegion(); canvas.scrollTop = canvas.scrollLeft = 0; });
     root.querySelector('.wm-search').addEventListener('click', () => open({ kind: 'search' }));
     root.querySelector('.wm-close').addEventListener('click', hide);
-    root.querySelector('.wm-dismiss').addEventListener('click', closePanel);
     root.querySelector('.wm-back').addEventListener('click', () => { if (fromSearch) open({ kind: 'search' }); else { drawRegion(); closePanel(); } });
     // Native inputs must not propagate keyboard shortcuts to the live game.
     root.addEventListener('keydown', event => {
-      if (event.key === 'Escape') { event.preventDefault(); escape(); }
+      if (!visible()) return;
+      if ((event.key === 'Escape' || event.which === 27) && !event.isComposing && event.keyCode !== 229) { event.preventDefault(); if (!event.repeat) escape(); }
       event.stopPropagation();
     });
     drawRegion();
   };
-  component.onAppend = function () { alive = true; this._host.style.display = 'none'; };
+  component.onAppend = function () { alive = true; this._host.style.display = 'none'; window.addEventListener('resize', fitViewport); };
   component.toggle = function () {
-    if (this._host.style.display !== 'none') { hide(); return; }
-    alive = true; this._host.style.display = ''; this.focus?.(); drawRegion();
+    if (visible()) { hide(); return; }
+    showWindow(); root.querySelector('.wm-search').focus({ preventScroll: true });
     const ticket = ++generation;
     notice('正在读取地图资料…');
     ensureData().then(() => { if (alive && ticket === generation) { message.hidden = true; drawRegion(); } }).catch(() => {
@@ -487,14 +584,33 @@ export function installLastroWorldMap(component, deps, regions, makeIndex) {
       notice('地图资料加载失败。'); message.append(button('重试', () => { this._host.style.display = 'none'; this.toggle(); }));
     });
   };
-  component.onRemove = function () { alive = false; generation++; closeItem(false); route = null; fromSearch = false; body?.replaceChildren(); };
-  component.onResize = function () { placeItem(); };
+  component.onRemove = function () { deps.cancelTeleport?.(); alive = false; generation++; closeItem(false); route = null; fromSearch = false; body?.replaceChildren(); window.removeEventListener('resize', fitViewport); };
+  component.onResize = function () { fitViewport(); placeItem(); };
   component.updatePartyMembers = function (packet) {
     partyMaps = new Set((packet.groupInfo || []).filter(member => member.state === 0 && member.AID !== deps.accountId?.()).map(member => String(member.mapName || '').replace(/\.gat$/i, '')));
     if (root) for (const tile of grid.children) tile.classList.toggle('party', partyMaps.has(tile.dataset.mapId));
   };
   component.captureKeyEvents = true;
-  component.onKeyDown = function (event) { if (event.key === 'Escape' || event.which === 27) { event.preventDefault(); escape(); } event.stopImmediatePropagation(); return true; };
+  component.onKeyDown = function (event) {
+    if (!visible()) return true;
+    const path = event.composedPath?.() || [], inside = path.includes(component._host) || path.includes(root);
+    // A prompt, another native window, or its text input may be above the map.
+    if (!inside) {
+      const z = Number(component._host.style.zIndex || 50);
+      if (Object.values(component.manager?.components || {}).some(other => other !== component && other.__active && other.needFocus !== false
+        && other._host?.isConnected && other._host.style.display !== 'none' && Number(other._host.style.zIndex || 50) > z)) return true;
+      const target = path[0] || event.target;
+      if (target?.matches?.('input,textarea,select,[contenteditable]:not([contenteditable="false"])')) return true;
+    }
+    const composing = event.isComposing || event.keyCode === 229 || event.key === 'Process' || event.key === 'Dead';
+    if (!composing && (event.key === 'Escape' || event.which === 27)) {
+      event.preventDefault(); if (!event.repeat) escape(); event.stopImmediatePropagation();
+    } else if (!inside) event.stopImmediatePropagation();
+    // Events inside the map must reach form, select and drag-title handlers.
+    // The shadow-root bubble listener stops them before game bubble shortcuts.
+    return true;
+  };
   component.onShortCut = function (key) { if (key.cmd === 'TOGGLE') this.toggle(); };
-  return { open, ensureData };
+  component.searchMonster = searchMonster;
+  return { open, ensureData, searchMonster };
 }

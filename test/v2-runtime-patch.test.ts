@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
-import { patchGuildEmblemRequestCallbacks, patchLegacyScriptSinks, patchLuaJsonEscapes, patchNpcMenuBlankArea, patchTrustedTypesDomWrites, patchV2Runtime, patchWebAudioPlayback, patchRuntimeWorldMap } from '../scripts/patch-v2-runtime.mjs';
+import { patchGuildEmblemRequestCallbacks, patchLegacyScriptSinks, patchLuaJsonEscapes, patchNpcMenuBlankArea, patchTrustedTypesDomWrites, patchV2Runtime, patchWebAudioPlayback, patchRuntimeWorldMap, patchRuntimeChatMapLinks, patchRuntimeToolsPanels } from '../scripts/patch-v2-runtime.mjs';
 import { buildClientConfig } from '../src/runtime/client-config';
 import { LASTRO_SERVER_PROFILES } from '../src/servers/server-profiles';
 
@@ -9,6 +9,39 @@ const profile = LASTRO_SERVER_PROFILES[0];
 if (!profile || profile.availability !== 'available') throw new Error('missing fixture profile');
 
 describe('V2 runtime patch', () => {
+  it.each([
+    'function cleanGameUI() {}',
+    'UIManager.addComponent(LastROTools); function cleanGameUI() {}',
+    'UIManager.addComponent(LastROTools); var MapRenderer = class MapRenderer { static setMap() { UIManager.removeComponents(); } };',
+    'UIManager.addComponent(LastROTools); UIManager.addComponent(LastROTools); var MapRenderer = class MapRenderer { static setMap() { UIManager.removeComponents(); } }; function cleanGameUI() {}',
+  ])('rejects missing or ambiguous tools/map lifecycle anchors', source => {
+    expect(() => patchRuntimeToolsPanels(source)).toThrow('anchor:lastro-tools-panels');
+  });
+  it('installs native tools and preserves navigation across map UI teardown in the pinned runtime', async () => {
+    const source = await readFile(new URL('../vendor/v2/Online.js', import.meta.url), 'utf8');
+    const patched = patchRuntimeToolsPanels(source);
+    expect(patched).toContain('getMap: () => normalizeLastROTeleportMap(MapRenderer.currentMap)');
+    expect(patched).toContain('routeMapChanged: () => lastroRouteNavigation.onMapChanged()');
+    expect(patched).toMatch(/onMapChanging\(\);\s*UIManager\.removeComponents\(\)/);
+    expect(patched).toMatch(/function cleanGameUI\(\) \{\s*if .*?\.cancelRoute\(\);/);
+    expect(patched).toContain('胖大海');
+    expect(patched).not.toContain('https://game.lastro.cn/ro/src/DB/logsTable.js');
+    const installation = patched.slice(patched.indexOf('const lastroSendRouteTeleport ='), patched.indexOf('UIManager.addComponent(LastROTools)'));
+    const ast = ts.createSourceFile('tools-install.js', installation, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+    let catalogSelector = '';
+    function findCatalog(node: ts.Node) {
+      if (ts.isPropertyAssignment(node) && node.name.getText(ast) === 'getPresetRoutes') catalogSelector = node.initializer.getText(ast);
+      ts.forEachChild(node, findCatalog);
+    }
+    findCatalog(ast);
+    const presets = JSON.parse(await readFile(new URL('../scripts/lastro-teleport-routes.json', import.meta.url), 'utf8'));
+    const appCatalog = new Function('Configs', 'LastROTeleportPresets', `return (${catalogSelector})();`)({ get: (name: string) => name === 'clientVer' ? 5 : 6 }, presets);
+    const kafra = Object.values(appCatalog.npc).find((row: unknown) => (row as { npc: string }).npc.startsWith('卡普拉'));
+    expect(kafra).toMatchObject({ outset: ['prontera', 116, 72], path: [['prontera', 149, 89]] });
+  }, 20000);
+  it('requires unambiguous chat-map integration anchors on upstream updates', () => {
+    expect(() => patchRuntimeChatMapLinks('function requestChatMapTeleport(link) { return false; }')).toThrow('anchor:chat-map-links');
+  });
   it('requires an unambiguous world-map anchor on upstream updates', () => {
     expect(() => patchRuntimeWorldMap('unrecognized upstream source')).toThrow('anchor:worldmap-component');
   });
@@ -132,6 +165,19 @@ end`;
       '//#region src/Network/SocketHelpers/NodeSocket.js\nvar Socket;\n//#endregion',
       '//#region src/UI/Components/WorldMap/WorldMap.js\nvar WorldMap;\n//#endregion',
       'function defaultSocketFactory(host, port) { return new Socket(host, port); }',
+      'function requestChatMapTeleport(link) { return false; }',
+      'function flushMessageBuffer() { messages.forEach(msg => { const div = document.createElement("div"); if (!msg.override) div.textContent = msg.text; else div.innerHTML = msg.text; }); }',
+      'ChatBox.addText = function addText(text, override) { text = text.replace(/<ITEMLINK>.*?<\\/ITEMLINK>/gi, function(match) { return match; }); if (!override && /mapname/.test(text)) override = true; };',
+      'function onMapClick(event, mapLink) { if (requestChatMapTeleport(mapLink)) { event.preventDefault(); event.stopImmediatePropagation(); } }',
+      'UIManager.addComponent(LastROTools);',
+      'Navigation.waitForMapData = function waitForMapData(callback) { setTimeout(() => Navigation.waitForMapData(callback), 100); };',
+      'Navigation.navigateTo = function navigateTo(options) { _finalTargetData = {map: options.endMap}; this.waitForMapData(function () { this.findPath(); }); };',
+      'var MapRenderer = class MapRenderer { static setMap(mapname) { UIManager.removeComponents(); } };',
+      'function onMapComplete(success,error) { if (!success) { UIManager.showErrorBox(error).ui.css("zIndex", 1e3); return; } }',
+      'function cleanGameUI() {}',
+      'function onGlobalAnnounce(pkt) { Announce_default.set(pkt.msg, "#FFFF00"); }',
+      'function onPlayerMessage(pkt) { ChatBox_default.addText(pkt.msg); }',
+      'function onEntityTalkColor(pkt) { ChatBox_default.addText(pkt.msg); }',
       'function onConnectionRequest(username, password) {',
       '\tNetwork.connect(_server.address, _server.port, (success) => {',
       '\t\tif (!success) return;',
@@ -176,10 +222,10 @@ end`;
     });
     expect(transpiled.diagnostics ?? []).toEqual([]);
     expect(patched).toContain('globalThis.LastRODirectSocketFactory(host, port)');
-    expect(patched).toContain("font-family: 'Source Han Sans CN', sans-serif");
-    expect(patched).toContain("font-family: 'Source Han Sans CN', Arial, sans-serif");
+    expect(patched).toContain("font-family: Arial, 'Microsoft YaHei', 'MiSans', 'Source Han Sans CN', sans-serif");
+    expect(patched).toContain("font-family: 'MiSans', Arial, sans-serif");
     expect(patched).toContain('font-size: 12px');
-    expect(patched).toContain('font-size-adjust: 0.5186');
+    expect(patched).toContain('font-size-adjust: none');
     expect(patched).toContain('ctx.font = "10px Arial"');
     expect(patched).toContain('Arial');
     expect(patched).toContain('function installLastROAudioUnlock()');
@@ -242,9 +288,9 @@ end`;
 
   it('applies bundled Chinese typography to the generated runtime', async () => {
     const runtime = await readFile('generated/runtime/Online.js', 'utf8');
-    expect(runtime).toContain("font-family: 'Source Han Sans CN'");
+    expect(runtime).toContain("font-family: 'MiSans'");
     expect(runtime).toContain('font-size: 12px');
-    expect(runtime).toContain('font-size-adjust: 0.5186');
+    expect(runtime).toContain('font-size-adjust: none');
     expect(runtime).not.toContain('SCDream');
     expect(runtime).toContain('Arial');
   });
@@ -252,9 +298,10 @@ end`;
   it('moves item obtain notices right and stabilizes shortcut number metrics', async () => {
     const runtime = await readFile('generated/runtime/Online.js', 'utf8');
     expect(runtime).toContain('LastRO item-obtain placement and typography');
-    expect(runtime).toContain('top: var(--loot-top, 35vh)');
+    expect(runtime).toContain('top: var(--loot-top, 0px)');
     expect(runtime).toContain('function installLastroLootList');
-    expect(runtime).toContain('right: var(--loot-edge, 20px) !important');
+    expect(runtime).toContain('left: var(--loot-left, 0px) !important');
+    expect(runtime).toContain('right: auto !important');
     expect(runtime).toContain('this._host.style.right = "24px"');
     expect(runtime).toContain('LastRO shortcut typography and alignment');
     expect(runtime).toContain('font-family: Arial, sans-serif');

@@ -1,8 +1,10 @@
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import ts from 'typescript';
 import { IDBFactory } from 'fake-indexeddb';
 import { describe, expect, it } from 'vitest';
 import { patchResourceHandler, patchResourceWorker } from '../scripts/patch-resource-worker.mjs';
+import { mapBinaryFixture } from './map-binary-fixture';
 
 async function loadWorker(responses: Array<Response | Error>, manifest: string[] = []) {
   const source = await readFile('generated/runtime/LastROThreadEventHandler.js', 'utf8');
@@ -119,10 +121,10 @@ describe('LastRO resource worker', () => {
   });
 
   it('races official and backup origins for map resources', async () => {
-    const worker = await loadWorker([response(404), response(200, new Uint8Array([9]).buffer)]);
+    const worker = await loadWorker([response(404), response(200, mapBinaryFixture('gat', 9))]);
     const result = await worker.load('data/map/prt.gat');
     expect(result.error).toBeUndefined();
-    expect(result.data?.byteLength).toBe(1);
+    expect(result.data).toEqual(mapBinaryFixture('gat', 9));
     expect(worker.urls).toEqual(['https://rodata.ltsd.ro/ro/client_re/data/map/prt.gat']);
     expect(worker.tcpRequests.map(request => [request.host, request.port])).toEqual([
       ['game.lastro.cn', 80],
@@ -167,7 +169,7 @@ describe('LastRO resource worker', () => {
   });
 
   it('serves a second request from IndexedDB without fetching again', async () => {
-    const worker = await loadWorker([response(200), response(503), response(503)]);
+    const worker = await loadWorker([response(200, mapBinaryFixture('gat')), response(503), response(503)]);
     const first = await worker.load('data/map/prt.gat');
     expect(first.error).toBeUndefined();
     const initialCounts = [worker.urls.length, worker.tcpRequests.length];
@@ -178,9 +180,9 @@ describe('LastRO resource worker', () => {
 
   it('falls back after empty and disguised HTML responses without hanging', async () => {
     for (const invalid of [new ArrayBuffer(0), new TextEncoder().encode('<!doctype html>').buffer]) {
-      const worker = await loadWorker([response(200, invalid), response(200, new Uint8Array([7]).buffer)]);
+      const worker = await loadWorker([response(200, invalid), response(200, mapBinaryFixture('gat', 7))]);
       const result = await worker.load('data/map/prt.gat');
-      expect(new Uint8Array(result.data!)).toEqual(new Uint8Array([7]));
+      expect(result.data).toEqual(mapBinaryFixture('gat', 7));
       expect(worker.urls).toHaveLength(1);
       expect(worker.tcpRequests).toHaveLength(1);
     }
@@ -219,5 +221,62 @@ describe('LastRO resource worker', () => {
     expect(() => patchResourceWorker(worker + worker)).toThrow(/anchor/);
     expect(() => patchResourceHandler(handler.replace('getLastROHTTP', 'changedHTTP'))).toThrow(/anchor/);
     expect(() => patchResourceHandler(handler + handler)).toThrow(/anchor/);
+    expect(() => patchResourceWorker(worker.replace('function i(t){t?', 'function i(t,u){t?'))).toThrow(/anchor/);
+  });
+
+  it.each(['rsw', 'gat', 'gnd'])('retains the real %s load or parse failure instead of reporting a missing file', async failure => {
+    const source = patchResourceWorker(await readFile('vendor/v2/ThreadEventHandler.js', 'utf8'));
+    const ast = ts.createSourceFile('worker.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+    let loader = '';
+    const visit = (node: ts.Node) => {
+      if (ts.isVariableDeclaration(node) && node.name.getText(ast) === 'fe' && node.initializer && ts.isClassExpression(node.initializer)) {
+        loader = node.initializer.members.find(member => member.name?.getText(ast) === 'load')!.getText(ast);
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(ast);
+    const calls: unknown[][] = [];
+    const context = {
+      Error, String,
+      se: {
+        filesAlias: {},
+        load: (path: string, callback: (data: unknown, error?: string) => void) => {
+          if (path.endsWith('.' + failure)) callback(null, `actual-${failure}-parser-error`);
+          else if (path.endsWith('.rsw')) callback({ files: { gat: 'prontera.gat', gnd: 'prontera.gnd' } });
+          else callback({ compile: () => ({}) });
+        },
+      },
+      subject: { setProgress() {}, ondata() {}, onload: (...args: unknown[]) => calls.push(args) },
+    };
+    vm.runInNewContext(`subject.load=({${loader}}).load;subject.load('prontera.rsw');`, context);
+    expect(calls).toEqual([[false, `actual-${failure}-parser-error`]]);
+  });
+
+  it.each(['gat', 'gnd', 'rsw'])('returns %s compile exceptions through the map completion callback', async kind => {
+    const source = patchResourceWorker(await readFile('vendor/v2/ThreadEventHandler.js', 'utf8'));
+    const ast = ts.createSourceFile('worker.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+    let loader = '';
+    const visit = (node: ts.Node) => {
+      if (ts.isVariableDeclaration(node) && node.name.getText(ast) === 'fe' && node.initializer && ts.isClassExpression(node.initializer)) {
+        loader = node.initializer.members.find(member => member.name?.getText(ast) === 'load')!.getText(ast);
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(ast);
+    const calls: unknown[][] = [];
+    const context = {
+      Error, String,
+      se: { filesAlias: {}, load: (path: string, callback: (data: unknown) => void) => callback({
+        files: { gat: 'prontera.gat', gnd: 'prontera.gnd' },
+        water: {}, textures: [], models: [],
+        compile: () => {
+          if (path.endsWith('.' + kind)) throw new Error(`invalid ${kind} data`);
+          return {};
+        },
+      }) },
+      subject: { setProgress() {}, ondata() {}, loadGroundTextures: (_world: unknown, _ground: unknown, callback: () => void) => callback(), onload: (...args: unknown[]) => calls.push(args) },
+    };
+    expect(() => vm.runInNewContext(`subject.load=({${loader}}).load;subject.load('prontera.rsw');`, context)).not.toThrow();
+    expect(calls).toEqual([[false, `invalid ${kind} data`]]);
   });
 });

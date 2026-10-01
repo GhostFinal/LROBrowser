@@ -4,6 +4,7 @@ import ts from 'typescript';
 import { describe, expect, it, vi } from 'vitest';
 import { BUNDLED_SKILL_NAMES, readSkillSource } from '../scripts/lastro-skill-data.mjs';
 import { patchLuaTableCompletion, patchRuntimeSkillLocalization } from '../scripts/patch-v2-runtime.mjs';
+import { createLastroUiMessages } from '../scripts/lastro-ui-messages.mjs';
 
 const source = readFileSync('generated/runtime/Online.js', 'utf8');
 const ast = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
@@ -108,6 +109,7 @@ describe('localization behavior', () => {
     const method = source.match(/static getMessage\(id, defaultText\) \{[\s\S]*?\n {4}\}/)?.[0];
     const getMessage = runInNewContext(`${labels?.getText(ast)}\nclass DB { ${method} }; DB.getMessage;`, {
       MsgStringTable: { 1: 'Shop Items', 2: '已有中文', 3: 'Zeny', 4: 'Base Job' },
+      LastROUiMessages: createLastroUiMessages(),
     });
     expect(getMessage(1)).toBe('商店物品');
     expect(getMessage(2)).toBe('已有中文');
