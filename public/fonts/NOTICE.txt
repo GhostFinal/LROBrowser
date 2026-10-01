@@ -1,4 +1,4 @@
-LASTRO uses MiSans fonts, Copyright Xiaomi Inc.
+The client uses MiSans fonts, Copyright Xiaomi Inc.
 MiSans Regular, Medium and Bold are unmodified official WOFF2 files.
 Source: https://hyperos.mi.com/font/zh/download/
 License: MiSans-LICENSE.pdf

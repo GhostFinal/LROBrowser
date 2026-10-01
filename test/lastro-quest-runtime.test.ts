@@ -117,18 +117,33 @@ const vendor = readFileSync(new URL('../vendor/v2/Online.js', import.meta.url), 
 const patched = patchRuntimeQuests(vendor);
 const file = ts.createSourceFile('Online.js', patched, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const assignments = new Map<string, string>();
-let bountyHook = '';
+let bountyHook = '', itemLookup = '';
 function extract(node: ts.Node) {
   if (ts.isBinaryExpression(node) && ts.isPropertyAccessExpression(node.left)) {
     const left = node.left.getText(file);
     if (['PACKET.CZ.HUNTINGLIST', 'PACKET.CZ.HUNTINGLIST.prototype.build', 'PACKET.ZC.HUNTINGLIST'].includes(left)) assignments.set(left, node.getText(file));
   }
   if (ts.isCallExpression(node) && node.expression.getText(file) === 'Network.hookPacket' && node.arguments[0]?.getText(file) === 'PACKET.ZC.HUNTINGLIST') bountyHook = node.getText(file);
+  if (ts.isCallExpression(node) && ts.isParenthesizedExpression(node.expression) && ts.isFunctionExpression(node.expression.expression)
+    && node.expression.expression.name?.text === 'installLastroQuestUI') {
+    const dependencies = node.arguments[0];
+    if (dependencies && ts.isObjectLiteralExpression(dependencies)) {
+      const property = dependencies.properties.find(value => value.name?.getText(file) === 'getItemInfo');
+      if (property && ts.isPropertyAssignment(property)) itemLookup = property.initializer.getText(file);
+    }
+  }
   ts.forEachChild(node, extract);
 }
 extract(file);
 
 describe('packaged quest protocol and native lifecycle patch', () => {
+  it('forwards reward item lookups to the actual native DB adapter', () => {
+    expect(itemLookup).not.toBe('');
+    const value = { identifiedDisplayName: '苹果' }, getItemInfo = vi.fn(() => value);
+    const lookup = runInNewContext('(' + itemLookup + ')', { DB: { getItemInfo } });
+    expect(lookup(501)).toBe(value); expect(getItemInfo).toHaveBeenCalledExactlyOnceWith(501);
+  });
+
   it('retains and decodes the native 12-byte bounty rows and two-byte request opcode', () => {
     class BinaryWriter { bytes: Uint8Array; constructor(size: number) { this.bytes = new Uint8Array(size); } writeShort(value: number) { new DataView(this.bytes.buffer).setUint16(0, value, true); } }
     const context = { PACKET: { CZ: {}, ZC: {} }, BinaryWriter };

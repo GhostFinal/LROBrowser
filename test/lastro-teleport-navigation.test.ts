@@ -9,15 +9,17 @@ function fixture(map = 'prontera.gat', position = [150, 150]) {
   const state = { map, position };
   const sendTeleport = vi.fn<(point: TeleportNavigationPoint) => void>();
   const navigate = vi.fn<(point: TeleportNavigationPoint) => void>();
+  const stopNavigation = vi.fn();
   const setStatus = vi.fn<(message: string) => void>();
   const controller = createLastroTeleportNavigation({
     getMap: () => state.map,
     getPosition: () => state.position,
     sendTeleport,
     navigate,
+    stopNavigation,
     setStatus,
   });
-  return { state, sendTeleport, navigate, setStatus, controller };
+  return { state, sendTeleport, navigate, stopNavigation, setStatus, controller };
 }
 
 afterEach(() => vi.useRealTimers());
@@ -166,6 +168,7 @@ describe('LastRO teleport route navigation', () => {
     f.controller.request(npcRoute);
     vi.advanceTimersByTime(180000);
     expect(f.setStatus).toHaveBeenLastCalledWith('导航超时，请重新选择地点');
+    expect(f.stopNavigation).toHaveBeenCalledOnce();
     expect(vi.getTimerCount()).toBe(0);
   });
 

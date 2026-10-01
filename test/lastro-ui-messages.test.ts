@@ -6,26 +6,38 @@ import { createLastroUiMessages, patchRuntimeUiMessages, UI_MESSAGE_OVERRIDES } 
 
 const vendor = readFileSync('vendor/v2/Online.js', 'utf8');
 const marker = '//#region src/DB/DBManager.js';
-const start = vendor.indexOf(marker), end = vendor.indexOf('//#endregion', start);
-if (start < 0 || end < 0) throw new Error('Missing native DBManager fixture');
-const file = ts.createSourceFile('DBManager.js', vendor.slice(start, end), ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
-const functions = ['loadTable', 'loadCSV', 'base64DecodeUtf8'].map(name => {
-  const node = file.statements.find(node => ts.isFunctionDeclaration(node) && node.name?.text === name);
-  if (!node) throw new Error(`Missing native ${name}`);
-  return node.getText(file);
-});
-let getMessage: string | undefined;
-function findMethod(node: ts.Node) {
-  if (ts.isMethodDeclaration(node) && node.name.getText(file) === 'getMessage') {
-    if (getMessage) throw new Error('Duplicate native getMessage');
-    getMessage = node.getText(file);
+function nativeDbFixture(source: string) {
+  const start = source.indexOf(marker), end = source.indexOf('//#endregion', start);
+  if (start < 0 || end < 0) throw new Error('Missing native DBManager fixture');
+  const file = ts.createSourceFile('DBManager.js', source.slice(start, end), ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const functions = ['loadTable', 'loadCSV', 'base64DecodeUtf8'].map(name => {
+    const node = file.statements.find(node => ts.isFunctionDeclaration(node) && node.name?.text === name);
+    if (!node) throw new Error(`Missing native ${name}`);
+    return node.getText(file);
+  });
+  let getMessage: string | undefined;
+  function findMethod(node: ts.Node) {
+    if (ts.isMethodDeclaration(node) && node.name.getText(file) === 'getMessage') {
+      if (getMessage) throw new Error('Duplicate native getMessage');
+      getMessage = node.getText(file);
+    }
+    ts.forEachChild(node, findMethod);
   }
-  ts.forEachChild(node, findMethod);
+  findMethod(file);
+  if (!getMessage) throw new Error('Missing native getMessage');
+  return `${marker}\n${functions.join('\n')}\nclass DB { ${getMessage} }\n//#endregion`;
 }
-findMethod(file);
-if (!getMessage) throw new Error('Missing native getMessage');
-const nativeFixture = `${marker}\n${functions.join('\n')}\nclass DB { ${getMessage} }\n//#endregion`;
+const nativeFixture = nativeDbFixture(vendor);
 const patchedFixture = patchRuntimeUiMessages(nativeFixture);
+const runtime = readFileSync('generated/runtime/Online.js', 'utf8');
+const helperStart = runtime.indexOf('const LastROUiMessages = (');
+if (helperStart < 0) throw new Error('Missing packaged message helper');
+const helperFile = ts.createSourceFile('message-helper.js', runtime.slice(helperStart, helperStart + 16000), ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+const helper = helperFile.statements[0];
+if (!helper || !ts.isVariableStatement(helper) || helper.declarationList.declarations[0]?.name.getText(helperFile) !== 'LastROUiMessages') throw new Error('Invalid packaged message helper');
+const labels = /const lastroUiMessages = [^\r\n]+;/.exec(runtime)?.[0];
+if (!labels) throw new Error('Missing packaged label overrides');
+const packagedFixture = `${helper.getText(helperFile)}\n${labels}\n${nativeDbFixture(runtime)}`;
 const csv = new Uint8Array(readFileSync('generated/core/data/msgstringtable.csv'));
 const utf8 = (text: string) => new TextEncoder().encode(text);
 
@@ -53,7 +65,7 @@ function harness(source = patchedFixture, buffers: Record<string, Uint8Array | u
 
 describe('packaged UI message table loading', () => {
   it('reproduces zero loaded messages with the actual native loader and UTF-8 comma CSV', () => {
-    expect(csv.byteLength).toBe(232728);
+    expect(new TextDecoder().decode(csv).startsWith('MSI_')).toBe(true);
     const f = harness(nativeFixture); f.loadCsv();
     expect(f.table).toEqual({}); expect(f.done).toHaveBeenCalledOnce();
   });
@@ -67,9 +79,7 @@ describe('packaged UI message table loading', () => {
     expect(f.api.DB.getMessage(3231)).toBe('队员');
     expect(f.api.DB.getMessage(3575)).toBe('TITLE');
     expect(f.api.DB.getMessage(4384)).toBe('4384');
-    // This packaged table has one CSV record per physical line, including ten
-    // explicit empty values and four original MIS_ keys. Check every ID, not a
-    // few translated buttons that could mask an offset in later records.
+    // Check every record's native ID, including empty values and original MIS_ keys.
     const records = new TextDecoder().decode(csv).split(/\r?\n/);
     for (let id = 0; id < records.length; id++) {
       const record = records[id]!;
@@ -111,9 +121,10 @@ describe('packaged UI message table loading', () => {
   });
 
   it('keeps nonempty TXT text when its original CSV record deliberately has an empty value', () => {
-    const f = harness(); f.table[484] = 'Existing maintenance message'; f.loadCsv();
-    expect(f.api.DB.getMessage(484)).toBe('Existing maintenance message');
-    expect(f.api.DB.getMessage(485)).toBeDefined();
+    const f = harness(patchedFixture, { 'data/msgstringtable.csv': utf8('MSI_ZERO,\nMSI_ONE,下一项') });
+    f.table[0] = 'Existing message'; f.loadCsv();
+    expect(f.api.DB.getMessage(0)).toBe('Existing message');
+    expect(f.api.DB.getMessage(1)).toBe('下一项');
   });
 
   it('parses quoted commas and escaped quotes without shifting IDs across blank records or a BOM', () => {
@@ -142,6 +153,31 @@ describe('packaged UI message table loading', () => {
     const unrelatedComma = harness(patchedFixture, { 'data/other.csv': csv });
     unrelatedComma.api.loadCSV('data/other.csv', unrelatedComma.table, 0, 1, unrelatedComma.done);
     expect(unrelatedComma.table).toEqual({});
+  });
+
+  it('preserves TXT initialization and the single combined loader in the fully packaged runtime', () => {
+    expect(runtime).toContain('"data/msgstringtable.txt"');
+    expect(runtime).toContain('() => loadCSV("data/msgstringtable.csv", MsgStringTable, 0, 1, loadmsg)');
+    expect(runtime.match(/const LastROUiMessages = /g)).toHaveLength(1);
+    const txt = new Uint8Array([0xd6, 0xd0, 0xce, 0xc4, 0x54, 0x58, 0x54, 0x23]);
+    const f = harness(packagedFixture, { 'data/msgstringtable.txt': txt, 'data/msgstringtable.csv': csv });
+    f.loadAll();
+    expect(f.reads).toEqual(['data/msgstringtable.txt', 'data/msgstringtable.csv']);
+    expect(f.api.DB.getMessage(0)).toBe('中文TXT');
+    expect(f.api.DB.getMessage(484)).toBe(' - 维护中');
+    expect(f.api.DB.getMessage(3111)).toBe('切换');
+    expect(f.done).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    ['Base64', `MSI_ZERO,${Buffer.from('确定!').toString('base64')}`, { 0: '确定!' }],
+    ['TAB', 'MSI_ZERO\t中文Tab\nMSI_ONE\t第二项', { 0: '中文Tab', 1: '第二项' }],
+    ['quoted CSV', '\uFEFFMSI_ZERO,"第一,条""引号"""\r\n\r\nMSI_TWO,"第三行\n第二段"', { 0: '第一,条"引号"', 2: '第三行\n第二段' }],
+  ] as const)('loads %s through the complete runtime patch pipeline', (_format, text, expected) => {
+    const f = harness(packagedFixture, { 'data/msgstringtable.csv': utf8(text) });
+    f.loadCsv();
+    expect(f.table).toEqual(expected);
+    expect(f.done).toHaveBeenCalledOnce();
   });
 
   it.each(Object.entries(UI_MESSAGE_OVERRIDES))('translates only the known English or absent UI label at ID %s', (id, entry) => {

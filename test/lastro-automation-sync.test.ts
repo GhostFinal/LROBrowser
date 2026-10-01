@@ -666,19 +666,19 @@ describe('native runtime request and update wiring', () => {
     expect(adapter.sent).toHaveLength(1);
   });
 
-  it.each([3, 5, 6])('keeps native toggle and offline packet behavior for profile %i without optimistic state', nid => {
+  it.each([3, 5, 6])('keeps automatic battle online for profile %i without optimistic state', nid => {
     const adapter = nativeAdapter(nid), f = fixture(nid, adapter.deps); f.tools.setLoadInfo(snapshot());
     const input = f.option('autoAttack'); input.checked = true; input.dispatchEvent(new Event('change', { bubbles: true }));
-    expect(adapter.sent).toHaveLength(2);
+    expect(adapter.sent).toHaveLength(1);
     if (nid === 3) expect(adapter.sent[0]).toMatchObject({ receiver: 'NPC:setautoattack', msg: '0' });
     else {
       const bytes = adapter.sent[0]!.build!().bytes;
       expect([...bytes]).toEqual([0xfe, 0x0a, 34, 1, 0, 0, 0]);
     }
-    expect(adapter.sent[1]).toMatchObject({ receiver: 'NPC:setoffline', msg: '0' });
+    expect(adapter.sent.some(packet => packet.receiver === 'NPC:setoffline')).toBe(false);
     expect(f.tools._settingState.autoAttack).toBe(false); expect(input.disabled).toBe(true);
     f.tools.setReloadInfo(reloadBytes(34, 0));
     expect(input.checked).toBe(false); expect(input.disabled).toBe(false);
-    expect(adapter.sent).toHaveLength(2);
+    expect(adapter.sent).toHaveLength(1);
   });
 });

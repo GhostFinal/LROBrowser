@@ -146,6 +146,7 @@ export function patchRuntimeQuests(source) {
     quest: Quest, helper: questHelper, tracker: questWindow,
     getQuests: () => _questList, getHidden: () => _questNotShowList,
     hydrateQuest: value => ({...lastroQuestData.hydrateQuest(value), route: lastroQuestData.metadataFor(value.questID).route}),
+    getItemInfo: id => DB.getItemInfo(id),
     preferences: _preferences, document: globalThis.document, window: globalThis,
     getShowTracker: () => _preferences.showwindow,
     setShowTracker: show => { _preferences.showwindow = show; _preferences.save(); },

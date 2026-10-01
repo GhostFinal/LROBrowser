@@ -420,6 +420,7 @@ var init_WorldMap = __esmMin(() => {
     },
   });
   WorldMap = new GUIComponent("WorldMap", ${JSON.stringify(WORLD_MAP_CSS)});
+  WorldMap._lastroTeleport = lastroWorldMapTeleport;
   WorldMap.render = () => ${JSON.stringify(WORLD_MAP_HTML)};
   (${installLastroWorldMap.toString()})(WorldMap, {
     DB, Client,
@@ -436,6 +437,7 @@ var init_WorldMap = __esmMin(() => {
       return { worldData: values[0], mobData: values[1] };
     },
     navigate: mapname => {
+      if (typeof LastROTools !== "undefined") LastROTools?._lastroPanels?.cancelRoute();
       if (normalizeLastROTeleportMap(MapRenderer.currentMap) === normalizeLastROTeleportMap(mapname)) {
         showLastroTeleportNotice("已在目标地图。");
         return;
@@ -444,7 +446,10 @@ var init_WorldMap = __esmMin(() => {
       Navigation_default.show();
       Navigation_default.navigateTo({ startMap: MapRenderer.currentMap, startX: position[0] | 0, startY: position[1] | 0, endMap: mapname, endX: 0, endY: 0, displayName: mapname });
     },
-    teleport: mapname => lastroWorldMapTeleport.request(mapname),
+    teleport: mapname => {
+      if (typeof LastROTools !== "undefined") LastROTools?._lastroPanels?.cancelRoute();
+      return lastroWorldMapTeleport.request(mapname);
+    },
     cancelTeleport: () => lastroWorldMapTeleport.cancelPending(),
   }, ${JSON.stringify(worldMapLayout.regions)}, ${createWorldMapIndex.toString()});
   WorldMap.mouseMode = GUIComponent.MouseMode.STOP;
@@ -1114,6 +1119,7 @@ export function patchRuntimeToolsPanels(source) {
     getPosition: () => SessionStorage_default.Entity?.position,
     clock: globalThis,
     sendTeleport: lastroSendRouteTeleport,
+    stopNavigation: () => { if (Navigation_default?.__loaded) Navigation_default.clear(); },
     navigate: point => {
       const position = SessionStorage_default.Entity?.position;
       if (!position || !Navigation_default?.navigateTo) throw new Error("当前地图尚未就绪");
@@ -1130,7 +1136,10 @@ export function patchRuntimeToolsPanels(source) {
     preflight: lastroRoutePreflight, navigation: lastroRouteNavigation,
     getMap: () => MapRenderer.loading ? "" : normalizeLastROTeleportMap(MapRenderer.currentMap),
     getProfile: () => String(Configs.get("lastroNid", 0)) + ":" + String(Configs.get("clientVer", 0)),
-    clearNavigation: () => { if (Navigation_default?.__loaded) Navigation_default.clear(); },
+    clearNavigation: () => {
+      WorldMap_default?._lastroTeleport?.cancelPending();
+      if (Navigation_default?.__loaded) Navigation_default.clear();
+    },
   });
   LastROTools._lastroQuestRoute = lastroVerifiedRouteRequest;
   LastROTools._lastroTeleportRejected = message => lastroRouteNavigation.onTeleportRejected(message);
@@ -1312,6 +1321,7 @@ ${normalizedSource}`;
     output = replaceOnce(output, `DB.LUA_PATH + "navigation/navi_${table}_krpri.lub"`,
       `DB.LUA_PATH + "navigation/" + (Configs.get("lastroProtocol", false) ? "navi_${table}_tw.lub" : "navi_${table}_krpri.lub")`);
   }
+
   output = replaceFunctionBody(output, 'loadXMLFile', `{
   Client.loadFile(filename, function(file) {
     try {

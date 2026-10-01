@@ -329,9 +329,6 @@ export function patchRuntimeAutomationSync(source) {
       } else if (request?.kind === "update" && PACKET.CZ.NOTIFY_UPDATEINFO) {
         const packet = new PACKET.CZ.NOTIFY_UPDATEINFO(); Object.assign(packet, mapScalarUpdate(request)); Network.sendPacket(packet);
       } else return false;
-      if (option === "autoAttack" && enabled && PACKET.CZ.WHISPER) {
-        const packet = new PACKET.CZ.WHISPER(); packet.receiver = "NPC:setoffline"; packet.msg = "0"; Network.sendPacket(packet);
-      }
     },
     sendTarget: (mobId, enabled) => {
       if (!PACKET.CZ.NOTIFY_ONLYTARGET) return false;

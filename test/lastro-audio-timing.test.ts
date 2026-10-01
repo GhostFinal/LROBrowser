@@ -20,7 +20,7 @@ function installer(source: string) {
 
 interface BufferValue { duration: number; }
 interface SoundManagerApi { play(filename: string, volume?: number): void; stop(filename?: string): void; }
-interface BgmApi { play(filename: string): void; stop(): void; cache: { currentTime: number }; }
+interface BgmApi { play(filename: string): void; stop(): void; setVolume(volume: number): void; cache: { currentTime: number }; }
 function deferred<T>() {
   let resolve!: (value: T) => void, reject!: (error: Error) => void;
   const promise = new Promise<T>((yes, no) => { resolve = yes; reject = no; });
@@ -223,6 +223,14 @@ describe('action sound timing through real patched SoundManager and Web Audio', 
 });
 
 describe('BGM remains music rather than an expiring effect', () => {
+  it.each([0, 0.2, 1])('uses the latest music volume %s after a cold decode finishes', async volume => {
+    const f = fixture(); f.bgm.play('01.mp3'); await settle();
+    f.bgm.setVolume(volume); await f.decode();
+    expect(f.preferences.BGM.volume).toBe(volume);
+    expect(f.sources).toHaveLength(1); expect(f.gains[0]?.gain.value).toBe(volume);
+    f.bgm.setVolume(0.6); expect(f.gains[0]?.gain.value).toBe(0.6);
+  });
+
   it('preserves long-load music playback and its requested resume position', async () => {
     const f = fixture(); f.bgm.play('01.mp3'); await settle(); f.advance(2000); await f.decode();
     expect(f.sources[0]?.loop).toBe(true); expect(f.sources[0]?.start).toHaveBeenCalledWith(0, 0);

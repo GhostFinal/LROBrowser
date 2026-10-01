@@ -1,4 +1,5 @@
 export interface TeleportPreflightMap {
+  /** Full server map ID; rsw may use the scene loader's instance base name. */
   mapname: string;
   width: number;
   height: number;

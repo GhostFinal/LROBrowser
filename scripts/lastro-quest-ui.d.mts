@@ -7,6 +7,7 @@ export interface NativeQuestComponent {
 export interface LastroQuestUIDeps {
   quest: NativeQuestComponent; helper: NativeQuestComponent; tracker: NativeQuestComponent;
   getQuests(): Record<string, NativeQuest>; getHidden?(): number[]; hydrateQuest?(quest: NativeQuest): NativeQuest;
+  getItemInfo?(id: number): { identifiedDisplayName?: string } | null | undefined;
   showMonster?(id: number | null, name: string): unknown; requestRoute?(route: QuestRoute): boolean | void | Promise<boolean | void>;
   cancelRoute?(): void; cancelPendingRoute?(): void; getShowTracker?(): boolean; setShowTracker?(show: boolean): void;
   showPrompt?: unknown; getMapReady?(): boolean; getMiniMap?(): NativeQuestComponent | HTMLElement | null;

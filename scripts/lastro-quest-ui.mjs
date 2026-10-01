@@ -19,7 +19,7 @@ const DETAIL_STYLE = `
 .lastro-quest-detail{font-size:12px;font-weight:400;line-height:1.5;color:#111;overflow-wrap:anywhere}
 .lastro-quest-detail h3{margin:0 0 8px;font-size:12px;font-weight:500;color:#000091}
 .lastro-quest-detail p{margin:6px 0;white-space:pre-wrap}
-.lastro-quest-targets{padding-left:18px;margin:8px 0}.lastro-quest-targets li{margin:3px 0}
+  .lastro-quest-targets,.lastro-quest-rewards{padding-left:18px;margin:8px 0}.lastro-quest-targets li,.lastro-quest-rewards li{margin:3px 0}
 .lastro-quest-link{background:none;border:0;padding:0;color:#064a8b;text-decoration:underline;font:inherit;cursor:pointer;text-align:left;white-space:normal}
 .lastro-quest-link:disabled{color:#666;cursor:default}.lastro-quest-status{color:#a00000;white-space:pre-wrap}
 `;
@@ -128,6 +128,22 @@ function escape(value) { return string(value).replace(/[&<>"']/g, char => ({ '&'
       catch { status('暂时无法显示怪物信息'); }
     });
   }
+  function itemId(value) {
+    if (typeof value !== 'number' && !(typeof value === 'string' && /^\d+$/.test(value))) return null;
+    const result = Number(value);
+    return Number.isSafeInteger(result) && result > 0 && result <= 0xffffffff ? result : null;
+  }
+  function itemButton(value, label) {
+    const target = itemId(value);
+    if (!target) return node('span', '', text(label));
+    const button = node('button', 'lastro-quest-link item-link', text(label) || `道具 #${target}`);
+    button.type = 'button'; button.dataset.itemId = String(target);
+    on(button, 'mousedown', event => event.stopPropagation());
+    on(button, 'touchstart', event => event.stopPropagation());
+    // Keep click bubbling to the native helper's ItemInfo delegate.
+    on(button, 'click', event => event.preventDefault());
+    return button;
+  }
   function validPoint(point) {
     if (!Array.isArray(point) || point.length !== 3 || typeof point[0] !== 'string' || !/^[a-z0-9_@#-]{1,32}$/i.test(point[0])) return null;
     const coordinates = point.slice(1).map(value => typeof value === 'number' ? value : typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : NaN);
@@ -161,11 +177,12 @@ function escape(value) { return string(value).replace(/[&<>"']/g, char => ({ '&'
     actionButtons.add(button); button.disabled = pending; return button;
   }
   function appendDescription(container, value) {
-    const raw = string(value), expression = /<NAVI>([^<]*)<INFO>([^<]*)<\/INFO><\/NAVI>|<smob>([^<]*)<\/smob>|<span\s+class\s*=\s*(['"])smob\4\s*>([^<]*)<\/span>/gi;
+    const raw = string(value), expression = /<NAVI>([^<]*)<INFO>([^<]*)<\/INFO><\/NAVI>|<smob>([^<]*)<\/smob>|<span\s+class\s*=\s*(['"])smob\4\s*>([^<]*)<\/span>|<ITEM>([^<]*)<INFO>([^<]*)<\/INFO><\/ITEM>/gi;
     let index = 0;
     for (const match of raw.matchAll(expression)) {
       container.append(doc.createTextNode(text(raw.slice(index, match.index))));
-      if (match[3] !== undefined || match[5] !== undefined) container.append(monsterButton({ mobName: match[3] ?? match[5] }));
+      if (match[6] !== undefined) container.append(itemButton(match[7], match[6]));
+      else if (match[3] !== undefined || match[5] !== undefined) container.append(monsterButton({ mobName: match[3] ?? match[5] }));
       else {
         const fields = match[2].split(',').map(value => value.trim());
         const point = fields.length >= 3 ? validPoint(fields.slice(0, 3)) : null;
@@ -210,6 +227,18 @@ function escape(value) { return string(value).replace(/[&<>"']/g, char => ({ '&'
     if (number(info.reward_exp_base)) rewards.push(`EXP ${number(info.reward_exp_base)}`);
     if (number(info.reward_exp_job)) rewards.push(`JEXP ${number(info.reward_exp_job)}`);
     if (rewards.length) container.append(node('p', '', rewards.join('　')));
+    const items = node('ul', 'lastro-quest-rewards');
+    for (const reward of Array.isArray(info.reward_item_list) ? info.reward_item_list : []) {
+      const target = itemId(reward?.ItemID); if (!target) continue;
+      let label;
+      try { label = deps.getItemInfo?.(target)?.identifiedDisplayName; } catch { /* An unavailable item still has its native ID. */ }
+      const row = node('li'); row.append(itemButton(target, label));
+      const quantity = Number(reward.ItemNum);
+      if ((typeof reward.ItemNum === 'number' || typeof reward.ItemNum === 'string' && /^\d+$/.test(reward.ItemNum))
+        && Number.isSafeInteger(quantity) && quantity >= 0) row.append(doc.createTextNode(` × ${quantity}`));
+      items.append(row);
+    }
+    if (items.childNodes.length) container.append(node('h3', '', '物品奖励'), items);
     if (number(info.end_time)) {
       const deadline = new Date(Number(info.end_time) * 1000);
       if (Number.isFinite(deadline.getTime())) container.append(node('p', 'lastro-quest-deadline', '期限：' + deadline.toLocaleString('zh-CN')));

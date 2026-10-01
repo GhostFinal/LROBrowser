@@ -196060,6 +196060,10 @@ var Escape_default$2;
 var init_Escape$2 = __esmMin(() => {
   Escape_default$2 =
     '<div id="Escape" data-background="basic_interface/titlebar_fix.bmp">\r\n	<div class="top">\r\n		<button\r\n			class="node"\r\n			data-background="basic_interface/sys_base_off.bmp"\r\n			data-hover="basic_interface/sys_base_on.bmp"\r\n		></button>\r\n		<div class="title" data-text="1483">Select Option</div>\r\n	</div>\r\n\r\n	<div class="container">\r\n		<button\r\n			class="resurection"\r\n			data-background="esc_05a.bmp"\r\n			data-hover="esc_05b.bmp"\r\n			data-down="esc_05c.bmp"\r\n		></button>\r\n		<button\r\n			class="savepoint"\r\n			data-background="esc_04a.bmp"\r\n			data-hover="esc_04b.bmp"\r\n			data-down="esc_04c.bmp"\r\n		></button>\r\n		<button\r\n			class="charselect"\r\n			data-background="esc_01a.bmp"\r\n			data-hover="esc_01b.bmp"\r\n			data-down="esc_01c.bmp"\r\n		></button>\r\n		<button\r\n			class="graphics"\r\n			data-background="esc_06a.bmp"\r\n			data-hover="esc_06b.bmp"\r\n			data-down="esc_06c.bmp"\r\n		></button>\r\n		<button class="sound" data-background="esc_07a.bmp" data-hover="esc_07b.bmp" data-down="esc_07c.bmp"></button>\r\n		<button class="hotkey" data-background="esc_08a.bmp" data-hover="esc_08b.bmp" data-down="esc_08c.bmp"></button>\r\n		<button class="exit" data-background="esc_03a.bmp" data-hover="esc_03b.bmp" data-down="esc_03c.bmp"></button>\r\n		<button class="cancel" data-background="esc_02a.bmp" data-hover="esc_02b.bmp" data-down="esc_02c.bmp"></button>\r\n	</div>\r\n</div>\r\n';
+  Escape_default$2 = Escape_default$2.replace(
+    '\r\n\t\t<button class="exit"',
+    '\r\n\t\t<button class="setoffline">离线战斗</button>\r\n\t\t<button class="exit"',
+  );
 });
 //#endregion
 //#region src/UI/Components/Escape/Escape.css?raw
@@ -196067,6 +196071,8 @@ var Escape_default$1;
 var init_Escape$1 = __esmMin(() => {
   Escape_default$1 =
     ":host {\r\n	width: 280px;\r\n	height: auto;\r\n	top: 200px;\r\n	left: 200px;\r\n}\r\n\r\n#Escape {\r\n	width: 280px;\r\n	height: auto;\r\n	border-radius: 5px;\r\n	background-color: white;\r\n	background-repeat: no-repeat;\r\n}\r\n\r\n#Escape .top .node {\r\n	width: 11px;\r\n	height: 11px;\r\n	position: absolute;\r\n	top: 3px;\r\n	left: 4px;\r\n	border: none;\r\n	background-color: transparent;\r\n	background-repeat: no-repeat;\r\n}\r\n\r\n#Escape .top .title {\r\n	position: absolute;\r\n	top: 2px;\r\n	left: 18px;\r\n	text-shadow: 1px 1px white;\r\n	white-space: nowrap;\r\n}\r\n\r\n#Escape .container {\r\n	width: 220px;\r\n	height: auto;\r\n	padding: 20px 30px 6px 30px;\r\n}\r\n\r\n#Escape .container button {\r\n	width: 221px;\r\n	height: 20px;\r\n	margin-top: 3px;\r\n	border: none;\r\n	background-color: transparent;\r\n	background-repeat: no-repeat;\r\n}\r\n";
+  Escape_default$1 +=
+    "\r\n#Escape .container .setoffline {\r\n\tfont-family: inherit;\r\n\tfont-size: 12px;\r\n\tcolor: #222;\r\n\tbackground: linear-gradient(to bottom, rgba(255, 255, 255, 1) 20%, rgba(230, 230, 230, 1) 80%, rgba(255, 255, 255, 1) 100%);\r\n\tborder: 1px solid #999;\r\n\tborder-radius: 3px;\r\n}\r\n#Escape .container .setoffline:hover {\r\n\tbackground: rgba(240, 240, 240, 1);\r\n}\r\n";
 });
 //#endregion
 //#region src/UI/Components/Escape/Escape.js
@@ -196131,6 +196137,15 @@ var init_Escape = __esmMin(() => {
     root.querySelectorAll(".resurection, .savepoint").forEach(function (el) {
       el.style.display = "none";
     });
+    const offlineButton = root.querySelector(".setoffline");
+    if (offlineButton) {
+      offlineButton.style.display =
+        Number(Configs.get("lastroNid", 0)) === 3 ? "" : "none";
+      offlineButton.addEventListener("click", function () {
+        Escape.onSetofflineRequest();
+        Escape._host.style.display = "none";
+      });
+    }
     root.querySelector(".sound").addEventListener("click", onToggleSoundUI);
     root
       .querySelector(".graphics")
@@ -196195,6 +196210,8 @@ var init_Escape = __esmMin(() => {
     this._host.style.display = "";
     root.querySelector(".savepoint").style.display = "";
     if (hasSiegfried) root.querySelector(".resurection").style.display = "";
+    const offlineButton = root.querySelector(".setoffline");
+    if (offlineButton) offlineButton.style.display = "none";
     root.querySelectorAll(".graphics, .sound, .hotkey").forEach(function (el) {
       el.style.display = "none";
     });
@@ -196211,6 +196228,10 @@ var init_Escape = __esmMin(() => {
     root.querySelectorAll(".graphics, .sound, .hotkey").forEach(function (el) {
       el.style.display = "";
     });
+    const offlineButton = root.querySelector(".setoffline");
+    if (offlineButton)
+      offlineButton.style.display =
+        Number(Configs.get("lastroNid", 0)) === 3 ? "" : "none";
   };
   /**
    * @var {function} callback when player want to resurect using Token of Siegfried
@@ -196228,6 +196249,7 @@ var init_Escape = __esmMin(() => {
    * @var {function} callback when player want to return to char selection
    */
   Escape.onCharSelectionRequest = function onCharSelectionRequest() {};
+  Escape.onSetofflineRequest = function onSetofflineRequest() {};
   Escape.mouseMode = GUIComponent.MouseMode.STOP;
   Escape.needFocus = true;
   Escape_default = UIManager.addComponent(Escape);
@@ -298336,12 +298358,6 @@ var init_LastROTools = __esmMin(() => {
       Object.assign(pkt, mapScalarUpdate(request));
       Network.sendPacket(pkt);
     }
-    if (option === "autoAttack" && enabled && PACKET.CZ.WHISPER) {
-      const pkt = new PACKET.CZ.WHISPER();
-      pkt.receiver = "NPC:setoffline";
-      pkt.msg = "0";
-      Network.sendPacket(pkt);
-    }
     this.setStatus(
       `${this.getOptionLabel(option)}：${enabled ? "开启" : "关闭"}`,
     );
@@ -314172,6 +314188,16 @@ function cleanGameUI() {
   }
 }
 /**
+ * Ask the server to enter offline battle mode
+ */
+function onSetofflineRequest$2() {
+  if (!PACKET.CZ.WHISPER) return;
+  const pkt = new PACKET.CZ.WHISPER();
+  pkt.receiver = "NPC:setoffline";
+  pkt.msg = "0";
+  Network.sendPacket(pkt);
+}
+/**
  * Ask the server to disconnect
  */
 function onExitRequest$2() {
@@ -315054,6 +315080,7 @@ var init_MapEngine = __esmMin(() => {
           Achievement_default.prepare();
         PetInformations_default.onConfigUpdate = onConfigUpdate;
         HomunInformations_default.onConfigUpdate = onConfigUpdate;
+        Escape_default.onSetofflineRequest = onSetofflineRequest$2;
         Escape_default.onExitRequest = onExitRequest$2;
         Escape_default.onCharSelectionRequest = onRestartRequest;
         Escape_default.onReturnSavePointRequest = onReturnSavePointRequest;

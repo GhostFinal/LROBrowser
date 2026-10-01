@@ -1,5 +1,5 @@
 // Serialized into the client runtime; dependencies must remain explicit.
-export function createLastroTeleportNavigation({ getMap, getPosition, sendTeleport, navigate, setStatus, clock = globalThis }) {
+export function createLastroTeleportNavigation({ getMap, getPosition, sendTeleport, navigate, stopNavigation, setStatus, clock = globalThis }) {
   let active = null;
   let disposed = false;
   let pollTimer;
@@ -21,10 +21,12 @@ export function createLastroTeleportNavigation({ getMap, getPosition, sendTelepo
   }
 
   function cancel() {
+    const state = active;
     active = null;
     if (pollTimer !== undefined) clock.clearTimeout(pollTimer);
     if (timeoutTimer !== undefined) clock.clearTimeout(timeoutTimer);
     pollTimer = timeoutTimer = undefined;
+    if (state?.phase === 'navigation') stopNavigation?.();
   }
 
   function finish(state, message) {

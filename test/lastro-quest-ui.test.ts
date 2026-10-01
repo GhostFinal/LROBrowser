@@ -75,6 +75,8 @@ function fixture(renew = false) {
   const preference = { show: true, showwindow: true, save: vi.fn() };
   const network = { sendPacket: vi.fn() }, chat = { addText: vi.fn(), TYPE: { ADMIN: 1, SELF: 2 }, FILTER: { QUEST: 1 } };
   const showMonster = vi.fn(), requestRoute = vi.fn<(route: QuestRoute) => boolean | Promise<boolean>>(() => true), cancelPendingRoute = vi.fn(), cancelRoute = vi.fn();
+  const itemInfo = { uid: null as number | null, append: vi.fn(), remove: vi.fn(), setItem: vi.fn() };
+  const getItemInfo = vi.fn((id: number) => ({ identifiedDisplayName: id === 501 ? '苹果' : '道具', identifiedResourceName: 'apple' }));
   const resources: string[] = [];
   class GUIComponent {
     static MouseMode = { CROSS: 0, STOP: 1 }; name: string; _host: HTMLElement | null = null; _root: ShadowRoot | null = null;
@@ -97,10 +99,10 @@ function fixture(renew = false) {
     init_Preferences$1: vi.fn(), init_UIManager: vi.fn(), init_GUIComponent: vi.fn(), init_QuestWindow$2: vi.fn(), init_QuestWindow$1: vi.fn(), init_QuestWindow: vi.fn(),
     Preferences: { get: (_key: string, defaults: object) => Object.assign({}, defaults, preference) },
     UIManager: { addComponent: (component: unknown) => component }, Renderer: { width: 1024, height: 768 },
-    DB: { INTERFACE_PATH: '', getQuestInfo: () => ({ Title: '真实狩猎任务' }), getItemInfo: () => ({ identifiedDisplayName: '道具', identifiedResourceName: 'apple' }) },
+    DB: { INTERFACE_PATH: '', getQuestInfo: () => ({ Title: '真实狩猎任务' }), getItemInfo },
     Client: { loadFile: (path: string, callback: (data: string) => void) => { resources.push(path); callback('data:image/bmp;base64,AA=='); } },
     Network: network, PACKET: { CZ: { ACTIVE_QUEST: class {} } }, ChatBox_default: chat, SessionStorage_default: {},
-    processText$1: (value: unknown) => typeof value === 'string' ? value : '', ItemInfo_default: {}, Navigation_default: {},
+    processText$1: (value: unknown) => typeof value === 'string' ? value : '', ItemInfo_default: itemInfo, Navigation_default: {},
     QuestWindow_default$1: css.tracker, QuestWindow_default$2: html.tracker,
   };
   const result = runInNewContext(`${helperFactory}\n${trackerSource}\ninit_QuestWindow();\n${questFactory}\nconst helper = createQuestHelper(${JSON.stringify({ name: renew ? 'QuestHelper' : 'QuestHelperV1', htmlText: renew ? html.renewHelper : html.classicHelper, cssText: renew ? css.renewHelper : css.classicHelper, preferencesKey: 'Quest', renewLayout: renew })});\nconst quest = createQuest({name:${JSON.stringify(renew ? 'Quest' : 'QuestV1')},htmlText:${JSON.stringify(renew ? html.renew : html.classic)},cssText:${JSON.stringify(renew ? css.renew : css.classic)},questHelper:helper,questWindow:QuestWindow_default,renewLayout:${renew}});\n({quest,helper,tracker:QuestWindow_default});`, context) as { quest: Component; helper: Component; tracker: Component };
@@ -110,7 +112,7 @@ function fixture(renew = false) {
   const viewport = { width: 1024, height: 768 }, readiness = { value: true };
   const install = runInNewContext('(' + installLastroQuestUI.toString() + ')') as typeof installLastroQuestUI;
   const api = install({ ...result, getQuests: () => result.quest.fixtureQuests(), getHidden: () => result.quest.fixtureHidden(),
-    hydrateQuest: value => value, showMonster, requestRoute, cancelPendingRoute, cancelRoute, getShowTracker: () => preference.showwindow,
+    hydrateQuest: value => value, getItemInfo, showMonster, requestRoute, cancelPendingRoute, cancelRoute, getShowTracker: () => preference.showwindow,
     setShowTracker: value => { preference.showwindow = value; preference.save(); }, getMapReady: () => readiness.value,
     getMiniMap: () => mini, getViewport: () => viewport, document, window });
   disposals.push(api); result.quest.append(); result.tracker.append(); result.helper.append();
@@ -120,7 +122,7 @@ function fixture(renew = false) {
       21: { huntID: 21, mobGID: 1002, mobName: '波利', huntCount: 5, maxCount: 20 },
       22: { huntID: 22, mobGID: 1004, mobName: '蜂兵', huntCount: 0, maxCount: 5 },
     }, reward_item_list: [], route });
-  return { ...result, api, preference, network, chat, resources, showMonster, requestRoute, cancelPendingRoute, cancelRoute, viewport, rect, mini, readiness, value,
+  return { ...result, api, preference, network, chat, resources, itemInfo, getItemInfo, showMonster, requestRoute, cancelPendingRoute, cancelRoute, viewport, rect, mini, readiness, value,
     root: result.quest.getRoot(), detailRoot: result.helper.getRoot(), trackerRoot: result.tracker.getRoot() };
 }
 const content = (root: ParentNode) => root.querySelector('.lastro-quest-detail')?.textContent || '';
@@ -214,6 +216,39 @@ describe('native quest windows and live tracking', () => {
 });
 
 describe('safe native quest descriptions and direct route actions', () => {
+  it.each([false, true])('preserves ITEM links and reward names/quantities through the actual native ItemInfo delegate (renew=%s)', renew => {
+    const f = fixture(renew), value = f.value();
+    value.description = '收集<ITEM>苹果<INFO>501</INFO></ITEM>';
+    value.reward_item_list = [{ ItemID: 501, ItemNum: 3 }, { ItemID: 502, ItemNum: 2 }];
+    f.quest.setQuestList({ 7: value }); f.helper.setQuestInfo(value);
+    const descriptionLink = f.detailRoot.querySelector<HTMLButtonElement>('.lastro-quest-description .item-link')!;
+    expect(descriptionLink.dataset.itemId).toBe('501'); expect(descriptionLink.textContent).toBe('苹果');
+    descriptionLink.click();
+    expect(f.itemInfo.append).toHaveBeenCalledOnce(); expect(f.itemInfo.setItem).toHaveBeenLastCalledWith({ ITID: 501, IsIdentified: true });
+    const rewards = f.detailRoot.querySelector('.lastro-quest-rewards')!;
+    expect(rewards.textContent).toBe('苹果 × 3道具 × 2');
+    rewards.querySelector<HTMLButtonElement>('[data-item-id="502"]')!.click();
+    expect(f.itemInfo.append).toHaveBeenCalledTimes(2); expect(f.itemInfo.setItem).toHaveBeenLastCalledWith({ ITID: 502, IsIdentified: true });
+    expect(f.requestRoute).not.toHaveBeenCalled(); expect(f.network.sendPacket).not.toHaveBeenCalled();
+  });
+
+  it.each([false, true])('keeps item names as text, rejects malformed ITEM IDs, and tolerates unavailable reward data (renew=%s)', renew => {
+    const f = fixture(renew), value = f.value();
+    value.description = '<ITEM>零<INFO>0</INFO></ITEM> <ITEM>负数<INFO>-1</INFO></ITEM> <ITEM>指数<INFO>1e3</INFO></ITEM> <ITEM>混合<INFO>501x</INFO></ITEM> <ITEM>过大<INFO>4294967296</INFO></ITEM>';
+    value.reward_item_list = [{ ItemID: 501, ItemNum: 3 }, { ItemID: 502, ItemNum: 2 }, { ItemID: 0, ItemNum: 1 }];
+    f.getItemInfo.mockImplementation(id => {
+      if (id === 502) throw new Error('Item DB unavailable');
+      return { identifiedDisplayName: '<img src=x onerror=evil()>苹果', identifiedResourceName: 'apple' };
+    });
+    f.quest.setQuestList({ 7: value }); f.helper.setQuestInfo(value);
+    expect(f.detailRoot.querySelector('.lastro-quest-description .item-link')).toBeNull();
+    expect(content(f.detailRoot)).toContain('零 负数 指数 混合 过大');
+    expect(f.detailRoot.querySelectorAll('.lastro-quest-rewards .item-link')).toHaveLength(2);
+    expect(f.detailRoot.querySelector('[data-item-id="501"]')?.textContent).toBe('<img src=x onerror=evil()>苹果');
+    expect(f.detailRoot.querySelector('[data-item-id="502"]')?.textContent).toBe('道具 #502');
+    expect(f.detailRoot.querySelector('img,script,[onerror]')).toBeNull(); expect(f.itemInfo.setItem).not.toHaveBeenCalled();
+  });
+
   it.each([false, true])('does not insert executable HTML from titles, descriptions, target names, or rewards (renew=%s)', renew => {
     const f = fixture(renew), value = f.value(); value.title = '<img src=x onerror=evil()>任务'; value.description = '<script>evil()</script>正文';
     value.hunt_list![21]!.mobName = '<img src=x>波利'; value.reward_item_list = [{ ItemID: 501, ItemNum: 1 }];

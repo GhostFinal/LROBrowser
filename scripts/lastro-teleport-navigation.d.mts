@@ -9,6 +9,8 @@ export function createLastroTeleportNavigation(deps: {
   getPosition: () => readonly number[] | null | undefined;
   sendTeleport: (point: TeleportNavigationPoint) => void;
   navigate: (point: TeleportNavigationPoint) => void;
+  /** Clear native navigation so a finished or failed route cannot keep walking. */
+  stopNavigation?: () => void;
   setStatus?: (message: string) => void;
   clock?: {
     setTimeout: (callback: () => void, milliseconds: number) => unknown;

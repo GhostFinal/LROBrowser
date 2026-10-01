@@ -1,10 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { validateMapBinary } from '../src/resources/map-binary-validation';
+import { patchRuntimeToolsPanels } from '../scripts/patch-v2-runtime.mjs';
 import { mapBinaryFixture } from './map-binary-fixture';
 
 const { buildPrivateAirshipRequest } = await import(new URL('../vendor/v2/lastro-v1-migration.mjs', import.meta.url).href);
-const runtime = readFileSync('generated/runtime/Online.js', 'utf8');
+const runtime = patchRuntimeToolsPanels(readFileSync('vendor/v2/Online.js', 'utf8'));
 const begin = runtime.indexOf('const lastroSendRouteTeleport =');
 const end = runtime.indexOf('(function installLastroToolsPanels', begin);
 if (begin < 0 || end < begin) throw new Error('Missing prepared teleport runtime');
@@ -45,13 +46,14 @@ function fixture(files = resources(), aliases: Record<string, string> = {}) {
     const complete = () => callback(files[input.filename] ?? null, files[input.filename] ? undefined : 'http-404');
     if (autoComplete) queueMicrotask(complete); else pending.push(complete);
   } };
-  const exposed = new Function('Thread', 'MapRenderer', 'SessionStorage_default', 'PACKET', 'Network', 'Configs', 'Navigation_default', 'LastROTools', 'normalizeLastROTeleportMap', 'buildPrivateAirshipRequest', 'DB', 'console', `
+  const worldMap = { _lastroTeleport: { cancelPending: vi.fn() } };
+  const exposed = new Function('Thread', 'MapRenderer', 'SessionStorage_default', 'PACKET', 'Network', 'Configs', 'Navigation_default', 'LastROTools', 'normalizeLastROTeleportMap', 'buildPrivateAirshipRequest', 'DB', 'console', 'WorldMap_default', `
     ${installation}
     return { api: lastroVerifiedRouteRequest, routeNavigation: lastroRouteNavigation };
   `)(thread, mapRenderer, { Entity: actor }, { CZ: { PRIVATE_AIRSHIP_REQUEST: class {} } },
     { sendPacket: (packet: unknown) => { events.push('packet'); packets.push(packet); } }, { get: () => 5 }, navigation, tools,
-    (value: string) => value.replace(/\.gat$/i, ''), buildPrivateAirshipRequest, { mapalias: aliases }, { warn: () => {} });
-  return { ...exposed, mapRenderer, actor, navigation, packets, events, pending, tools, setManual: () => { autoComplete = false; } };
+    (value: string) => value.replace(/\.gat$/i, ''), buildPrivateAirshipRequest, { mapalias: aliases }, { warn: () => {} }, worldMap);
+  return { ...exposed, mapRenderer, actor, navigation, packets, events, pending, tools, worldMap, setManual: () => { autoComplete = false; } };
 }
 
 beforeEach(() => vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }));

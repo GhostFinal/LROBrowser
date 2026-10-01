@@ -62,7 +62,7 @@ interface NativeApi {
 }
 const frames: HTMLIFrameElement[] = [];
 afterEach(() => { frames.splice(0).forEach(frame => frame.remove()); });
-function fixture(options: { patched?: boolean; preferences?: Record<string, unknown> } = {}) {
+function fixture(options: { patched?: boolean; preferences?: Record<string, unknown>; nid?: number } = {}) {
   const frame = document.createElement('iframe'); document.body.append(frame); frames.push(frame);
   const win = frame.contentWindow as Window & typeof globalThis, doc = win.document;
   const calls = vi.fn(), commands = vi.fn(), height = vi.fn(), submit = vi.fn(), saved = vi.fn();
@@ -77,6 +77,7 @@ function fixture(options: { patched?: boolean; preferences?: Record<string, unkn
   const context = vm.createContext({
     window: win, document: doc, console, Object, Number, parseInt, Array,
     getComputedStyle: win.getComputedStyle.bind(win), Renderer: { width: 800, height: 600 },
+    Configs: { get: (name: string, fallback?: unknown) => name === 'lastroNid' ? options.nid ?? 3 : fallback },
     DB: { getMessage: () => '输入数量', formatMsgToHtml: (value: string) => value },
     ShortCutOption_default$1: '', _root$18: () => chatRoot, ChatBox: chat,
     _historyMessage: { previous: () => '上一条', next: () => '下一条' },

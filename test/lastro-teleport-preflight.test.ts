@@ -110,11 +110,11 @@ describe('teleport resource preflight', () => {
   });
 
   it('normalizes .gat and ASCII case while retaining the complete instance map name', async () => {
-    const check = fixture({ 'data/123#1@abc-test.rsw': rsw() });
+    const check = fixture({ 'data/1@abc-test.rsw': rsw() });
     const input = { path: [[' 123#1@ABC-Test.GAT ', 0, 0]] };
     await expect(check.check(input)).resolves.toMatchObject({ maps: [{ mapname: '123#1@abc-test' }] });
     expect(input.path[0]![0]).toBe(' 123#1@ABC-Test.GAT ');
-    expect(check.loadFile).toHaveBeenCalledWith('data/123#1@abc-test.rsw');
+    expect(check.loadFile).toHaveBeenCalledWith('data/1@abc-test.rsw');
   });
 
   it('accepts exactly 16 map characters, and coordinates at the 16-bit maximum when the GAT permits them', async () => {

@@ -60,7 +60,7 @@ export function createLastroSoundTiming({ now, wallNow, available }) {
 function installLastroTimedWebAudio({ timingFactory, AudioContextCtor, registerContext, fetchAudio, document, host, now, wallNow, soundEnabled }) {
   const stateKey = '__lastroWebAudio';
   if (host[stateKey]) return host[stateKey];
-  let context, unlocked = false, bgm = null, bgmGeneration = 0;
+  let context, unlocked = false, bgm = null, bgmGeneration = 0, bgmVolume = 1;
   const buffers = new Map(), bgmPositions = new Map(), activeSounds = new Map();
   const timing = timingFactory({ now, wallNow, available: () => !document.hidden && context?.state === 'running' && soundEnabled() });
 
@@ -103,13 +103,14 @@ function installLastroTimedWebAudio({ timingFactory, AudioContextCtor, registerC
     return offset;
   };
   const playBgm = async (filename, url, volume, requestedOffset = 0) => {
+    bgmVolume = Math.max(0, Math.min(1, volume));
     const generation = ++bgmGeneration, buffer = await decode('bgm:' + filename, url);
     if (generation !== bgmGeneration || bgm?.filename === filename) return;
     stopBgm();
     const ctx = getContext(), source = ctx.createBufferSource(), gain = ctx.createGain();
     const offset = bgmPositions.get(filename) ?? requestedOffset;
     source.buffer = buffer; source.loop = true; source.connect(gain); gain.connect(ctx.destination);
-    gain.gain.value = Math.max(0, Math.min(1, volume)); source.start(0, offset);
+    gain.gain.value = bgmVolume; source.start(0, offset);
     bgm = { filename, source, gain, buffer, offset, startedAt: ctx.currentTime };
   };
   const requestSound = (filename, dueTick) => {
@@ -152,7 +153,10 @@ function installLastroTimedWebAudio({ timingFactory, AudioContextCtor, registerC
       for (const item of [...entry]) { disconnect(item.source); item.finish(); }
     }
   };
-  const setBgmVolume = volume => { if (bgm) bgm.gain.gain.value = Math.max(0, Math.min(1, volume)); };
+  const setBgmVolume = volume => {
+    bgmVolume = Math.max(0, Math.min(1, volume));
+    if (bgm) bgm.gain.gain.value = bgmVolume;
+  };
   const setSoundVolume = volume => {
     for (const entry of activeSounds.values()) for (const item of entry) item.gain.gain.value = Math.max(0, Math.min(1, item.baseVolume * volume));
   };

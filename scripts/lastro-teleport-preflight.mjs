@@ -193,7 +193,11 @@ export function createLastroTeleportPreflight({ loadFile, getMap }) {
       const maps = [];
       const names = new Set(points.map((point) => point.mapname));
       for (const name of names) {
-        const rsw = `data/${name}.rsw`;
+        // MapRenderer.setMap removes instance prefixes before loading the scene.
+        // Keep the full server ID in points and approval; only resource names use
+        // the same physical map name as the native scene loader.
+        const resourceMap = name.replace(/^(\d{3})(\d@)/, '$2').replace(/^\d{3}#/, '');
+        const rsw = `data/${resourceMap}.rsw`;
         const { gnd, gat } = rswReferences(await read(rsw), rsw);
         const [ground, altitude] = await Promise.all([read(gnd), read(gat)]);
         const groundSize = dimensions(ground, 'GRGN', gnd);
