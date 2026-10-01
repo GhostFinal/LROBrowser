@@ -4,7 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { auditRuntimeSource } from './audit-runtime-code.mjs';
 
-const ALLOWED_ORIGINS = new Set(['https://game.lastro.cn', 'https://rodata.ltsd.ro']);
+const ALLOWED_ORIGINS = new Set(['https://game.lastro.cn', 'https://rodata.ltsd.ro', 'https://ltsd.ro']);
 const NON_RESOURCE_ORIGINS = new Set(['http://www.w3.org']);
 const REQUIRED_HEADERS = {
   'Content-Security-Policy': "script-src 'self' 'wasm-unsafe-eval'",
@@ -78,6 +78,7 @@ export async function auditDist(distDirectory, reportPath = path.resolve('releas
   if (relativeFiles.some((file) => file.endsWith('.map'))) throw new Error('source maps are not allowed in the IWA bundle');
 
   const originSet = new Set();
+  const navigationOrigins = new Set();
   const prohibitedResults = [];
   const bytesByCategory = {};
   let totalBytes = 0;
@@ -90,7 +91,14 @@ export async function auditDist(distDirectory, reportPath = path.resolve('releas
     if (!/\.(?:js|mjs|cjs|html|json|css|webmanifest)$/i.test(relative)) continue;
     const source = bytes.toString('utf8');
     if (relative !== '.well-known/manifest.webmanifest') {
-      for (const origin of originReferences(source)) originSet.add(origin);
+      const navigationOnly = /^(?:core\/)?runtime\/lro-reference-links\.mjs$/.test(relative);
+      if (navigationOnly && /\bfetch\s*\(|XMLHttpRequest|WebSocket|\.src\s*=|import\s*\(/.test(source)) {
+        throw new Error('navigation helper must not load remote resources');
+      }
+      for (const origin of originReferences(source)) {
+        if (navigationOnly && ['https://ro.dvg.cn', 'https://ro.ro321.com'].includes(origin)) navigationOrigins.add(origin);
+        else originSet.add(origin);
+      }
     }
     for (const [name, pattern] of PROHIBITED_TEXT) {
       if (pattern.test(source)) prohibitedResults.push({ file: relative, name });
@@ -111,6 +119,7 @@ export async function auditDist(distDirectory, reportPath = path.resolve('releas
     fileCount: files.length,
     totalBytes,
     bytesByCategory,
+    navigationOrigins: [...navigationOrigins],
     externalOrigins: [...originSet].filter((origin) => ALLOWED_ORIGINS.has(origin)),
     coreManifestSummary: { fileCount: coreManifest.files.length, packagedBytes: coreManifest.bytes },
     prohibitedPatternResults: [],

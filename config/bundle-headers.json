@@ -1,5 +1,5 @@
 {
-  "Content-Security-Policy": "script-src 'self' 'wasm-unsafe-eval'",
+  "Content-Security-Policy": "script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' https://game.lastro.cn https://rodata.ltsd.ro https://ltsd.ro",
   "Cross-Origin-Opener-Policy": "same-origin",
   "Cross-Origin-Embedder-Policy": "require-corp",
   "Cross-Origin-Resource-Policy": "same-origin"

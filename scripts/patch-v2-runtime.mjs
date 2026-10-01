@@ -1,3 +1,4 @@
+import { patchLroAssistantRuntime } from './patch-lro-assistant.mjs';
 import { createHash } from 'node:crypto';
 import { Buffer } from 'node:buffer';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -706,7 +707,7 @@ export function patchAchievementClaimButton(source) {
   return source;
 }
 
-export function patchV2Runtime(source) {
+export function patchV2Runtime(source, { assistant = false } = {}) {
   if (!source.startsWith('import ')) fail('anchor:runtime-imports');
   const normalizedSource = source.replace(/\r\n/g, '\n');
   let output = `import { decorateLastROLoginTemplate, decorateLastROLoginStyles, installLastROLogin } from "./lastro-account-login.mjs";
@@ -916,7 +917,8 @@ ${normalizedSource}`;
   ]);
   output = patchRuntimeTypography(output);
   if (/new WebSocket|wss?:\/\/|socketProxy|electronAPI|NodeSocket/i.test(output)) fail('legacy-transport');
-  return patchTrustedTypesDomWrites(output);
+  const patched = patchTrustedTypesDomWrites(output);
+  return assistant ? patchLroAssistantRuntime(patched) : patched;
 }
 
 async function main() {
@@ -926,7 +928,7 @@ async function main() {
   if (!values.input || !values.output || !values.manifest || !path.isAbsolute(values.input)
     || !path.isAbsolute(values.output) || !path.isAbsolute(values.manifest)) fail('absolute-path-required');
   const input = await readFile(values.input);
-  const output = Buffer.from(patchV2Runtime(input.toString('utf8')));
+  const output = Buffer.from(patchV2Runtime(input.toString('utf8'), { assistant: true }));
   await mkdir(path.dirname(values.output), { recursive: true });
   await writeFile(values.output, output);
   const manifest = {

@@ -1,7 +1,27 @@
 {
   "coreRoot": "vendor/core",
   "moduleRoot": "vendor/v2",
-  "runtimeFiles": ["src/runtime/lastro-account-login.mjs", "src/runtime/lastro-trusted-dom.mjs"],
+  "runtimeFiles": [
+    "src/runtime/lastro-account-login.mjs",
+    "src/runtime/lastro-trusted-dom.mjs",
+    "src/assistant/lro-assistant.mjs",
+    "src/assistant/lro-assistant-standard.mjs",
+    "src/assistant/lro-assistant-storage.mjs",
+    "src/assistant/lro-assistant-dom.mjs",
+    "src/assistant/lro-assistant-packets.mjs",
+    "src/assistant/lro-assistant-input.mjs",
+    "src/assistant/lro-assistant-target.mjs",
+    "src/assistant/lro-monster-reference.mjs",
+    "src/assistant/lro-assistant-shop.mjs",
+    "src/assistant/lro-assistant-ui.mjs",
+    "src/assistant/lro-assistant-windows.mjs",
+    "src/assistant/lro-assistant-theme.mjs",
+    "src/assistant/lro-assistant-icon.mjs",
+    "src/assistant/lro-assistant-features.mjs",
+    "src/assistant/lro-client-knowledge.mjs",
+    "src/assistant/lro-reference-links.mjs",
+    "src/assistant/lro-market-api.mjs"
+  ],
   "baseline": {
     "luaCount": 473,
     "luaBytes": 49723747,

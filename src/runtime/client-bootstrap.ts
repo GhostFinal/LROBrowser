@@ -5,6 +5,7 @@ import type { AvailableServerProfile } from '../servers/server-profile';
 import { buildClientConfig, type ClientCredentials, type V2ClientConfig } from './client-config';
 
 export interface BootstrapOptions {
+  assistantEnabled?: boolean;
   mount: HTMLElement;
   profile: AvailableServerProfile;
   credentials: ClientCredentials;
@@ -51,7 +52,7 @@ export async function bootstrapV2Client(options: BootstrapOptions): Promise<void
   if (!globalThis.LastRODirectSocketsSupported) {
     throw new Error('当前页面不支持 Direct TCP。请安装客户端并从 Chrome 的 IWA 应用入口打开，不要直接访问本地开发服务器地址。');
   }
-  globalThis.ROConfig = buildClientConfig(options.profile, options.credentials);
+  globalThis.ROConfig = buildClientConfig(options.profile, options.credentials, { assistantEnabled: options.assistantEnabled });
   globalThis.LastRODirectSocketFactory = options.socketFactory ?? createDirectSocket;
   globalThis.LastROLoginRegistration = (phase, nid, username, password) => {
     void sendLastROLoginPost(phase, nid, username, password).catch(() => undefined);
