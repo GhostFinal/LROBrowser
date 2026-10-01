@@ -1,4 +1,8 @@
 /** Validate the layouts consumed by the bundled GAT/GND/RSW parsers. */
+// Only the GND decoder's derived lightmap allocation is capped: one
+// 4096 x 4096 RGBA atlas. This is not a download limit for passive resources.
+const MAX_GND_LIGHTMAP_ATLAS_BYTES = 64 * 1024 * 1024;
+
 class MapReader {
   readonly view: DataView;
   offset = 0;
@@ -52,19 +56,34 @@ function validateGnd(reader: MapReader): void {
   reader.count(textures, textureNameSize);
   const lightmaps = reader.i32(), lightWidth = reader.i32(), lightHeight = reader.i32(), gridSize = reader.i32();
   if ([lightmaps, lightWidth, lightHeight, gridSize].some(value => value < 0)) reader.fail('invalid-lightmaps');
-  reader.count(lightmaps, lightWidth * lightHeight * gridSize * 4);
+  const pixelsPerLightmap = lightWidth * lightHeight * gridSize;
+  const lightmapStride = pixelsPerLightmap * 4;
+  // The native parser samples a fixed 8 x 8 block regardless of these fields.
+  // Zero/short strides must not allow a large count to consume no input bytes.
+  if (!Number.isSafeInteger(lightmapStride) || (lightmaps > 0 && pixelsPerLightmap < 64)) reader.fail('invalid-lightmaps');
+  reader.count(lightmaps, lightmapStride);
+  // Match createLightmapImage's power-of-two atlas, including square-root
+  // rounding. Its decoded allocation can exceed the input section's size.
+  if (lightmaps > 0) {
+    const atlasWidth = 2 ** Math.ceil(Math.log(8 * Math.round(Math.sqrt(lightmaps))) / Math.log(2));
+    const atlasHeight = 2 ** Math.ceil(Math.log(8 * Math.ceil(Math.sqrt(lightmaps))) / Math.log(2));
+    const atlasBytes = atlasWidth * atlasHeight * 4;
+    if (!Number.isSafeInteger(atlasBytes) || atlasBytes > MAX_GND_LIGHTMAP_ATLAS_BYTES) reader.fail('lightmap-atlas-memory-limit');
+  }
   const tiles = reader.u32();
   const tileStart = reader.offset;
   reader.count(tiles, 40);
-  // References are checked without allocating the worker's potentially large arrays.
-  for (let index = 0; index < tiles; index++) {
-    if (reader.view.getUint16(tileStart + index * 40 + 32, true) >= textures) reader.fail('invalid-texture-index');
-  }
+  // Check only tiles referenced by faces, without allocating the worker's
+  // arrays. Unused tile records need no valid texture/lightmap backing.
   const surfaceStart = reader.offset;
   reader.count(cells, 28);
   for (let index = 0; index < cells; index++) {
     for (let side = 0; side < 3; side++) {
-      if (reader.view.getInt32(surfaceStart + index * 28 + 16 + side * 4, true) >= tiles) reader.fail('invalid-tile-index');
+      const tile = reader.view.getInt32(surfaceStart + index * 28 + 16 + side * 4, true);
+      if (tile >= tiles) reader.fail('invalid-tile-index');
+      if (tile < 0) continue; // The native decoder omits all negative faces.
+      if (reader.view.getUint16(tileStart + tile * 40 + 32, true) >= textures) reader.fail('invalid-texture-index');
+      if (reader.view.getUint16(tileStart + tile * 40 + 34, true) >= lightmaps) reader.fail('invalid-lightmap-index');
     }
   }
   if (version >= 1.8) {

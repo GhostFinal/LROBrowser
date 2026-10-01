@@ -187,13 +187,25 @@ describe('equipment view patch boundaries', () => {
     expect(patchRuntimeEquipmentView(vendor)).toBe(vendor.slice(0, start) + patched + vendor.slice(end));
   });
 
-  it.each([
-    (source: string) => source.replace('function UpdateGeneric(type, func, fallback)', 'function UpdateGeneric(type, changed, fallback)'),
-    (source: string) => source.replace('let _val = val;', 'let _val = other;'),
-    (source: string) => source.replace('refreshHeadState.call(this);\r\n      }', 'refreshHeadState.call(this);\r\n        changed();\r\n      }'),
-    (source: string) => source + source,
-    () => patched,
-  ])('fails on changed, duplicate or already patched native anchors', change => {
-    expect(() => patchRuntimeEquipmentView(change(native))).toThrow('anchor:equipment-view');
+  const lineEndings = [{ name: 'LF', newline: '\n' }, { name: 'CRLF', newline: '\r\n' }];
+  it.each(lineEndings)('patches unchanged native anchors with $name line endings', ({ newline }) => {
+    const source = native.replace(/\r?\n/g, newline);
+    expect(patchRuntimeEquipmentView(source).replace(/\r\n/g, '\n')).toBe(patched.replace(/\r\n/g, '\n'));
+  });
+
+  describe.each(lineEndings)('with $name line endings', ({ newline }) => {
+    const source = native.replace(/\r?\n/g, newline);
+    it.each([
+      (input: string) => input.replace('function UpdateGeneric(type, func, fallback)', 'function UpdateGeneric(type, changed, fallback)'),
+      (input: string) => input.replace('let _val = val;', 'let _val = other;'),
+      (input: string) => input.replace(/refreshHeadState\.call\(this\);(\r?\n) {6}}/,
+        (_match, ending: string) => `refreshHeadState.call(this);${ending}        changed();${ending}      }`),
+      (input: string) => input + input,
+      () => patched,
+    ])('fails on changed, duplicate or already patched native anchors', change => {
+      const changed = change(source);
+      expect(changed).not.toBe(source);
+      expect(() => patchRuntimeEquipmentView(changed)).toThrow('anchor:equipment-view');
+    });
   });
 });

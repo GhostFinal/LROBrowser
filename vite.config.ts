@@ -72,5 +72,9 @@ export default defineConfig({
     fs: { strict: true, allow: [path.resolve('.')], deny: ['**/.env', '**/.env.*', '**/*.{crt,pem,key}', '**/.git/**', '**/.local/**', '**/.codex/**', '**/.agents/**', '**/.npmrc', '**/.netrc'] },
     headers: REQUIRED_HEADERS,
   },
-  test: { include: ['test/**/*.test.ts'] },
+  test: {
+    include: ['test/**/*.test.ts'],
+    // Runtime fixtures parse large bundled sources; keep their memory use bounded.
+    maxWorkers: 2,
+  },
 });

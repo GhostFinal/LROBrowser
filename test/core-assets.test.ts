@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { describe, expect, it, afterEach } from 'vitest';
 import { importCoreAssets } from '../scripts/import-core-assets.mjs';
@@ -51,7 +51,14 @@ describe('core executable asset importer', () => {
 
   it('rejects symlinked executable inputs', async () => {
     const f = await fixture();
-    await symlink(path.join(f.root, 'outside.lua'), path.join(f.core, 'data/luafiles514/lua files/sub/outside.lua'));
+    const directory = path.join(f.root, 'outside');
+    await mkdir(directory);
+    const file = path.join(directory, 'outside.lua');
+    await writeFile(file, 'return "synthetic-linked-executable"');
+    const link = path.join(f.core, 'data/luafiles514/lua files/sub/outside.lua');
+    // Windows junctions exercise the same rejection without symlink privileges.
+    await symlink(process.platform === 'win32' ? directory : file, link, process.platform === 'win32' ? 'junction' : 'file');
+    expect((await lstat(link)).isSymbolicLink()).toBe(true);
     await expect(importCoreAssets({ coreRoot: f.core, moduleRoot: f.modules, output: f.output })).rejects.toThrow(/symlink/);
   });
 
