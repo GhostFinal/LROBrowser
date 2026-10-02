@@ -1,3 +1,4 @@
+import { assistantDom } from './assistant-runtime-fixture';
 // @vitest-environment jsdom
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
@@ -111,7 +112,12 @@ describe('packaged native panels through the real HTML boundary', () => {
       function visit(node: ts.Node) {
         if (ts.isStringLiteralLike(node) && /^\s*<[a-z]/i.test(node.text) && node.text.includes('</')) {
           count++;
-          try { setLastROInnerHTML(document.createElement('div'), node.text); }
+          try {
+            const call = node.parent;
+            const assistantTemplate = ts.isCallExpression(call) && call.expression.getText(file) === 'setAssistantInnerHTML';
+            const render = assistantTemplate ? assistantDom.setAssistantInnerHTML : setLastROInnerHTML;
+            render(document.createElement('div'), node.text);
+          }
           catch (error) { rejected.push({ file: filename, line: file.getLineAndCharacterOfPosition(node.getStart(file)).line + 1, error: String(error) }); }
         }
         ts.forEachChild(node, visit);

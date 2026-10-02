@@ -3,7 +3,7 @@ import { createStandardAssistant } from './lro-assistant-standard.mjs';
 import { installAssistantInputTracking } from './lro-assistant-input.mjs';
 import { installMarketApi } from './lro-market-api.mjs';
 
-export const ASSISTANT_VERSION = '0.4.18';
+export const ASSISTANT_VERSION = '0.4.19';
 export const ASSISTANT_AUTHOR = '加藤惠';
 const installations = new WeakMap();
 

@@ -1,3 +1,4 @@
+import { assistantInput } from './assistant-runtime-fixture';
 // @vitest-environment jsdom
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -49,7 +50,7 @@ function mount() {
   const getComputedStyle = (element: Element) => ({
     display: (element as HTMLElement).style.display || win.getComputedStyle(element).display,
   });
-  const context = vm.createContext({ window: win, document: doc, Event: win.Event, getComputedStyle,
+  const context = vm.createContext({ ...assistantInput, window: win, document: doc, Event: win.Event, getComputedStyle,
     console, next, close, world, KEYS: { SPACE: 32, ENTER: 13, ESCAPE: 27, getDeepActiveElement: () => {
       let active = doc.activeElement;
       while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;

@@ -76,11 +76,20 @@ if (globalThis.ROConfig?.lroAssistantEnabled === true) {
 
 export function patchLroAssistantRuntime(source) {
   if (source.includes('const lroAssistantPackets =')) throw new Error('Assistant patch already applied');
-  const callback = 'if (packet.callback) packet.callback(packet.instance);';
-  if (source.split(callback).length !== 2) throw new Error('Assistant packet dispatch anchor changed');
-  source = source.replace(callback, `lroAssistantPackets.emit(packet.Struct, packet.instance, 'before');
-          try { if (packet.callback) packet.callback(packet.instance); }
-          finally { lroAssistantPackets.emit(packet.Struct, packet.instance, 'after'); }`);
+  const dispatchFile = ts.createSourceFile('dispatch.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const callbacks = [];
+  function findDispatch(node) {
+    if (ts.isIfStatement(node) && node.expression.getText(dispatchFile) === 'packet.callback'
+      && node.thenStatement.getText(dispatchFile).includes('packet.callback(packet.instance);')) callbacks.push(node);
+    ts.forEachChild(node, findDispatch);
+  }
+  findDispatch(dispatchFile);
+  if (callbacks.length !== 1) throw new Error('Assistant packet dispatch anchor changed');
+  const dispatch = callbacks[0];
+  // Keep the upstream diagnostic catch/rethrow intact inside the observer pair.
+  source = source.slice(0, dispatch.getStart(dispatchFile)) + `lroAssistantPackets.emit(packet.Struct, packet.instance, 'before');
+          try { ${dispatch.getText(dispatchFile)} }
+          finally { lroAssistantPackets.emit(packet.Struct, packet.instance, 'after'); }` + source.slice(dispatch.end);
   // Wrap native event registrations only; no prototype mutation and no changes
   // to assistant controls. Inserting tokens also preserves nested registrations.
   const parsed = ts.createSourceFile('Online.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
@@ -184,7 +193,7 @@ export function patchLroAssistantRuntime(source) {
   // cancellation, map/profile checks, or loading behavior.
   for (const [anchor, replacement] of [
     ['loadData: async () => {', 'loadData: WorldMap.lroLoadData = async () => {'],
-    ['teleport: mapname => {', 'teleport: WorldMap.lroTeleport = mapname => {'],
+    ['teleport: (mapname, label) => {', 'teleport: WorldMap.lroTeleport = (mapname, label) => {'],
   ]) {
     if (source.split(anchor).length !== 2) throw new Error('Native world map callback changed: ' + anchor);
     source = source.replace(anchor, replacement);

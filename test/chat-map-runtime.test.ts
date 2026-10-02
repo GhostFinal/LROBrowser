@@ -1,3 +1,4 @@
+import { assistantInput } from './assistant-runtime-fixture';
 // @vitest-environment jsdom
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
@@ -23,7 +24,7 @@ const showPromptBox = findNode(node => ts.isMethodDeclaration(node) && node.name
 const factory = findNode(node => ts.isVariableDeclaration(node) && node.name.getText(ast) === 'LastROChatMapLinks');
 const addText = findNode(node => ts.isBinaryExpression(node) && node.left.getText(ast) === 'ChatBox.addText');
 
-function mount(immediate = true, lastro = true) {
+function mount(immediate = true, lastro = true, currentMap = 'izlude.gat') {
   const host = document.createElement('div');
   host.innerHTML = '<div class="content" data-content="0"></div>';
   const content = host.firstElementChild as HTMLElement;
@@ -36,7 +37,7 @@ function mount(immediate = true, lastro = true) {
   const recovered = vi.fn();
   let popup: { _shadow: ShadowRoot; _host: HTMLElement; init?: () => void; onRemove?: () => void; draggable: () => void; append: () => void; remove: () => void };
   const ChatBox: Record<string, unknown> = { tabs: [{}], MAX_MSG: 400, TYPE: { SELF: 1, PUBLIC: 2, ANNOUNCE: 32 }, FILTER: { PUBLIC_CHAT: 1, PUBLIC_LOG: 0 } };
-  const context = {
+  const context = { ...assistantInput,
     document, crypto: globalThis.crypto, queueMicrotask, setLastROInnerHTML, ChatBox,
     _root$18: () => host,
     _messageBuffer: [], _rafScheduled: false, MAX_MSG: 400,
@@ -58,7 +59,7 @@ function mount(immediate = true, lastro = true) {
     PACKET: { CZ: { PRIVATE_AIRSHIP_REQUEST: class { mapname = ''; } } },
     buildPrivateAirshipRequest: (target: Record<string, unknown>) => ({ ...target, itemid: 14527 }),
     Network: { sendPacket: sent },
-    MapRenderer: { currentMap: 'izlude.gat', loading: false },
+    MapRenderer: { currentMap, loading: false },
     normalizeLastROTeleportMap: (map: string) => map.trim().replace(/\.gat$/i, '').toLowerCase(),
   };
   const nativeUI = runInNewContext(`${declaration('_createButton')}\nclass NativeUI { ${showPromptBox} }; NativeUI;`, context);
@@ -93,8 +94,20 @@ describe('packaged activity notification integration', () => {
     expect(f.popup()._shadow.querySelector('.text')?.textContent).toContain('force_map3（100, 184）');
     expect(f.sent).not.toHaveBeenCalled();
     f.button('ok').click();
-    expect(f.sent).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ mapname: 'force_map3', x: 100, y: 184, type: 0, itemid: 14527 }));
+    expect(f.sent).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ mapname: 'force_map3', x: 100, y: 184, type: 1, itemid: 14527 }));
     expect(f.popup()._host.isConnected).toBe(false);
+  });
+
+  it.each(['izlude#150#150#', 'izlude#150#150#0', 'izlude'])('renders an Izlude activity broadcast and confirms its native destination for %s', dataMap => {
+    const f = mount(true, true, 'prontera.gat');
+    f.runtime.onGlobalAnnounce({ msg: `[随机事件] 10秒后召唤师将在依斯鲁得岛举办魔物派对(<span class="mapname" data-map="${dataMap}">点击前往</span>).` });
+    expect(f.content.textContent).toBe('[随机事件] 10秒后召唤师将在依斯鲁得岛举办魔物派对(传送到活动地点).');
+    expect(f.announce.set).toHaveBeenCalledExactlyOnceWith('[随机事件] 10秒后召唤师将在依斯鲁得岛举办魔物派对(活动地点见聊天栏).', '#FFFF00');
+    expect(f.runtime.requestChatMapTeleport(f.content.querySelector('a.mapname'))).toBe(true);
+    expect(f.sent).not.toHaveBeenCalled();
+    f.button('ok').click();
+    const coordinate = dataMap === 'izlude' ? 0 : 150;
+    expect(f.sent).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ mapname: 'izlude', x: coordinate, y: coordinate, type: 1, itemid: 14527 }));
   });
 
   it('keeps item links beside activity links and cancels without sending', () => {
@@ -198,7 +211,7 @@ describe('packaged LastRO server-message packet routing', () => {
     expect(f.runtime.requestChatMapTeleport(f.content.querySelector('a.mapname'))).toBe(true);
     expect(f.sent).not.toHaveBeenCalled();
     f.button('ok').click();
-    expect(f.sent).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ mapname: 'force_map3', x: 100, y: 184, type: 0, itemid: 14527 }));
+    expect(f.sent).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ mapname: 'force_map3', x: 100, y: 184, type: 1, itemid: 14527 }));
     expect(f.recovered).not.toHaveBeenCalled();
     expect(f.playerDialog.set).toHaveBeenCalledExactlyOnceWith('下一条普通消息');
     expect(f.npcDialog.set).not.toHaveBeenCalled();

@@ -67,8 +67,8 @@ test('native world map data supplies monster maps and item drops without externa
     assert.equal(await bridge.get('UI/WorldMapActions').teleport('field'),false);
     assert.deepEqual(nativeCalls,['field']);assert.equal(prepared,2);
     assert.ok(source.includes('loadData: WorldMap.lroLoadData = async () => {'));
-    assert.ok(source.includes('teleport: WorldMap.lroTeleport = mapname => {'));
-    assert.ok(source.includes('return lastroWorldMapTeleport.request(mapname);'));
+    assert.ok(source.includes('teleport: WorldMap.lroTeleport = (mapname, label) => {'));
+    assert.ok(source.includes('return lastroWorldMapTeleport.request(mapname, label);'));
   }finally{f.cleanup();}
 });
 import { createAssistantTheme } from '../src/assistant/lro-assistant-theme.mjs';
@@ -233,6 +233,36 @@ test('standard UI mounts, preserves author, shows adaptation limits, and manual 
     app.partyBars.ensureWindow();assert.ok(app.partyBars.window);
     app.openAuthorMail();assert.match(app.shadow.querySelector('.support-mail-status').textContent,/请进入游戏/);
   }finally{f.cleanup();}
+});
+
+test('bounty bottom rows use the scroll viewport and capture tasks open monster lookup',()=>{
+  const f=fixture();
+  try {
+    const host=f.page.document.createElement('div'); host.id='NpcMenu';
+    const root=host.attachShadow({mode:'open'}); f.page.document.body.append(host);
+    root.innerHTML='<div class="middle" style="overflow-y:scroll"><div class="content"><div data-index="0">[收集] - 艾丽斯的围裙★★</div><div data-index="1">[收集] - 捕捉米杜拉魔物★★★</div><div data-index="2">刷新个人任务</div></div></div>';
+    const box=(top,bottom)=>({top,bottom,left:20,right:280,width:260,height:bottom-top});
+    root.querySelector('.middle').getBoundingClientRect=()=>box(40,140);
+    root.querySelector('.content').getBoundingClientRect=()=>box(-20,60);
+    const rows=root.querySelectorAll('[data-index]');
+    rows.forEach((row,i)=>{row.getBoundingClientRect=()=>box(70+i*20,90+i*20);});
+    f.members.set('UI/Components/NpcMenu/NpcMenu',{getRoot:()=>root});
+    const app=createStandardAssistant({page:f.page,modules:f.members,storage:f.storage,subscribePackets:f.bus.subscribe});
+    app.settings.bountyEnabled=true; app.syncBountyTaskButtons();
+    assert.equal(app.bountyOverlayButtons.size,2);
+    const item=app.bountyOverlayButtons.get(rows[0]).button;
+    const monster=app.bountyOverlayButtons.get(rows[1]).button;
+    assert.equal(item.style.display,'block'); assert.equal(monster.style.display,'block');
+    assert.equal(item.textContent,'搜商店'); assert.equal(monster.textContent,'查怪物');
+    let searched,lookedUp;
+    app.searchBountyItem=name=>{searched=name;}; app.openBountyMonster=name=>{lookedUp=name;};
+    item.click(); monster.click();
+    assert.equal(searched,'艾丽斯的围裙'); assert.equal(lookedUp,'米杜拉');
+    rows[0].getBoundingClientRect=()=>box(10,30);
+    app.syncBountyOverlayPositions(); assert.equal(item.style.display,'none');
+    assert.equal(monster.style.display,'block');
+    host.remove(); app.syncBountyOverlayPositions(); assert.equal(monster.style.display,'none');
+  } finally {f.cleanup();}
 });
 
 test('disabled integration has no effects',async()=>{
